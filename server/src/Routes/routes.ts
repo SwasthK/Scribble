@@ -18,6 +18,14 @@ import { deleteBlog } from '../Controllers/DeleteBlog_Controller'
 import { get_Blog_bulk } from '../Controllers/Bulk_Blog'
 import { getBlogContent } from '../Controllers/GetBlogContent'
 
+
+//Notification Route handlers
+import {
+    createUserNotifications,
+    getUserNotifications,
+    markNotificationAsRead
+} from '../Controllers/Notification/user_Notification_Controller'
+
 //MiddlwWare
 import { authMiddleware } from '../Middleware/Auth'
 import { findActiveUser } from '../Middleware/findActiveUser'
@@ -46,6 +54,11 @@ api
     .delete('profile/:id/unfollow', authMiddleware, findActiveUser, UnFollowUser)
     .get('/profile/getFollowersDetails', authMiddleware, findActiveUser, getFollowersDetails)
     .get('/profile/getFollowingsDetails', authMiddleware, findActiveUser, getFollowingsDetails)
+
+    //Notification Routes
+    .post('/notification/createUserNotifications', authMiddleware, findActiveUser, createUserNotifications)
+    .get('/notification/getUserNotifications', authMiddleware, findActiveUser, getUserNotifications)
+    .put('/notification/markNotificationAsRead/:id', authMiddleware, findActiveUser, markNotificationAsRead)
 
     //Blog Routes
     .post('/blog', blog)

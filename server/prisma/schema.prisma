@@ -17,12 +17,30 @@ model User {
   role                  Role           @default(USER)
   followers             Follower[]     @relation("UserFollowers")
   following             Follower[]     @relation("UserFollowing")
+  posts                 Post[]         @relation("UserPosts")
+  likes                 Like[]
   notifications         Notification[]
+  savedBlog             SavedBlog[]    @relation("UserSavedBlogs")
+  comments              Comment[]      @relation("UserComments")
+  PostReport            PostReport[]
+  socials               Social[]
   isActive              Boolean        @default(true)
   createdAt             DateTime       @default(now())
   updatedAt             DateTime       @updatedAt
   refreshToken          String?
   refreshTokenExpiresAt DateTime?
+}
+
+model Social {
+  id        String   @id @default(uuid())
+  platform  String
+  url       String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([platform, userId])
 }
 
 model Follower {
@@ -46,6 +64,119 @@ model Notification {
   updatedAt DateTime         @updatedAt
 }
 
+model Post {
+  id            String       @id @default(uuid())
+  coverImage    String?
+  title         String
+  shortCaption  String?
+  slug          String       @unique
+  body          String
+  summary       String?
+  author        User         @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId      String
+  likes         Like[]
+  multiMedias   MultiMedia[] @relation("PostMultimedia")
+  savedBy       SavedBlog[]  @relation("PostSavedBlog")
+  revisions     Revision[]   @relation("UserRevision")
+  categories    Category[]   @relation("PostCategories")
+  tags          Tag[]        @relation("PostTags")
+  comments      Comment[]    @relation("PostComments")
+  reports       PostReport[] @relation("PostReports")
+  allowComments Boolean      @default(true)
+  status        PostStatus   @default(DRAFT)
+  publishedAt   DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([slug])
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MultiMedia {
+  id         String    @id @default(uuid())
+  caption    String?
+  altText    String?
+  url        String
+  type       MediaType
+  post       Post?     @relation("PostMultimedia", fields: [postId], references: [id], onDelete: Cascade)
+  postId     String?
+  uploadedAt DateTime  @default(now())
+}
+
+model SavedBlog {
+  id        String   @id @default(uuid())
+  user      User     @relation("UserSavedBlogs", fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  Post      Post     @relation("PostSavedBlog", fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  createdAt DateTime @default(now())
+}
+
+model Revision {
+  id        String   @id @default(uuid())
+  Post      Post     @relation("UserRevision", fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  content   Json
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  posts     Post[]   @relation("PostCategories")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  posts     Post[]   @relation("PostTags")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  content   String
+  author    User      @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  post      Post      @relation("PostComments", fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  parent    Comment?  @relation("ParentComment", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId  String?
+  replies   Comment[] @relation("ParentComment")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model PostReport {
+  id        String         @id @default(uuid())
+  post      Post           @relation("PostReports", fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  type      PostReportType
+  reason    String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
 enum Role {
   USER
   ADMIN
@@ -58,4 +189,30 @@ enum NotificationType {
   WARNING
   ERROR
   SUCCESS
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+}
+
+enum PostReportType {
+  SPAM
+  INAPPROPRIATE
+  HARASSMENT
+  MISINFORMATION
+  COPYRIGHT_VIOLATION
+  HATE_SPEECH
+  VIOLENCE
+  SELF_HARM
+  ILLEGAL_ACTIVITY
+  OTHER
 }

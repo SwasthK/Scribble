@@ -79,3 +79,17 @@ export const updateUserPasswordSchema = z.object({
     .refine(value => value.oldPassword !== value.newPassword, {
         message: "Old password and new password cannot be same"
     })
+
+export const createUserNotificationsSchema = z.object({
+    type: z.enum(["INFO", "WARNING", "ERROR", "SUCCESS"], { message: "Invalid notification type" }),
+    title: z.string({ required_error: "Title is required", invalid_type_error: "Title must be a string" })
+        .min(5, { message: "Title must be at least 5 characters long" })
+        .max(50, { message: "Title must be at most 50 characters long" }),
+    body: z.string({ required_error: "Body is required", invalid_type_error: "Body must be a string" })
+        .min(10, { message: "Body must be at least 5 characters long" })
+        .max(200, {
+            message: "Body must be at most 200 characters long"
+        })
+});
+
+export const markNotificationAsReadSchema = z.string().uuid({ message: "Invalid notification ID" });
