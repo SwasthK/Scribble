@@ -19,4 +19,5 @@ export async function dbConnect(c: Context<{ Bindings: { DATABASE_URL: string, J
         Log('Database', 'Connection Failed,', `Error: ${error.message}`);
         return apiError(c, 500, 'Internal Server Error');
     }
+    
 }
