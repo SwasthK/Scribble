@@ -1,23 +1,37 @@
 import { Context } from "hono";
 import { Log } from "../../utils/log";
 import { dbConnect } from "../../Connection/db.connect";
-import { ServerSignupSchema } from "@swasthik/medium-common-types";
 import { apiError } from "../../utils/apiError";
 import { apiResponse } from "../../utils/apiResponse";
 import { accessToken, verifyTokens, generateAccessAndRefreshToken } from "../../utils/jwt";
-import { ServerSignin } from "../../Zod/zod";
+import { ServerSignin, ServerSignup } from "../../Zod/zod";
+import { fileUploadMessage } from "../../Middleware/cloudinary";
 
 export async function signup(c: Context) {
 
-    const body = await c.req.json();
     try {
-        const response = ServerSignupSchema.safeParse(body)
 
-        if (!response.success) {
-            return apiError(c, 400, response.error.errors[0].message)
+        const message = c.get('fileUploadMessage');
+        const fileHandle: Record<string, any> = {};
+
+        switch (message) {
+            case fileUploadMessage.TYPEERROR:
+                return apiError(c, 400, "Invalid file type");
+
+            case fileUploadMessage.NOFILE:
+                fileHandle.noFile = true;
+                break;
+
+            case fileUploadMessage.SUCCESS:
+                fileHandle.success = true;
+                break;
+
+            default:
+                fileHandle.error = true;
+                break;
         }
 
-        const { username, email, password } = response.data;
+        const { username, email, password, role } = c.get('signupData')
 
         const prisma: any = await dbConnect(c);
 
@@ -34,15 +48,21 @@ export async function signup(c: Context) {
             return apiError(c, 400, "Username or Email already exists")
         }
 
-        // // const hashedPassword = await bcrypt.hash(password, 10);
+        const avatarUrl = fileHandle.success ?
+            c.get('fileUploadResponse').secure_url || `https://ui-avatars.com/api/?name=${username}&background=random&bold=true`
+            :
+            `https://ui-avatars.com/api/?name=${username}&background=random&bold=true`;
+
+        const avatarPublicId = fileHandle.success ? c.get('fileUploadResponse').public_id : null;
 
         const InsertData = await prisma.user.create({
             data: {
                 username,
                 email,
                 password,
-                avatarUrl: `https://ui-avatars.com/api/?name=${username}&background=random&bold=true` || 'N/A',
-                role: body.role || 'USER'
+                avatarUrl,
+                avatarPublicId,
+                role: role ?? 'USER'
             }
         })
 
@@ -55,7 +75,7 @@ export async function signup(c: Context) {
             return apiError(c, 400, "Failed to create an account")
         }
 
-        return apiResponse(c, 200, Token.data, "Account Created Successully", { accessToken: Token.aToken, refreshToken: Token.rToken },)
+        return apiResponse(c, 200, Token.data, "Account Created Successully", { fileHandle, accessToken: Token.aToken, refreshToken: Token.rToken },)
 
     } catch (error: any) {
         Log('Signup Controller', `ERROR:${error.message}`)

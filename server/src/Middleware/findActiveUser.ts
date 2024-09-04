@@ -1,6 +1,5 @@
 import { Context, Next } from "hono";
 import { dbConnect } from "../Connection/db.connect";
-import { apiResponse } from "../utils/apiResponse";
 
 export async function findActiveUser(c: Context, next: Next) {
     try {
