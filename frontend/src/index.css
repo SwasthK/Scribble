@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background-color: #212121;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+::selection {
+  background-color: rgba(255, 241, 39, 0.129);
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  /* Ensures words break and don't cause overflow */
+}
+
+.input-style {
+  @apply bg-cdark-200 px-4 py-3 outline-none rounded-lg border-2 font-medium transition-colors duration-100 border-solid focus:border-[#596A95] border-[#2B3040];
+}
+
+.error {
+  color: red;
+}
+
+.btn {
+  @apply bg-custom-gradient-1 hover:bg-custom-gradient-2 transition-colors duration-300 ease-in-out border-solid hover:cursor-pointer hover:border-[#596A95] border-[#2B3040] border-2;
+}
+
+.menuItems {
+  @apply flex gap-5 px-4 pr-20 py-[0.6rem] rounded-lg transition-colors duration-300 ease-in-out hover:bg-[#22262D] hover:cursor-pointer;
+}
+
+
+.bg-gradient-1 {
+  background: linear-gradient(135deg, rgba(30, 30, 30, 1) 0%, rgba(50, 50, 50, 1) 50%, rgba(30, 30, 30, 1) 100%);
+  background-size: 200% 200%;
+}
+
+
+.backdrop-blur-md {
+  backdrop-filter: blur(10px);
+}
+
+.bg-op {
+  background-color: rgba(22, 22, 22, 0.7);
+  /* Adjust the opacity as needed */
+}
+
+.hover\:bg-opacity-80:hover {
+  background-color: rgba(22, 22, 22, 0.8);
+  /* Darkens on hover */
+}
+
+.skeleton-parent {
+  @apply bg-[#3B3B3B] relative overflow-hidden;
+}
+
+.skeleton-child {
+  @apply bg-gradient-to-r from-transparent via-[#555151] to-transparent animate-shimmer;
+}
+
+
+.gr {
+  background: #22c1c3;
+  background: -webkit-linear-gradient(to right, #fdbb2d, #22c1c3);
+  background: linear-gradient(to right, #fdbb2d, #22c1c3);
+  transition: all 5s ease-in-out;
+}
+
+.gr:hover {
+  background: #22c1c3;
+  background: -webkit-linear-gradient(to right, #ebb237, #18a7aa);
+  background: linear-gradient(to right, #f3b228, #04eff3);
+}
+
+.card-user-profile-blog {
+  background-color: rgb(7 16 45);
+  background: linear-gradient(to top right, rgb(7 16 45), rgb(58 60 84));
+  background: -webkit-linear-gradient(to top right, rgb(7 16 45), rgb(58 60 84));
+}
+
+
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.item {
+  border-radius: 0.5rem;
+  flex: 1;
+  overflow: hidden;
+}
+
+.item.bordered {
+  border: 1px solid gray;
+}
+
+.item pre {
+  border-radius: 0.5rem;
+  height: 100%;
+  overflow: auto;
+  padding-block: 1rem;
+  padding-inline: 54px;
+  width: 100%;
+  white-space: pre-wrap;
+}
+
+p.bn-inline-content {
+  @apply text-base sm:text-lg
+}
+
+p.bn-inline-content>code {
+  font-family: "Courier New", Courier, monospace;
+  @apply text-sm sm:text-base font-semibold bg-[#f5f5f5] text-[#0f0e0e] px-[5px] py-[4px] rounded-md;
+}
+
+h1.bn-inline-content {
+  @apply text-[2rem] sm:text-[2.5rem]
+}
+
+h2.bn-inline-content {
+  @apply text-[1.6rem] sm:text-[2rem]
+}
+
+h3.bn-inline-content {
+  @apply text-[1.3rem] sm:text-[1.47rem]
+}
+
+.bn-container[data-theming-css-variables-demo][data-color-scheme="dark"] {
+  --bn-colors-editor-background: #212121;
+}
