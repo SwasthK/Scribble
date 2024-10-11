@@ -75,7 +75,7 @@ export async function signup(c: Context) {
             return apiError(c, 400, "Failed to create an account")
         }
 
-        return apiResponse(c, 200, Token.data, "Account Created Successully", { fileHandle, accessToken: Token.aToken, refreshToken: Token.rToken },)
+        return apiResponse(c, 200, Token.data, "Account Created Successully", { fileHandle, accessToken: Token.aToken, refreshToken: Token.rToken })
 
     } catch (error: any) {
         Log('Signup Controller', `ERROR:${error.message}`)
@@ -119,7 +119,17 @@ export async function signin(c: Context) {
             return apiError(c, 400, "Failed to login")
         }
 
-        return apiResponse(c, 200, Token.data, "Login Successfull", { accessToken: Token.aToken, refreshToken: Token.rToken },)
+        return apiResponse(c, 200, Token.data, "Login Successfull", {
+            accessToken: Token.aToken, refreshToken: Token.rToken,
+            user: {
+                id: existingUser.id,
+                username: existingUser.username,
+                email: existingUser.email,
+                avatarUrl: existingUser.avatarUrl,
+                bio: existingUser.bio,
+                createdAt: existingUser.createdAt
+            }
+        },)
 
     } catch (error: any) {
         Log('Signin Controller', `ERROR:${error.message}`)
@@ -130,6 +140,7 @@ export async function signin(c: Context) {
 export async function logout(c: Context) {
     try {
         const user = c.get('user');
+        console.log(user);
 
         const prisma: any = await dbConnect(c);
 
@@ -144,7 +155,7 @@ export async function logout(c: Context) {
             return apiError(c, 400, "Failed to logout")
         }
 
-        return apiResponse(c, 200, updateUser, "Logout Successfull")
+        return apiResponse(c, 200, {}, "Logout Successfull")
 
     } catch (error) {
         console.log("Error while logging out : ", error);
@@ -155,12 +166,13 @@ export async function logout(c: Context) {
 export async function refreshAccessToken(c: Context) {
     try {
         const recievedRefreshToken = c.req.header('refreshToken')?.split(' ')[1];
+
         if (!recievedRefreshToken) return apiError(c, 401, "Failed to Authorize User")
 
         const verifiedToken = await verifyTokens(c, recievedRefreshToken, c.env.REFRESH_TOKEN_SECRET)
         if (!verifiedToken) return apiError(c, 401, "Failed to Authorize User")
 
-        const prisma: any = await dbConnect(c);
+        const prisma = c.get('prisma')
 
         const dbUser = await prisma.user.findUnique({ where: { id: verifiedToken.id } })
         if (!dbUser) return apiError(c, 401, "Failed to Authorize User")
@@ -170,7 +182,17 @@ export async function refreshAccessToken(c: Context) {
         const newAccessToken = await accessToken(c, dbUser.id)
         if (!newAccessToken) return apiError(c, 401, "Failed to Authorize User")
 
-        return apiResponse(c, 200, { accessToken: newAccessToken }, "Access Token Refreshed")
+        return apiResponse(c, 200, {
+            accessToken: newAccessToken,
+            user: {
+                id: dbUser.id,
+                username: dbUser.username,
+                email: dbUser.email,
+                avatarUrl: dbUser.avatarUrl,
+                bio: dbUser.bio,
+                createdAt: dbUser.createdAt
+            }
+        }, "Access Token Refreshed")
     } catch (error: any) {
         console.log("Error while refreshing token : ", error);
         return apiError(c, 500, "Internal Server Error", { code: "CE" })

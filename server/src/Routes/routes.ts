@@ -15,7 +15,7 @@ import { FollowUser, UnFollowUser } from '../Controllers/FollowUser/user.Follow.
 import { getFollowersDetails, getFollowingsDetails } from '../Controllers/FollowUser/user.getFollow.Controller'
 
 //Import Post Route handlers
-import { createPost } from '../Controllers/Posts/create.Post'
+import { createPost, upSert } from '../Controllers/Posts/create.Post'
 import { updatePost } from '../Controllers/Posts/update.Post'
 import {
     getPostById,
@@ -23,7 +23,9 @@ import {
     getAllPosts,
     getPublishedPost,
     getArchivedPost,
-    getUserPosts
+    getUserPosts,
+    getPostBySlug,
+    getPostByAuthorId
 } from '../Controllers/Posts/get.Posts'
 import { deletePost } from '../Controllers/Posts/delete.Post'
 
@@ -70,7 +72,6 @@ import { apiError } from '../utils/apiError'
 import { getFileToUpload } from '../Middleware/cloudinary'
 import { signupBodyParse } from '../Middleware/signupBody.Parse'
 
-
 const api = new Hono();
 
 //Middleware
@@ -102,10 +103,13 @@ api
     .put('/post/update/:postId', authMiddleware, findActiveUser, updatePost)
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/get/:postId', authMiddleware, findActiveUser, getPostById)
-    .get('/posts/getBy/:postTitle', authMiddleware, findActiveUser, getPostByTitle)
+    .get('/posts/getBy/authorId/:authorId', authMiddleware, findActiveUser, getPostByAuthorId)
+    .get('/posts/getBy/title/:postTitle', authMiddleware, findActiveUser, getPostByTitle)
+    .get('/posts/getBy/slug/:postSlug', authMiddleware, findActiveUser, getPostBySlug)
     .get('posts/published', authMiddleware, findActiveUser, getPublishedPost)
     .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
     .delete('/posts/delete/:postId', authMiddleware, findActiveUser, deletePost)
+    .post('/posts/upsert', authMiddleware, findActiveUser, upSert)
 
     //Notification Routes
     .post('/notification/createUserNotifications', authMiddleware, findActiveUser, createUserNotifications)
@@ -167,16 +171,16 @@ api
 
     //all data
     .get('/alldetails', async (c: Context) => {
-        const userId = '05409e56-0cf7-4073-a991-307d21382e61'.toString()
-        const prisma: any = await dbConnect(c);
+        console.log('All Details--------------------');
+
+        const prisma = c.get('prisma');
 
         try {
             const userWithDetails = await prisma.user.findMany({
 
                 select: {
                     username: true,
-                    avatarUrl: true,
-                    avatarPublicId: true
+                    password: true,
 
                     //     id: true,
                     //     refreshToken: true,
@@ -227,15 +231,11 @@ api
         return apiResponse(c, 200, upload);
     })
 
-
-
-//     .delete ('/delete', async (c: Context) => {
-//     const prisma: any = await dbConnect(c);
-//     const data = await prisma.user.deleteMany({
-//     });
-//     return apiResponse(c, 200, data);
-// })
-
-
+    .delete('/delete', async (c: Context) => {
+        const prisma: any = await dbConnect(c);
+        const data = await prisma.user.deleteMany({
+        });
+        return apiResponse(c, 200, data);
+    })
 
 export default api;

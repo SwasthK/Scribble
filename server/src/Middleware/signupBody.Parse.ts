@@ -4,7 +4,13 @@ import { apiError } from "../utils/apiError";
 
 export async function signupBodyParse(c: Context, next: Next) {
     try {
-        const formData = await c.req.formData();
+
+        let formData;
+        try {
+            formData = await c.req.formData();
+        } catch (error) {
+            return apiError(c, 400, "Data is Invalid");
+        }
 
         const rawUsername = formData.get('username') as string;
         const rawEmail = formData.get('email') as string;
@@ -17,6 +23,7 @@ export async function signupBodyParse(c: Context, next: Next) {
             return apiError(c, 400, response.error.errors[0].message)
         }
         c.set('signupData', { ...response.data, role });
+        
         return await next();
     } catch (error) {
         console.error('Signup Body Parse Middleware Error: ', error);

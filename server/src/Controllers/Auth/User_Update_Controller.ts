@@ -24,15 +24,12 @@ export async function updateUserProfile(c: Context) {
 
         const existingUser = await prisma.user.findFirst({
             where: {
-                OR: [
-                    { email: updateData.email },
-                    { username: updateData.username }
-                ]
+                id: user.id
             }
         })
 
-        if (existingUser) {
-            return apiError(c, 400, "Username or Email already exists")
+        if (!existingUser) {
+            return apiError(c, 400, "User not found")
         }
 
         const updateUser = await prisma.user.update({

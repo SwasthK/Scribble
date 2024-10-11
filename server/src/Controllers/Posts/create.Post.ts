@@ -35,10 +35,10 @@ const createPostSchema = z.object({
     }, { message: "Invalid Multimedia type" }), { message: "Invalid Multimedia type" }).optional(),
     tags: z.array(z.string().uuid({ message: "Invalid Tag ID" }), { message: "Invalid Tag ID" })
         .min(1, { message: "You must add atleast 1 Tag" })
-        .max(5, { message: "You can add atmost 5 Tags" }),
+        .max(5, { message: "You can add atmost 5 Tags" }).optional(),
     categories: z.array(z.string().uuid({ message: "Invalid Category ID" }), { message: "Invalid Category ID" })
         .min(1, { message: "You must add atleast 1 Category" })
-        .max(5, { message: "You can add atmost 5 Categories" })
+        .max(5, { message: "You can add atmost 5 Categories" }).optional()
 })
 
 export async function createPost(c: Context) {
@@ -109,7 +109,7 @@ export async function createPost(c: Context) {
 
             if (multiMedias && multiMedias.length > 0) {
                 await prisma.multiMedia.createMany({
-                    data: multiMedias.map((media:any) => ({
+                    data: multiMedias.map((media: any) => ({
                         postId: newPost.id,
                         caption: media.caption || null,
                         altText: media.altText,
@@ -124,15 +124,13 @@ export async function createPost(c: Context) {
                     console.log("Alt Text: ", media.altText);
                     console.log("URL: ", media.url);
                     console.log("Type: ", media.type);
-
-                })
-             
-            }
+                });
+            };
 
             return newPost;
         }, {
-            timeout: 10000, 
-          });
+            timeout: 10000,
+        });
 
         return apiResponse(c, 200, result, "Post Created Successfully");
 
@@ -141,6 +139,102 @@ export async function createPost(c: Context) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             console.error("Prisma Transaction Error: ", error.message);
             return apiError(c, 400, "Post Creation Failed");
+        }
+        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+    }
+}
+
+export async function upSert(c: Context) {
+    const authorId = c.get("user").id;
+    const prisma=c.get('prisma');
+    const requestBody = await c.req.json();
+
+    try {
+        const response = createPostSchema.safeParse(requestBody);
+
+        if (!response.success) {
+            return apiError(c, 400, response.error.errors[0].message);
+        }
+
+        const { title, shortCaption, summary, tags, categories, body, coverImage, allowComments, multiMedias } = response.data;
+        const slug = createSlug(title, 25);
+
+        // Upsert Post (create or update if exists)
+        const result = await prisma.$transaction(async (prisma: any) => {
+            const upsertedPost = await prisma.post.upsert({
+                where: { slug },
+                update: {
+                    coverImage: coverImage ?? null,
+                    title,
+                    shortCaption,
+                    body,
+                    summary,
+                    allowComments,
+                },
+                create: {
+                    coverImage: coverImage ?? null,
+                    title,
+                    shortCaption,
+                    slug,
+                    body,
+                    summary,
+                    allowComments,
+                    author: {
+                        connect: { id: authorId }
+                    },
+                    status: PostStatus.DRAFT,
+                }
+            });
+
+            // Update tags if provided
+            if (tags && tags.length > 0) {
+                await prisma.post.update({
+                    where: { id: upsertedPost.id },
+                    data: {
+                        tags: {
+                            connect: tags.map((tagId: string | number) => ({ id: tagId }))
+                        }
+                    }
+                });
+            }
+
+            // Update categories if provided
+            if (categories && categories.length > 0) {
+                await prisma.post.update({
+                    where: { id: upsertedPost.id },
+                    data: {
+                        categories: {
+                            connect: categories.map((categoryId: string | number) => ({ id: categoryId }))
+                        }
+                    }
+                });
+            }
+
+            // Create multimedia if provided
+            if (multiMedias && multiMedias.length > 0) {
+                await prisma.multiMedia.createMany({
+                    data: multiMedias.map((media: any) => ({
+                        postId: upsertedPost.id,
+                        caption: media.caption || null,
+                        altText: media.altText,
+                        url: media.url,
+                        type: media.type,
+                    })),
+                });
+            }
+
+            return upsertedPost;
+        }, {
+            timeout: 10000,
+        });
+
+        return apiResponse(c, 200, result, "Post Upserted Successfully");
+
+    } catch (error: any) {
+        console.log("Create Post Error: ", error.message);
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            console.error("Prisma Transaction Error: ", error.message);
+            return apiError(c, 400, "Post Upsert Failed");
         }
         return apiError(c, 500, "Internal Server Error", { code: "CE" });
     }

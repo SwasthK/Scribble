@@ -36,8 +36,8 @@ export async function accessToken(c: Context, id: number | string) {
     try {
         const payload = {
             id: id,
-            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 // 1 Day
-            // exp: Math.floor(Date.now() / 1000) + 60 * 5  // 5 Minutes
+            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 5 - 120
+            // 5 Day
         }
         const secret = c.env.ACCESS_TOKEN_SECRET;
         const token = await sign(payload, secret)
@@ -51,7 +51,8 @@ export async function refreshToken(c: Context, id: number | string) {
     try {
         const payload = {
             id: id,
-            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 // 1 Day
+            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 10
+            // 10 Day
         }
         const secret = c.env.REFRESH_TOKEN_SECRET;
         const token = await sign(payload, secret)
