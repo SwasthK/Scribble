@@ -4,29 +4,105 @@ import { AppBar } from "../components/AppBar/AppBar";
 import { GlobeIcon } from "../assets/svg/GlobeIcon";
 import { Link } from "react-router-dom";
 import { SaveFileIcon } from "../assets/svg/SaveFileIcon";
+import { BlockNoteView } from "@blocknote/mantine";
+import { useCreateBlockNote } from "@blocknote/react";
+import { createPostFormData, FormErrors } from "../Types/type";
+import {
+  validateFileSize,
+  validateFileType,
+  validateUsername,
+} from "../components/Auth/register.validate";
+import {
+  validateShortCaption,
+  validateTitle,
+} from "../validation/FormValidations";
 
 export const HandlePost = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
   const { state } = location;
 
-  useEffect(() => {
-    if (!state) {
-      console.log("User is Creating a new post");
-    } else {
-      console.log("User is Editing a post");
-      navigate(location.pathname, { replace: true, state: null });
-      setTimeout(() => {}, 5000);
-    }
-  }, []);
-
-  const [loadDraft, setLoadDraft] = useState(false);
+  const [loadDraft, setLoadDraft] = useState(true);
   const [loadPublish, setLoadPublish] = useState(false);
-  const [published, setPublished] = useState(!false);
+  const [published, setPublished] = useState(false);
+
+  const editor = useCreateBlockNote({
+    initialContent: state ? state.body : "",
+  });
+
+  const [formData, setFormData] = useState<createPostFormData>({
+    title: "",
+    shortCaption: "",
+    coverImage: null,
+    body: "",
+  });
+
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    let handleError: FormErrors = {};
+    let error: string | undefined = undefined;
+
+    switch (name) {
+      case "title":
+        if (value !== "") {
+          error = validateTitle(value);
+        }
+        break;
+      case "shortCaption":
+        if (value !== "") {
+          error = validateShortCaption(value);
+        }
+        break;
+      default:
+        break;
+    }
+
+    if (error) {
+      handleError[name] = error;
+    } else {
+      handleError[name] = "";
+    }
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      ...handleError,
+    }));
+
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    console.log(errors);
+    if (!errors.title && errors.shortCaption && errors.coverImage) {
+      console.log("semd bcknd request");
+    } else {
+      console.log("nop");
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const fileTypeError = validateFileType(file.type);
+      const fileSizeError = validateFileSize(file.size);
+      if (fileTypeError || fileSizeError) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          coverImage: fileTypeError || fileSizeError,
+        }));
+        return;
+      }
+      setErrors((prevErrors) => ({ ...prevErrors, coverImage: undefined }));
+      setFormData((prevData) => ({ ...prevData, coverImage: file }));
+    }
+  };
+
+  const handlePublish = async () => {
+    console.log(errors);
+    console.log(formData);
+  };
 
   return (
-    <>
+    <div className="">
       <AppBar />
       <div className="flex justify-center items-center px-8 py-8 sm:px-16">
         <div className="fixed top-24 w-[95%]  max-w-[800px] flex items-center justify-between px-16 bg-slate-800 rounded-full">
@@ -54,6 +130,7 @@ export const HandlePost = () => {
             ) : (
               <>
                 <button
+                  onClick={handlePublish}
                   disabled={loadPublish ? true : false}
                   className={`cursor-pointer disabled:cursor-not-allowed bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold disabled:bg-[#80bdff] w-[5.5rem]`}
                 >
@@ -61,7 +138,6 @@ export const HandlePost = () => {
                 </button>
               </>
             )}
-
           </div>
         </div>
         <div className="w-[95%] flex flex-col gap-8 max-w-[800px] h-3/4 fixed overflow-y-scroll top-44 pb-24 px-4 sm:px-8 ">
@@ -79,7 +155,7 @@ export const HandlePost = () => {
                   name="title"
                   placeholder="eg. The ultimate next.js guide - 2024"
                   // value={formData.username}
-                  // onChange={handleChange}
+                  onChange={handleChange}
                   // disabled={loading}
                 />
                 {/* {errors.username ? (
@@ -99,11 +175,11 @@ export const HandlePost = () => {
                 <input
                   className="input-style  text-base italic"
                   type="text"
-                  id="title"
-                  name="title"
+                  id="shortCaption"
+                  name="shortCaption"
                   placeholder="eg.  Fast-track your Next.js journey - Step-by-step guide for beginners"
                   // value={formData.username}
-                  // onChange={handleChange}
+                  onChange={handleChange}
                   // disabled={loading}
                 />
                 {/* {errors.username ? (
@@ -119,7 +195,7 @@ export const HandlePost = () => {
               <p className="text-cgray font-semibold ml-2">Cover Image</p>
               <div className="flex items-center justify-center w-full">
                 <label
-                  htmlFor="dropzone-file"
+                  htmlFor="coverImage"
                   className="flex flex-col w-full border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-800 bg-gray-700 border-gray-600 hover:border-gray-500"
                 >
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -146,59 +222,44 @@ export const HandlePost = () => {
                       SVG, PNG, JPG or GIF (MAX. 800x400px)
                     </p>
                   </div>
-                  <input id="dropzone-file" type="file" className="hidden" />
+                  <input
+                    id="coverImage"
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
                 </label>
               </div>
             </div>
           </div>
 
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
-            iste iure, dolorum obcaecati qui ipsam mollitia explicabo nesciunt
-            quisquam corporis.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
-            iste iure, dolorum obcaecati qui ipsam mollitia explicabo nesciunt
-            quisquam corporis.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
-            iste iure, dolorum obcaecati qui ipsam mollitia explicabo nesciunt
-            quisquam corporis.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
-            iste iure, dolorum obcaecati qui ipsam mollitia explicabo nesciunt
-            quisquam corporis.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
-            iste iure, dolorum obcaecati qui ipsam mollitia explicabo nesciunt
-            quisquam corporis.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
-            iste iure, dolorum obcaecati qui ipsam mollitia explicabo nesciunt
-            quisquam corporis.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
-            iste iure, dolorum obcaecati qui ipsam mollitia explicabo nesciunt
-            quisquam corporis.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
-            iste iure, dolorum obcaecati qui ipsam mollitia explicabo nesciunt
-            quisquam corporis.
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus
-            iste iure, dolorum obcaecati qui ipsam mollitia explicabo nesciunt
-            quisquam corporis.
-          </p>
+          <div className="pl-8 font-semibold">
+            <p>Blog Content</p>
+          </div>
+
+          <BlockNoteView
+            editor={editor}
+            editable={true}
+            data-changing-font-demo
+            data-theming-css-variables-demo
+            formattingToolbar={false}
+            // linkToolbar={false}
+            // filePanel={false}
+            // sideMenu={false}
+            // slashMenu={false}
+            // tableHandles={false}
+            onChange={async () => {
+              function formatHTML(html: any) {
+                return html.replace(/<p><\/p>/g, "<br>");
+              }
+              const html = await editor.blocksToHTMLLossy(editor.document);
+              const formattedHTML = formatHTML(html);
+              setFormData({ ...formData, body: formattedHTML });
+            }}
+          />
         </div>
       </div>
-    </>
+    </div>
   );
 };

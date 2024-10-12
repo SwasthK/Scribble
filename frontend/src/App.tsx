@@ -25,9 +25,9 @@ function App() {
     {
       path: "/",
       element: (
-        <UnProtectedRoute>
+        // <UnProtectedRoute>
           <Home />
-        </UnProtectedRoute>
+        // </UnProtectedRoute>
       ),
     },
 

@@ -34,7 +34,7 @@ const Editor = ({ onChange, editable }: EditorProps) => {
         editor={editor}
         editable={editable}
         formattingToolbar={false}
-        // data-changing-font-demo  
+        data-changing-font-demo  
         data-theming-css-variables-demo
       >
         {/* // onChange={async () => {

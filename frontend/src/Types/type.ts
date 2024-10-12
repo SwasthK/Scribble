@@ -45,4 +45,11 @@ export interface updateUserProfileMetaData {
     username: string;
     email: string;
     bio: string;
-  }
+}
+
+export interface createPostFormData {
+    title: string;
+    shortCaption: string;
+    coverImage: File | null;
+    body: string;
+}

@@ -149,5 +149,11 @@ h3.bn-inline-content {
 }
 
 .bn-container[data-theming-css-variables-demo][data-color-scheme="dark"] {
-  --bn-colors-editor-background: #212121;
+  --bn-colors-editor-background: #2e2c2c;
+}
+
+.bn-container .bn-editor{
+  min-height: 80vh;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
