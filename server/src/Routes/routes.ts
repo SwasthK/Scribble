@@ -15,7 +15,7 @@ import { FollowUser, UnFollowUser } from '../Controllers/FollowUser/user.Follow.
 import { getFollowersDetails, getFollowingsDetails } from '../Controllers/FollowUser/user.getFollow.Controller'
 
 //Import Post Route handlers
-import { createPost, upSert } from '../Controllers/Posts/create.Post'
+import { createDraftPost,updateDraftPost,upSertDraftPost } from 'Controllers/Posts/create.Post'
 import { updatePost } from '../Controllers/Posts/update.Post'
 import {
     getPostById,
@@ -99,7 +99,11 @@ api
     .get('/profile/getFollowingsDetails', authMiddleware, findActiveUser, getFollowingsDetails)
 
     //Post Routes
-    .post('/post/create', authMiddleware, findActiveUser, createPost)
+    .post('/post/createNewDraftPost', authMiddleware, findActiveUser, createDraftPost)
+    .put('/post/updateDraftPost', authMiddleware, findActiveUser, updateDraftPost)
+
+
+
     .put('/post/update/:postId', authMiddleware, findActiveUser, updatePost)
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/get/:postId', authMiddleware, findActiveUser, getPostById)
@@ -109,7 +113,7 @@ api
     .get('posts/published', authMiddleware, findActiveUser, getPublishedPost)
     .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
     .delete('/posts/delete/:postId', authMiddleware, findActiveUser, deletePost)
-    .post('/posts/upsert', authMiddleware, findActiveUser, upSert)
+    .post('/posts/upsert', authMiddleware, findActiveUser, upSertDraftPost)
 
     //Notification Routes
     .post('/notification/createUserNotifications', authMiddleware, findActiveUser, createUserNotifications)
@@ -176,33 +180,14 @@ api
         const prisma = c.get('prisma');
 
         try {
-            const userWithDetails = await prisma.user.findMany({
+            const userWithDetails = await prisma.post.count({
 
-                select: {
-                    username: true,
-                    password: true,
-
-                    //     id: true,
-                    //     refreshToken: true,
-                    //     followers: {
-                    //         select: {
-                    //             following: {
-                    //                 select: {
-                    //                     username: true
-                    //                 }
-                    //             }
-                    //         }
-                    //     },
-                    //     following: {
-                    //         select: {
-                    //             follower: {
-                    //                 select: {
-                    //                     username: true
-                    //                 }
-                    //             },
-                    //         }
-                    //     }
-                }
+                where: {
+                    author: {
+                      username: 'AlphaWolf'
+                    }
+                  }
+                  
 
             });
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppBar } from "../components/AppBar/AppBar";
 import { GlobeIcon } from "../assets/svg/GlobeIcon";
@@ -10,12 +10,16 @@ import { createPostFormData, FormErrors } from "../Types/type";
 import {
   validateFileSize,
   validateFileType,
-  validateUsername,
 } from "../components/Auth/register.validate";
 import {
+  validateBlogBody,
   validateShortCaption,
   validateTitle,
 } from "../validation/FormValidations";
+import { debounce } from "./NoveEditor";
+import axios from "axios";
+
+enum operationStatus {}
 
 export const HandlePost = () => {
   const location = useLocation();
@@ -23,12 +27,22 @@ export const HandlePost = () => {
   const { state } = location;
 
   const [loadDraft, setLoadDraft] = useState(true);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loadPublish, setLoadPublish] = useState(false);
   const [published, setPublished] = useState(false);
 
-  const editor = useCreateBlockNote({
-    initialContent: state ? state.body : "",
-  });
+  const [draftId, setDraftId] = useState<string | null>(
+    state ? state.id : null
+  );
+
+  useEffect(() => {
+    if (location.state) {
+      console.log("user is editing");
+      navigate(location.pathname, { replace: true, state: null });
+    } else {
+      console.log("user is creating new post");
+    }
+  }, [location, navigate]);
 
   const [formData, setFormData] = useState<createPostFormData>({
     title: "",
@@ -37,46 +51,15 @@ export const HandlePost = () => {
     body: "",
   });
 
-  const [errors, setErrors] = useState<FormErrors>({});
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    let handleError: FormErrors = {};
-    let error: string | undefined = undefined;
+    setFormData((prevData) => {
+      const newFormData = { ...prevData, [name]: value };
 
-    switch (name) {
-      case "title":
-        if (value !== "") {
-          error = validateTitle(value);
-        }
-        break;
-      case "shortCaption":
-        if (value !== "") {
-          error = validateShortCaption(value);
-        }
-        break;
-      default:
-        break;
-    }
+      debouncedHandleDraft(newFormData);
 
-    if (error) {
-      handleError[name] = error;
-    } else {
-      handleError[name] = "";
-    }
-
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      ...handleError,
-    }));
-
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-    console.log(errors);
-    if (!errors.title && errors.shortCaption && errors.coverImage) {
-      console.log("semd bcknd request");
-    } else {
-      console.log("nop");
-    }
+      return newFormData;
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,21 +68,123 @@ export const HandlePost = () => {
       const fileTypeError = validateFileType(file.type);
       const fileSizeError = validateFileSize(file.size);
       if (fileTypeError || fileSizeError) {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          coverImage: fileTypeError || fileSizeError,
-        }));
-        return;
+        setErrors((prevErrors) => {
+          return {
+            ...prevErrors,
+            coverImage: fileTypeError || fileSizeError,
+          };
+        });
+      } else {
+        setErrors((prevErrors) => {
+          return { ...prevErrors, coverImage: "" };
+        });
+        setFormData((prevData) => {
+          const newFormData = { ...prevData, coverImage: file };
+          debouncedHandleDraft(newFormData);
+          return newFormData;
+        });
       }
-      setErrors((prevErrors) => ({ ...prevErrors, coverImage: undefined }));
-      setFormData((prevData) => ({ ...prevData, coverImage: file }));
     }
   };
 
-  const handlePublish = async () => {
-    console.log(errors);
-    console.log(formData);
+  const handleBodyChange = async () => {
+    function formatHTML(html: any) {
+      return html.replace(/<p><\/p>/g, "<br>");
+    }
+    const html = await editor.blocksToHTMLLossy(editor.document);
+    const formattedHTML = formatHTML(html);
+
+    setFormData((prevData) => {
+      const newFormData = { ...prevData, body: formattedHTML };
+      debouncedHandleDraft(newFormData);
+      return newFormData;
+    });
   };
+
+  const updateDraftPost = async (data: any) => {
+    console.log("updating draft");
+    try {
+      const res = await axios.put(
+        `/post/updateDraftPost`,
+        {
+          id: draftId,
+          title: data.title || "",
+          shortCaption: data.shortCaption || "",
+          body: data.body || "",
+          allowComments: true,
+        },
+        {
+          headers: {
+            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      const { data: responseData } = res.data;
+      console.log(responseData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // useEffect(() => {
+  //   console.log("draftId", draftId);
+  // }, [draftId]);
+
+  const createNewDraftPost = async (data: any) => {
+    console.log(draftId);
+    setLoadDraft(true);
+    try {
+      const res = await axios.post(
+        `/posts/upsert`,
+        {
+          id: draftId || "",
+          title: data.title || "",
+          shortCaption: data.shortCaption || "",
+          body: data.body || "",
+          allowComments: true,
+        },
+        {
+          headers: {
+            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      const { data: responseData } = res.data;
+      setDraftId(responseData.id);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadDraft(false);
+    }
+  };
+
+  const handleDraft = async (data: any) => {
+    createNewDraftPost(data);
+  };
+
+  const checkErrors = () => {
+    console.log();
+    if (
+      !errors.title &&
+      !errors.shortCaption &&
+      !errors.coverImage &&
+      !errors.body &&
+      formData.title &&
+      formData.shortCaption &&
+      formData.coverImage &&
+      formData.body
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const debouncedHandleDraft = useCallback(debounce(handleDraft, 1000), []);
+
+  const editor = useCreateBlockNote({
+    initialContent: state ? state.body : "",
+  });
 
   return (
     <div className="">
@@ -130,7 +215,6 @@ export const HandlePost = () => {
             ) : (
               <>
                 <button
-                  onClick={handlePublish}
                   disabled={loadPublish ? true : false}
                   className={`cursor-pointer disabled:cursor-not-allowed bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold disabled:bg-[#80bdff] w-[5.5rem]`}
                 >
@@ -155,7 +239,7 @@ export const HandlePost = () => {
                   name="title"
                   placeholder="eg. The ultimate next.js guide - 2024"
                   // value={formData.username}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   // disabled={loading}
                 />
                 {/* {errors.username ? (
@@ -179,7 +263,7 @@ export const HandlePost = () => {
                   name="shortCaption"
                   placeholder="eg.  Fast-track your Next.js journey - Step-by-step guide for beginners"
                   // value={formData.username}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   // disabled={loading}
                 />
                 {/* {errors.username ? (
@@ -249,14 +333,7 @@ export const HandlePost = () => {
             // sideMenu={false}
             // slashMenu={false}
             // tableHandles={false}
-            onChange={async () => {
-              function formatHTML(html: any) {
-                return html.replace(/<p><\/p>/g, "<br>");
-              }
-              const html = await editor.blocksToHTMLLossy(editor.document);
-              const formattedHTML = formatHTML(html);
-              setFormData({ ...formData, body: formattedHTML });
-            }}
+            onChange={handleBodyChange}
           />
         </div>
       </div>

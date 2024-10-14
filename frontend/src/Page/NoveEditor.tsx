@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import Editor from "./Novel";
 import axios from "axios";
 
-function debounce(func: (...args: any[]) => void, delay: number) {
+export function debounce(func: (...args: any[]) => void, delay: number) {
   let timeoutId: ReturnType<typeof setTimeout>;
 
   return function (...args: any[]) {
