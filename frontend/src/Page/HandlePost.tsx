@@ -18,22 +18,30 @@ import {
 } from "../validation/FormValidations";
 import { debounce } from "./NoveEditor";
 import axios from "axios";
+import { Spinner } from "../components/Global/Spinner";
 
-enum operationStatus {}
+enum statusType {
+  DRAFT = "DRAFT",
+  PUBLISHED = "PUBLISHED",
+  ARCHIEVED = "ARCHIEVED",
+}
 
 export const HandlePost = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { state } = location;
 
-  const [loadDraft, setLoadDraft] = useState(true);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [loadDraft, setLoadDraft] = useState(false);
   const [loadPublish, setLoadPublish] = useState(false);
+
+  const [errors, setErrors] = useState<FormErrors>({});
   const [published, setPublished] = useState(false);
 
-  const [draftId, setDraftId] = useState<string | null>(
-    state ? state.id : null
-  );
+  // const [draftId, setDraftId] = useState<string | null>(
+  //   state ? state.id : null
+  // );
+
+  const [postId, setPostId] = useState<string | null>(state ? state.id : null);
 
   useEffect(() => {
     if (location.state) {
@@ -51,16 +59,46 @@ export const HandlePost = () => {
     body: "",
   });
 
+  // const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prevData) => {
+  //     const newFormData = { ...prevData, [name]: value };
+
+  //     debouncedHandleDraft(newFormData);
+
+  //     return newFormData;
+  //   });
+  // };
+
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prevData) => {
-      const newFormData = { ...prevData, [name]: value };
-
-      debouncedHandleDraft(newFormData);
-
-      return newFormData;
-    });
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
+
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files && e.target.files.length > 0) {
+  //     const file = e.target.files[0];
+  //     const fileTypeError = validateFileType(file.type);
+  //     const fileSizeError = validateFileSize(file.size);
+  //     if (fileTypeError || fileSizeError) {
+  //       setErrors((prevErrors) => {
+  //         return {
+  //           ...prevErrors,
+  //           coverImage: fileTypeError || fileSizeError,
+  //         };
+  //       });
+  //     } else {
+  //       setErrors((prevErrors) => {
+  //         return { ...prevErrors, coverImage: "" };
+  //       });
+  //       setFormData((prevData) => {
+  //         const newFormData = { ...prevData, coverImage: file };
+  //         debouncedHandleDraft(newFormData);
+  //         return newFormData;
+  //       });
+  //     }
+  //   }
+  // };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -78,14 +116,24 @@ export const HandlePost = () => {
         setErrors((prevErrors) => {
           return { ...prevErrors, coverImage: "" };
         });
-        setFormData((prevData) => {
-          const newFormData = { ...prevData, coverImage: file };
-          debouncedHandleDraft(newFormData);
-          return newFormData;
-        });
+        setFormData((prevData) => ({ ...prevData, coverImage: file }));
       }
     }
   };
+
+  // const handleBodyChange = async () => {
+  //   function formatHTML(html: any) {
+  //     return html.replace(/<p><\/p>/g, "<br>");
+  //   }
+  //   const html = await editor.blocksToHTMLLossy(editor.document);
+  //   const formattedHTML = formatHTML(html);
+
+  //   setFormData((prevData) => {
+  //     const newFormData = { ...prevData, body: formattedHTML };
+  //     debouncedHandleDraft(newFormData);
+  //     return newFormData;
+  //   });
+  // };
 
   const handleBodyChange = async () => {
     function formatHTML(html: any) {
@@ -94,63 +142,161 @@ export const HandlePost = () => {
     const html = await editor.blocksToHTMLLossy(editor.document);
     const formattedHTML = formatHTML(html);
 
-    setFormData((prevData) => {
-      const newFormData = { ...prevData, body: formattedHTML };
-      debouncedHandleDraft(newFormData);
-      return newFormData;
-    });
+    setFormData((prevData) => ({ ...prevData, body: formattedHTML }));
   };
 
-  const updateDraftPost = async (data: any) => {
-    console.log("updating draft");
-    try {
-      const res = await axios.put(
-        `/post/updateDraftPost`,
-        {
-          id: draftId,
-          title: data.title || "",
-          shortCaption: data.shortCaption || "",
-          body: data.body || "",
-          allowComments: true,
-        },
-        {
-          headers: {
-            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      const { data: responseData } = res.data;
-      console.log(responseData);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const updateDraftPost = async (data: any) => {
+  //   console.log("updating draft");
+  //   try {
+  //     const res = await axios.put(
+  //       `/post/updateDraftPost`,
+  //       {
+  //         id: draftId,
+  //         title: data.title || "",
+  //         shortCaption: data.shortCaption || "",
+  //         body: data.body || "",
+  //         allowComments: true,
+  //       },
+  //       {
+  //         headers: {
+  //           accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+  //         },
+  //       }
+  //     );
+  //     const { data: responseData } = res.data;
+  //     console.log(responseData);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   // useEffect(() => {
   //   console.log("draftId", draftId);
   // }, [draftId]);
 
-  const createNewDraftPost = async (data: any) => {
-    console.log(draftId);
+  // const createNewDraftPost = async (data: any) => {
+  //   console.log(draftId);
+
+  // };
+
+  useEffect(() => {
+    console.log("postId", postId);
+  }, [postId]);
+
+  // const handleDraft = async (data: any) => {
+  //   setLoadDraft(true);
+  //   try {
+  //     console.log(postId);
+  //     if (postId === null) {
+  //       console.log("creating new draft");
+  //       const res = await axios.post(
+  //         `/post/createNewDraftPost`,
+  //         {
+  //           id: draftId || "",
+  //           title: data.title || "",
+  //           shortCaption: data.shortCaption || "",
+  //           body: data.body || "",
+  //           allowComments: true,
+  //         },
+  //         {
+  //           headers: {
+  //             accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+  //           },
+  //         }
+  //       );
+  //       const { id: newPostId } = res.data.data; // Accessing the correct response structure
+  //       console.log(newPostId); // Log the new post ID to ensure it's correct
+  //       setPostId(newPostId); // Update postId with the new ID
+  //     } else {
+  //       console.log("updating draft");
+  //       const res = await axios.put(
+  //         `/post/updateDraftPost`,
+  //         {
+  //           id: postId || "",
+  //           title: data.title || "",
+  //           shortCaption: data.shortCaption || "",
+  //           body: data.body || "",
+  //           allowComments: true,
+  //         },
+  //         {
+  //           headers: {
+  //             accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+  //           },
+  //         }
+  //       );
+  //       const { id: updatedPostId } = res.data.data;
+  //       console.log(updatedPostId); // Log to ensure update was successful
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   } finally {
+  //     setLoadDraft(false);
+  //   }
+  // };
+
+  // const checkErrors = () => {
+  //   console.log();
+  //   if (
+  //     !errors.title &&
+  //     !errors.shortCaption &&
+  //     !errors.coverImage &&
+  //     !errors.body &&
+  //     formData.title &&
+  //     formData.shortCaption &&
+  //     formData.coverImage &&
+  //     formData.body
+  //   ) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // };
+
+  // const debouncedHandleDraft = useCallback(debounce(handleDraft, 1000), []);
+
+  const handleDraft = async () => {
     setLoadDraft(true);
     try {
-      const res = await axios.post(
-        `/posts/upsert`,
-        {
-          id: draftId || "",
-          title: data.title || "",
-          shortCaption: data.shortCaption || "",
-          body: data.body || "",
-          allowComments: true,
-        },
-        {
-          headers: {
-            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+      if (postId === null) {
+        console.log("creating new draft");
+        const res = await axios.post(
+          `/post/createNewDraftPost`,
+          {
+            id: "",
+            title: formData.title || "",
+            shortCaption: formData.shortCaption || "",
+            body: formData.body || "",
+            allowComments: true,
           },
-        }
-      );
-      const { data: responseData } = res.data;
-      setDraftId(responseData.id);
+          {
+            headers: {
+              accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        const { id: newPostId } = res.data.data; // Accessing the correct response structure
+        console.log(newPostId); // Log the new post ID to ensure it's correct
+        setPostId(newPostId); // Update postId with the new ID
+      } else {
+        console.log("updating draft");
+        const res = await axios.put(
+          `/post/updateDraftPost`,
+          {
+            id: postId || "",
+            title: formData.title || "",
+            shortCaption: formData.shortCaption || "",
+            body: formData.body || "",
+            allowComments: true,
+          },
+          {
+            headers: {
+              accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        const { id: updatedPostId } = res.data.data;
+        console.log(updatedPostId); // Log to ensure update was successful
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -158,29 +304,20 @@ export const HandlePost = () => {
     }
   };
 
-  const handleDraft = async (data: any) => {
-    createNewDraftPost(data);
-  };
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === "d") {
+        e.preventDefault(); // Prevent default browser behavior (like bookmarking)
+        handleDraft();
+      }
+    };
 
-  const checkErrors = () => {
-    console.log();
-    if (
-      !errors.title &&
-      !errors.shortCaption &&
-      !errors.coverImage &&
-      !errors.body &&
-      formData.title &&
-      formData.shortCaption &&
-      formData.coverImage &&
-      formData.body
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  };
+    window.addEventListener("keydown", handleKeyPress);
 
-  const debouncedHandleDraft = useCallback(debounce(handleDraft, 1000), []);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [postId, formData]);
 
   const editor = useCreateBlockNote({
     initialContent: state ? state.body : "",
@@ -192,15 +329,32 @@ export const HandlePost = () => {
       <div className="flex justify-center items-center px-8 py-8 sm:px-16">
         <div className="fixed top-24 w-[95%]  max-w-[800px] flex items-center justify-between px-16 bg-slate-800 rounded-full">
           <div className="flex gap-3 items-center  py-3">
-            {!loadDraft ? (
-              <SaveFileIcon
-                color={loadDraft ? "currentColor" : "currentColor"}
-              />
-            ) : null}
-            <p className={`${loadDraft ? "font-semibold" : "font-semibold"}`}>
-              {loadDraft ? "Saving . . ." : "Saved"}
-            </p>
+            <button
+              onClick={handleDraft}
+              disabled={loadDraft || loadPublish ? true : false}
+              className={`cursor-pointer h-[2.2rem] disabled:cursor-not-allowed ${
+                loadPublish
+                  ? "disabled:bg-[#8babce] "
+                  : "disabled:bg-transparent"
+              } bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold w-[5.5rem]`}
+            >
+              <div className="flex justify-center items-center gap-2">
+                {!loadDraft ? (
+                  <>
+                    <SaveFileIcon
+                      color={loadDraft ? "currentColor" : "currentColor"}
+                    />
+                    <p>Draft</p>
+                  </>
+                ) : (
+                  <>
+                    <Spinner size={5} />
+                  </>
+                )}
+              </div>
+            </button>
           </div>
+
           <div className="flex gap-3 items-center ">
             {published ? (
               <>
@@ -215,10 +369,39 @@ export const HandlePost = () => {
             ) : (
               <>
                 <button
-                  disabled={loadPublish ? true : false}
-                  className={`cursor-pointer disabled:cursor-not-allowed bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold disabled:bg-[#80bdff] w-[5.5rem]`}
+                  // onClick={() => {
+                  //   setLoadPublish(true);
+                  //   setTimeout(() => {
+                  //     setLoadPublish(false);
+                  //   }, 3000);
+                  // }}
+                  disabled={loadPublish || loadDraft ? true : false}
+                  className={`cursor-pointer h-[2.2rem] disabled:cursor-not-allowed bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold 
+                     ${
+                       loadDraft
+                         ? "disabled:bg-[#8babce] "
+                         : "disabled:bg-transparent"
+                     } w-[5.5rem]`}
                 >
-                  Publish
+                  <div className="flex justify-center items-center gap-2">
+                    {!loadPublish ? (
+                      <>
+                        <p>
+                          {state?.statusType === statusType.DRAFT
+                            ? "Publish"
+                            : state?.statusType === statusType.PUBLISHED
+                            ? "Republish"
+                            : state?.statusType === statusType.ARCHIEVED
+                            ? "Publish"
+                            : "Publish"}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <Spinner size={5} />
+                      </>
+                    )}
+                  </div>
                 </button>
               </>
             )}

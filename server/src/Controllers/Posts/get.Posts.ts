@@ -313,7 +313,8 @@ export async function getAllPosts(c: Context) {
             where: {
                 authorId: {
                     not: user.id
-                }
+                },
+                status: PostStatus.PUBLISHED
             },
             orderBy: {
                 createdAt: 'desc',
@@ -367,7 +368,8 @@ export async function getUserPosts(c: Context) {
         const totalPosts = await prisma.post.count(
             {
                 where: {
-                    authorId: user.id
+                    authorId: user.id,
+                        status: PostStatus.PUBLISHED
                 }
             }
         );

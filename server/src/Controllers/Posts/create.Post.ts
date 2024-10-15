@@ -84,20 +84,20 @@ export async function createDraftPost(c: Context) {
 
         const { title, shortCaption, summary, tags, categories, body, coverImage, allowComments, multiMedias } = response.data
 
-        const slug = createSlug(title, 25)
+        // const slug = createSlug(title, 25)
 
-        const isPostExist = await prisma.post.findFirst({
-            where: {
-                AND: [
-                    { slug },
-                    { status: PostStatus.PUBLISHED }
-                ]
-            }
-        })
+        // const isPostExist = await prisma.post.findFirst({
+        //     where: {
+        //         AND: [
+        //             { slug },
+        //             { status: PostStatus.PUBLISHED }
+        //         ]
+        //     }
+        // })
 
-        if (isPostExist) {
-            return apiError(c, 400, "Post name already exist");
-        }
+        // if (isPostExist) {
+        //     return apiError(c, 400, "Post name already exist");
+        // }
 
         const result = await prisma.$transaction(async (prisma: any) => {
             const newPost = await prisma.post.create({
@@ -105,7 +105,6 @@ export async function createDraftPost(c: Context) {
                     coverImage: coverImage ?? null,
                     title,
                     shortCaption,
-                    slug,
                     body,
                     summary,
                     allowComments,
@@ -192,7 +191,7 @@ export async function updateDraftPost(c: Context) {
         }
 
         const { title, shortCaption, summary, tags, categories, body, coverImage, allowComments, multiMedias } = response.data;
-        const slug = createSlug(title, 25);
+        // const slug = createSlug(title, 25);
 
         // Upsert Post (create or update if exists)
         const result = await prisma.$transaction(async (prisma: any) => {

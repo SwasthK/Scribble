@@ -71,7 +71,7 @@ model Post {
   coverImage    String?
   title         String
   shortCaption  String?
-  slug          String       @unique
+  slug          String?       @unique
   body          String
   summary       String?
   author        User         @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)

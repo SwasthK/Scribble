@@ -15,7 +15,7 @@ import { FollowUser, UnFollowUser } from '../Controllers/FollowUser/user.Follow.
 import { getFollowersDetails, getFollowingsDetails } from '../Controllers/FollowUser/user.getFollow.Controller'
 
 //Import Post Route handlers
-import { createDraftPost,updateDraftPost,upSertDraftPost } from 'Controllers/Posts/create.Post'
+import { createDraftPost, updateDraftPost, upSertDraftPost } from 'Controllers/Posts/create.Post'
 import { updatePost } from '../Controllers/Posts/update.Post'
 import {
     getPostById,
@@ -180,16 +180,21 @@ api
         const prisma = c.get('prisma');
 
         try {
-            const userWithDetails = await prisma.post.count({
+            const userWithDetails = await prisma.post.findMany({
 
                 where: {
                     author: {
-                      username: 'AlphaWolf'
+                        username: 'AlphaWolf'
                     }
-                  }
-                  
+                },
+                include: {
+                    author: true
+                }
 
-            });
+            }
+
+
+            );
 
             if (!userWithDetails) {
                 return apiError(c, 404, "User not found");
