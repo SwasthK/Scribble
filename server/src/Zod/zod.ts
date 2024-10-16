@@ -45,16 +45,24 @@ const bioSchema = z.string({
     invalid_type_error: "Invalid Bio",
 })
     .min(3, { message: "Bio must be at least 10 characters long" })
-    .max(160, { message: "Bio must be at most 160 characters long" })
+    .max(300, { message: "Bio must be at most 300 characters long" })
     .optional()
     .refine((val) => val === undefined || val.trim().length > 0, {
         message: "Bio should not be empty or only whitespace",
     });
 
+export const ServerSignup = z.object({
+    username: usernameSchema,
+    email: emailSchema,
+    password: passwordSchema,
+}, { message: "Data provided is invalid" })
 
-// zod type
 export const ServerSignin = z.object({
-    identifier: z.union([emailSchema, usernameSchema]),
+    identifier: z.string().refine((value) => {
+        return emailSchema.safeParse(value).success || usernameSchema.safeParse(value).success;
+    }, {
+        message: "please enter a valid email or username",
+    }),
     password: passwordSchema,
 })
 

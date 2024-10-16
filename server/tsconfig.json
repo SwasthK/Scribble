@@ -5,13 +5,15 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
-    "lib": [
-      "ESNext"
-    ],
-    "types": [
-      "@cloudflare/workers-types"
-    ],
+    "lib": ["ESNext"],
+    "types": ["@cloudflare/workers-types"],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "baseUrl": "./src" // Add this to ensure type imports are resolved correctly
   },
+  "include": [
+    "src/**/*.ts", // Ensure your TypeScript files are included
+    "src/types.d.ts" // Explicitly include the types declaration file
+  ],
+  "exclude": ["node_modules"]
 }

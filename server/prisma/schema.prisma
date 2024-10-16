@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -14,6 +15,7 @@ model User {
   password              String
   bio                   String?
   avatarUrl             String?
+  avatarPublicId        String?
   role                  Role           @default(USER)
   followers             Follower[]     @relation("UserFollowers")
   following             Follower[]     @relation("UserFollowing")
@@ -69,7 +71,7 @@ model Post {
   coverImage    String?
   title         String
   shortCaption  String?
-  slug          String       @unique
+  slug          String?       @unique
   body          String
   summary       String?
   author        User         @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
@@ -151,19 +153,19 @@ model Tag {
   @@index([slug])
 }
 
-model Comment {
-  id        String    @id @default(uuid())
-  content   String
-  author    User      @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String
-  post      Post      @relation("PostComments", fields: [postId], references: [id], onDelete: Cascade)
-  postId    String
-  parent    Comment?  @relation("ParentComment", fields: [parentId], references: [id], onDelete: Cascade)
-  parentId  String?
-  replies   Comment[] @relation("ParentComment")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-}
+  model Comment {
+    id        String    @id @default(uuid())
+    content   String
+    author    User      @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
+    authorId  String
+    post      Post      @relation("PostComments", fields: [postId], references: [id], onDelete: Cascade)
+    postId    String
+    parent    Comment?  @relation("ParentComment", fields: [parentId], references: [id], onDelete: Cascade)
+    parentId  String?
+    replies   Comment[] @relation("ParentComment")
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+  }
 
 model PostReport {
   id        String         @id @default(uuid())

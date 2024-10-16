@@ -1,11 +1,9 @@
 import { Context, Next } from "hono";
-import { dbConnect } from "../Connection/db.connect";
-import { apiResponse } from "../utils/apiResponse";
 
 export async function findActiveUser(c: Context, next: Next) {
     try {
         const id = c.get('id')
-        const prisma: any = await dbConnect(c);
+        const prisma = c.get('prisma');
 
         const isUserExist = await prisma.user.findUnique({ where: { id } })
 

@@ -2,9 +2,10 @@ import { Hono } from 'hono'
 import api from './Routes/routes'
 
 //Import Middleware
-import { logger } from 'hono/logger'
-import { prettyJSON } from 'hono/pretty-json'
+// import { logger } from 'hono/logger'
+// import { prettyJSON } from 'hono/pretty-json'
 import { cors } from 'hono/cors'
+import { connectPrismaClient } from 'Client/prismaClient'
 
 const app = new Hono<{
   Bindings: {
@@ -13,6 +14,7 @@ const app = new Hono<{
   }
 }>().basePath('/api/v1');
 
+app.use('*', connectPrismaClient)
 
 //Middlewares
 app.use('/*', cors(
@@ -22,10 +24,10 @@ app.use('/*', cors(
   //   allowMethods: ['POST', 'GET', 'DELETE', 'PUT'],
   //   credentials: true,
   // }
-)
-)
-app.use(prettyJSON())
-app.use(logger())
+))
+
+// app.use(prettyJSON())
+// app.use(logger())
 
 app.route('/', api)
 
