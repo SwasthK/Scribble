@@ -22,7 +22,7 @@ export const Profile = () => {
   const { user: userData } = useRecoilValue(authAtom);
   const setUserData = useSetRecoilState(authAtom);
   const { formattedDate } = UseFormatDate(userData.createdAt);
-  const [ShowBlogs, HideBlogs] = useState(true);
+  const [showAboutSection, HideBlogs] = useState(true);
   // const StateUser = "@" + userData.username;
   // const navigate = useNavigate();
   // const { username } = useParams<{ username: string }>();
@@ -31,7 +31,7 @@ export const Profile = () => {
 
   const postsQuery = useGetUserPosts(currentPage);
 
-  const { data, isError, error, isLoading } = postsQuery;
+  const { data, isError, error, isLoading,isFetching } = postsQuery;
 
   const pageCount = data ? Math.ceil(data.totalPosts / 6) : 6;
 
@@ -160,26 +160,30 @@ export const Profile = () => {
           <h6
             onClick={() => HideBlogs(true)}
             className={`text-gray-80 cursor-pointer px-5 py-2 rounded-full ${
-              ShowBlogs ? "font-bold bg-blue-300 text-black" : "text-cgray "
-            }`}
-          >
-            Blogs
-          </h6>
-          <h6
-            onClick={() => HideBlogs(false)}
-            className={`text-gray-80 cursor-pointer px-5 py-2 rounded-full ${
-              ShowBlogs ? "font-normal" : "font-bold bg-blue-300 text-black"
+              showAboutSection
+                ? "font-bold bg-blue-300 text-black"
+                : "text-cgray "
             }`}
           >
             About
           </h6>
+          <h6
+            onClick={() => HideBlogs(false)}
+            className={`text-gray-80 cursor-pointer px-5 py-2 rounded-full ${
+              showAboutSection
+                ? "font-normal"
+                : "font-bold bg-blue-300 text-black"
+            }`}
+          >
+            Blogs
+          </h6>
         </div>
         <div className=" xl:min-w-[70vw]">
           {isError && <h1>{error.message}</h1>}
-          {ShowBlogs && (
+          {!showAboutSection && (
             <>
               <div className="xl:max-w-[70%] lg:max-w-[90%]  grid grid-cols-1 place-items-center sm:grid-cols-2 px-6 md:grid-cols-3 md:px-6  gap-8 lg:gap-6  lg:px-0 pb-8">
-                {isLoading ? (
+                {isFetching ? (
                   <>
                     {[...Array(6)].map((_, index) => (
                       <UserBlogs_Skeleton key={index} />
@@ -227,7 +231,7 @@ export const Profile = () => {
                   </h1>
                   <button
                     className="bg-[#1d58aa] disabled:cursor-not-allowed font-semibold cursor-pointer px-8 py-3 rounded-lg disabled:bg-[#fb8e8e] disabled:text-black"
-                    disabled={currentPage === pageCount}
+                    disabled={currentPage === pageCount || isFetching}
                     onClick={handleNextClick}
                   >
                     Next
@@ -237,7 +241,7 @@ export const Profile = () => {
             </>
           )}
 
-          {!ShowBlogs && (
+          {showAboutSection && (
             <>
               <div className="w-full sm:max-w-[30rem] flex md:gap-8 gap-8 px-16 py-12 rounded-xl flex-col">
                 {isSuccess && (
@@ -380,7 +384,7 @@ export const UserBlogs = memo(
         <Link
           to={`/blog/${slug}`}
           state={{
-            id: 'i am from profile',
+            id: "i am from profile",
           }}
           className="bg-[#1F2937] overflow-hidden group hover:bg-[#304158] cursor-pointer transition-colors duration-300 ease-in max-w-72 pb-6 rounded-2xl flex flex-col gap-6 justify-center items-center md:max-w-60"
         >

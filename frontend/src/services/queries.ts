@@ -1,5 +1,5 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { getAllPosts, getPostByAuthorId, getPostBySlug, getUserPosts } from "./api";
+import { getAllPosts, getDraftPost, getPostByAuthorId, getPostBySlug, getUserPosts } from "./api";
 
 export function useGetAllPosts() {
     return useInfiniteQuery(
@@ -40,9 +40,18 @@ export function useGetPostBySlug(slug: string | undefined) {
 
 export function useGetPostByAuthorId(authorId: string) {
     return useQuery({
-        queryKey: ["getPostBySlug", authorId],
+        queryKey: ["getPostByAuthorId", authorId],
         queryFn: () => getPostByAuthorId(authorId),
         enabled: false,
         staleTime: Infinity,
     });
+}
+
+export function useGetDraftedPost() {
+    return useQuery({
+        queryKey: ["draftedPosts"],
+        queryFn: () => getDraftPost(),
+        enabled: true,
+        staleTime: Infinity,
+    })
 }

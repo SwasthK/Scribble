@@ -18,6 +18,7 @@ import { Blogs } from "./Page/Blogs";
 import NoveEditor from "./Page/NoveEditor";
 import { NovelPreview } from "./Page/NovelPreview";
 import { HandlePost } from "./Page/HandlePost";
+import { Draft } from "./Page/Draft";
 
 function App() {
   const [user, setUser] = useRecoilState(authAtom);
@@ -75,6 +76,16 @@ function App() {
       element: (
         <ProtectedRoute>
           <BlogContent />
+        </ProtectedRoute>
+      ),
+      errorElement: <NotFound />,
+    },
+
+    {
+      path: "/post/draft",
+      element: (
+        <ProtectedRoute>
+          <Draft />
         </ProtectedRoute>
       ),
       errorElement: <NotFound />,

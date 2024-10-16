@@ -12,6 +12,8 @@ import { SavedIcon } from "../../assets/svg/SavedIcon";
 import { authAtom, useAuthAtomResetValue } from "../../atoms/auth.atoms";
 import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
+import { DraftIcon } from "../../assets/svg/DraftIcon";
+import { ArchiveIcon } from "../../assets/svg/ArchiveIcon";
 
 export const AppBar = () => {
   const { user: currentUser } = useRecoilValue(authAtom);
@@ -130,7 +132,7 @@ export const AppBar = () => {
           </h1>
         </div>
         <div className="menu flex flex-col gap-2 text-base">
-          <MenuItems icon={EditIcon} label="Write" url={'/create'}/>
+          <MenuItems icon={EditIcon} label="Write" url={"/create"} />
           <hr className="opacity-30 mt-2 mb-1" />
           <MenuItems
             icon={UserIcon}
@@ -139,6 +141,8 @@ export const AppBar = () => {
           />
           <MenuItems icon={SavedIcon} label="Saved" />
           <MenuItems icon={FollowersIcon} label="Followers" />
+          <MenuItems icon={DraftIcon} url={"/post/draft"} label="Draft" />
+          <MenuItems icon={ArchiveIcon} label="Archieved" />
 
           {currentUser.email && (
             <MenuItems className="mt-4 text-cgray" label={currentUser.email} />

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppBar } from "../components/AppBar/AppBar";
 import { GlobeIcon } from "../assets/svg/GlobeIcon";
@@ -19,11 +19,14 @@ import {
 import { debounce } from "./NoveEditor";
 import axios from "axios";
 import { Spinner } from "../components/Global/Spinner";
+import { useRecoilValue } from "recoil";
+import { authAtom } from "../atoms/auth.atoms";
 
-enum statusType {
+export enum statusType {
   DRAFT = "DRAFT",
   PUBLISHED = "PUBLISHED",
   ARCHIEVED = "ARCHIEVED",
+  NEW = "NEW",
 }
 
 export const HandlePost = () => {
@@ -34,23 +37,98 @@ export const HandlePost = () => {
   const [loadDraft, setLoadDraft] = useState(false);
   const [loadPublish, setLoadPublish] = useState(false);
 
+  const [postId, setPostId] = useState<string | null>(
+    state ? state.postId : null
+  );
+  const [authorId, setAuthorId] = useState<string | null>(
+    state ? state.authorId : null
+  );
+
+  const [published, setPublished] = useState<boolean>(
+    state?.statusType === statusType.PUBLISHED ? true : false
+  );
+
+  const [statusTypeState, setStatusTypeState] = useState<statusType>(
+    state ? state.statusType : statusType.NEW
+  );
+
+  const { user: currentUser } = useRecoilValue(authAtom);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [published, setPublished] = useState(false);
-
-  // const [draftId, setDraftId] = useState<string | null>(
-  //   state ? state.id : null
-  // );
-
-  const [postId, setPostId] = useState<string | null>(state ? state.id : null);
 
   useEffect(() => {
-    if (location.state) {
-      console.log("user is editing");
+    if (location.state && state.postId && state.authorId && state.statusType) {
       navigate(location.pathname, { replace: true, state: null });
-    } else {
-      console.log("user is creating new post");
     }
-  }, [location, navigate]);
+
+    async function checkData() {
+      if (postId && authorId) {
+        if (currentUser.id !== authorId) {
+          navigate("/blogs");
+          return null;
+        } else {
+          console.log("I am getting the Data");
+          // get the data of the post by providing postId
+          // if error log it else set the recieved data to formData
+        }
+      }
+    }
+    checkData();
+  }, []);
+
+  const handleDraft = async () => {
+    setLoadDraft(true);
+    if (
+      (statusTypeState === statusType.PUBLISHED ||
+        statusTypeState === statusType.DRAFT) &&
+      postId
+    ) {
+      // backend call update content - def - draft ---1
+      setPublished(false);
+    } else if (statusTypeState === statusType.NEW) {
+      setPublished(false);
+      try {
+        if (postId === null) {
+          const res = await axios.post(
+            `/post/createNewDraftPost`,
+            {
+              id: "",
+              title: formData.title || "",
+              shortCaption: formData.shortCaption || "",
+              body: formData.body || "",
+              allowComments: true,
+            },
+            {
+              headers: {
+                accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+            }
+          );
+          const { id: newPostId } = res.data.data;
+          setPostId(newPostId);
+        } else {
+          const res = await axios.put(
+            `/post/updateDraftPost`,
+            {
+              id: postId || "",
+              title: formData.title || "",
+              shortCaption: formData.shortCaption || "",
+              body: formData.body || "",
+              allowComments: true,
+            },
+            {
+              headers: {
+                accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+            }
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoadDraft(false);
+      }
+    }
+  };
 
   const [formData, setFormData] = useState<createPostFormData>({
     title: "",
@@ -59,46 +137,33 @@ export const HandlePost = () => {
     body: "",
   });
 
-  // const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prevData) => {
-  //     const newFormData = { ...prevData, [name]: value };
+  const getPostData = async () => {
+    try {
+      const res = await axios.get(`/posts/get/${postId}`, {
+        headers: {
+          accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      const { data } = res.data;
+      const { title, shortCaption, body, coverImage } = data;
 
-  //     debouncedHandleDraft(newFormData);
-
-  //     return newFormData;
-  //   });
-  // };
+      setFormData({
+        title,
+        shortCaption,
+        body,
+        coverImage,
+      });
+      // setStatusTypeState(data.status);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPublished(false);
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
-
-  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (e.target.files && e.target.files.length > 0) {
-  //     const file = e.target.files[0];
-  //     const fileTypeError = validateFileType(file.type);
-  //     const fileSizeError = validateFileSize(file.size);
-  //     if (fileTypeError || fileSizeError) {
-  //       setErrors((prevErrors) => {
-  //         return {
-  //           ...prevErrors,
-  //           coverImage: fileTypeError || fileSizeError,
-  //         };
-  //       });
-  //     } else {
-  //       setErrors((prevErrors) => {
-  //         return { ...prevErrors, coverImage: "" };
-  //       });
-  //       setFormData((prevData) => {
-  //         const newFormData = { ...prevData, coverImage: file };
-  //         debouncedHandleDraft(newFormData);
-  //         return newFormData;
-  //       });
-  //     }
-  //   }
-  // };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -120,8 +185,6 @@ export const HandlePost = () => {
       }
     }
   };
-
-  // const handleBodyChange = async () => {
   //   function formatHTML(html: any) {
   //     return html.replace(/<p><\/p>/g, "<br>");
   //   }
@@ -145,169 +208,66 @@ export const HandlePost = () => {
     setFormData((prevData) => ({ ...prevData, body: formattedHTML }));
   };
 
-  // const updateDraftPost = async (data: any) => {
-  //   console.log("updating draft");
-  //   try {
-  //     const res = await axios.put(
-  //       `/post/updateDraftPost`,
-  //       {
-  //         id: draftId,
-  //         title: data.title || "",
-  //         shortCaption: data.shortCaption || "",
-  //         body: data.body || "",
-  //         allowComments: true,
-  //       },
-  //       {
-  //         headers: {
-  //           accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-  //         },
-  //       }
-  //     );
-  //     const { data: responseData } = res.data;
-  //     console.log(responseData);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   console.log("draftId", draftId);
-  // }, [draftId]);
-
-  // const createNewDraftPost = async (data: any) => {
-  //   console.log(draftId);
-
-  // };
-
-  useEffect(() => {
-    console.log("postId", postId);
-  }, [postId]);
-
-  // const handleDraft = async (data: any) => {
-  //   setLoadDraft(true);
-  //   try {
-  //     console.log(postId);
-  //     if (postId === null) {
-  //       console.log("creating new draft");
-  //       const res = await axios.post(
-  //         `/post/createNewDraftPost`,
-  //         {
-  //           id: draftId || "",
-  //           title: data.title || "",
-  //           shortCaption: data.shortCaption || "",
-  //           body: data.body || "",
-  //           allowComments: true,
-  //         },
-  //         {
-  //           headers: {
-  //             accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-  //           },
-  //         }
-  //       );
-  //       const { id: newPostId } = res.data.data; // Accessing the correct response structure
-  //       console.log(newPostId); // Log the new post ID to ensure it's correct
-  //       setPostId(newPostId); // Update postId with the new ID
-  //     } else {
-  //       console.log("updating draft");
-  //       const res = await axios.put(
-  //         `/post/updateDraftPost`,
-  //         {
-  //           id: postId || "",
-  //           title: data.title || "",
-  //           shortCaption: data.shortCaption || "",
-  //           body: data.body || "",
-  //           allowComments: true,
-  //         },
-  //         {
-  //           headers: {
-  //             accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-  //           },
-  //         }
-  //       );
-  //       const { id: updatedPostId } = res.data.data;
-  //       console.log(updatedPostId); // Log to ensure update was successful
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   } finally {
-  //     setLoadDraft(false);
-  //   }
-  // };
-
-  // const checkErrors = () => {
-  //   console.log();
-  //   if (
-  //     !errors.title &&
-  //     !errors.shortCaption &&
-  //     !errors.coverImage &&
-  //     !errors.body &&
-  //     formData.title &&
-  //     formData.shortCaption &&
-  //     formData.coverImage &&
-  //     formData.body
-  //   ) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // };
-
-  // const debouncedHandleDraft = useCallback(debounce(handleDraft, 1000), []);
-
-  const handleDraft = async () => {
-    setLoadDraft(true);
-    try {
-      if (postId === null) {
-        console.log("creating new draft");
-        const res = await axios.post(
-          `/post/createNewDraftPost`,
-          {
-            id: "",
-            title: formData.title || "",
-            shortCaption: formData.shortCaption || "",
-            body: formData.body || "",
-            allowComments: true,
-          },
-          {
-            headers: {
-              accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+  const handlePublish = async () => {
+    setLoadPublish(true);
+    if (statusTypeState === statusType.PUBLISHED && postId) {
+      // check for errors and update the content - def- published ---2
+      setPublished(true);
+    } else if (statusTypeState === statusType.DRAFT && postId) {
+      // check for errors and update the content - def- published ---2
+      setPublished(true);
+    } else if (statusTypeState === statusType.NEW) {
+      try {
+        if (postId === null) {
+          const res = await axios.post(
+            `/post/publish`,
+            {
+              id: "",
+              title: formData.title || "",
+              shortCaption: formData.shortCaption || "",
+              body: formData.body || "",
+              allowComments: true,
             },
-          }
-        );
-        const { id: newPostId } = res.data.data; // Accessing the correct response structure
-        console.log(newPostId); // Log the new post ID to ensure it's correct
-        setPostId(newPostId); // Update postId with the new ID
-      } else {
-        console.log("updating draft");
-        const res = await axios.put(
-          `/post/updateDraftPost`,
-          {
-            id: postId || "",
-            title: formData.title || "",
-            shortCaption: formData.shortCaption || "",
-            body: formData.body || "",
-            allowComments: true,
-          },
-          {
-            headers: {
-              accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+            {
+              headers: {
+                accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+            }
+          );
+          const { id: newPostId } = res.data.data;
+          setPostId(newPostId);
+          setPublished(true);
+        } else {
+          // check for errors and update the content - def- published ---2
+          const res = await axios.put(
+            `/post/updateDraftPost`,
+            {
+              id: postId || "",
+              title: formData.title || "",
+              shortCaption: formData.shortCaption || "",
+              body: formData.body || "",
+              allowComments: true,
             },
-          }
-        );
-        const { id: updatedPostId } = res.data.data;
-        console.log(updatedPostId); // Log to ensure update was successful
+            {
+              headers: {
+                accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+            }
+          );
+          setPublished(true);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoadPublish(false);
       }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoadDraft(false);
     }
   };
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === "d") {
-        e.preventDefault(); // Prevent default browser behavior (like bookmarking)
+        e.preventDefault();
         handleDraft();
       }
     };
@@ -369,12 +329,7 @@ export const HandlePost = () => {
             ) : (
               <>
                 <button
-                  // onClick={() => {
-                  //   setLoadPublish(true);
-                  //   setTimeout(() => {
-                  //     setLoadPublish(false);
-                  //   }, 3000);
-                  // }}
+                  onClick={handlePublish}
                   disabled={loadPublish || loadDraft ? true : false}
                   className={`cursor-pointer h-[2.2rem] disabled:cursor-not-allowed bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold 
                      ${
@@ -389,7 +344,7 @@ export const HandlePost = () => {
                         <p>
                           {state?.statusType === statusType.DRAFT
                             ? "Publish"
-                            : state?.statusType === statusType.PUBLISHED
+                            : statusTypeState === statusType.PUBLISHED
                             ? "Republish"
                             : state?.statusType === statusType.ARCHIEVED
                             ? "Publish"
@@ -421,7 +376,7 @@ export const HandlePost = () => {
                   id="title"
                   name="title"
                   placeholder="eg. The ultimate next.js guide - 2024"
-                  // value={formData.username}
+                  value={formData.title || ""}
                   onChange={handleInputChange}
                   // disabled={loading}
                 />
@@ -445,7 +400,7 @@ export const HandlePost = () => {
                   id="shortCaption"
                   name="shortCaption"
                   placeholder="eg.  Fast-track your Next.js journey - Step-by-step guide for beginners"
-                  // value={formData.username}
+                  value={formData.shortCaption || ""}
                   onChange={handleInputChange}
                   // disabled={loading}
                 />

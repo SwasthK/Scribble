@@ -8,6 +8,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { authAtom } from "../../atoms/auth.atoms";
 import { EditIcon } from "../../assets/svg/EditIcon";
+import { statusType } from "../../Page/HandlePost";
 
 export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
   const { refetch, data, isLoading } = useGetPostByAuthorId(
@@ -87,6 +88,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                   state={{
                     postId: id,
                     authorId,
+                    statusType: statusType.PUBLISHED,
                   }}
                   className="flex justify-center items-center gap-2 px-4 py-2 rounded-lg bg-cdark-200 border-2"
                 >
