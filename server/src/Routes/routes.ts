@@ -26,7 +26,8 @@ import {
     getUserPosts,
     getPostBySlug,
     getPostByAuthorId,
-    getDraftedPost
+    getDraftedPostShortned,
+    getDraftedPostFullContentById
 } from '../Controllers/Posts/get.Posts'
 import { deleteDraftBulk, deleteDraftPost, deleteDraftPostById, deletePost } from '../Controllers/Posts/delete.Post'
 
@@ -93,6 +94,15 @@ api
     .put('/updateUserAvatar', authMiddleware, findActiveUser, getFileToUpload, updateUserAvatar)
     .delete('/deleteUserProfile', authMiddleware, findActiveUser, deleteUserProfile)
 
+    // Draft Routes
+    .get('/posts/drafts/shortened', authMiddleware, findActiveUser, getDraftedPostShortned)
+    .get('/posts/drafts/fullContent/:postId', authMiddleware, findActiveUser, getDraftedPostFullContentById)
+    .delete('/posts/delete/draftById/:draftId', authMiddleware, findActiveUser, deleteDraftPostById)
+    .delete('/posts/delete/draftBulk', authMiddleware, findActiveUser, deleteDraftBulk)
+
+
+
+
     //Follow Routes
     .post('profile/:id/follow', authMiddleware, findActiveUser, FollowUser)
     .delete('profile/:id/unfollow', authMiddleware, findActiveUser, UnFollowUser)
@@ -113,10 +123,7 @@ api
     .delete('/posts/delete/post/:postId', authMiddleware, findActiveUser, deletePost)
     .post('/posts/upsert', authMiddleware, findActiveUser, upSertDraftPost)
 
-    // Draft Routes
-    .get('/posts/drafts', authMiddleware, findActiveUser, getDraftedPost)
-    .delete('/posts/delete/draftById/:draftId', authMiddleware, findActiveUser, deleteDraftPostById)
-    .delete('/posts/delete/draftBulk', authMiddleware, findActiveUser, deleteDraftBulk)
+
 
     //Notification Routes
     .post('/notification/createUserNotifications', authMiddleware, findActiveUser, createUserNotifications)
