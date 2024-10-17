@@ -1,6 +1,5 @@
 import { Context } from "hono";
 import { apiError } from "../../utils/apiError";
-import { dbConnect } from "../../Connection/db.connect";
 import { apiResponse } from "../../utils/apiResponse";
 import { PostStatus } from "@prisma/client";
 
@@ -17,11 +16,6 @@ export async function getPostById(c: Context) {
 
         const post = await prisma.post.findUnique({
             where: { id: postId },
-            select: {
-                title: true,
-                shortCaption: true,
-                body: true,
-            }
         });
 
         if (!post) {
@@ -240,6 +234,46 @@ export async function getArchivedPost(c: Context) {
 
 }
 
+export async function getDraftedPost(c: Context) {
+    const user = c.get("user");
+
+    try {
+        const prisma = c.get('prisma');
+
+        const posts = await prisma.post.findMany({
+            where: {
+                authorId: user.id,
+                status: PostStatus.DRAFT
+            },
+            orderBy: {
+                updatedAt: 'desc'
+            },
+            select: {
+                id: true,
+                authorId: true,
+                title: true,
+                status: true,
+                updatedAt: true
+            }
+        });
+
+        if (!posts) {
+            return apiError(c, 404, "No Post Found");
+        }
+
+        if (posts.length === 0) {
+            return apiError(c, 404, "0 Post Found");
+        }
+
+        return apiResponse(c, 200, posts, "Posts fetched successfully");
+
+    } catch (error: any) {
+        console.log("Get All Posts Error: ", error.message);
+        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+    }
+
+}
+
 export async function getAllPosts(c: Context) {
     //Used
 
@@ -255,7 +289,13 @@ export async function getAllPosts(c: Context) {
         const prisma = c.get('prisma');
 
         // Get total number of posts
-        const totalPosts = await prisma.post.count();
+        const totalPosts = await prisma.post.count(
+            // {
+            //     where: {
+            //         status: PostStatus.PUBLISHED
+            //     }
+            // }
+        );
 
         const totalPages = Math.ceil(totalPosts / limit);
 
@@ -314,7 +354,7 @@ export async function getAllPosts(c: Context) {
                 authorId: {
                     not: user.id
                 },
-                status: PostStatus.PUBLISHED
+                // status: PostStatus.PUBLISHED
             },
             orderBy: {
                 createdAt: 'desc',
@@ -369,7 +409,7 @@ export async function getUserPosts(c: Context) {
             {
                 where: {
                     authorId: user.id,
-                        status: PostStatus.PUBLISHED
+                    status: PostStatus.PUBLISHED
                 }
             }
         );
@@ -382,7 +422,10 @@ export async function getUserPosts(c: Context) {
             orderBy: {
                 createdAt: 'desc',
             },
-            where: { authorId: user.id },
+            where: {
+                authorId: user.id,
+                status: PostStatus.PUBLISHED
+            },
             select: {
                 id: true,
                 title: true,

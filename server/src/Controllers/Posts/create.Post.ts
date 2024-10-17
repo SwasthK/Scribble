@@ -7,7 +7,7 @@ import { dbConnect } from "../../Connection/db.connect";
 import { z } from 'zod';
 import { createSlug } from '../../utils/createSlug';
 
-const createPostSchema = z.object({
+export const createPostSchema = z.object({
     coverImage: z.string().url({ message: "Invalid Cover Image URL" }).optional(),
     title: z.string()
         .min(10, { message: "Title must be atleast 6 Characters" })
@@ -70,7 +70,7 @@ const createNewDraftPostSchema = z.object({
 export async function createDraftPost(c: Context) {
     const authorId = c.get("user").id;
 
-    const prisma: any = await dbConnect(c);
+    const prisma = c.get('prisma');
 
     const requestBody = await c.req.json()
 
