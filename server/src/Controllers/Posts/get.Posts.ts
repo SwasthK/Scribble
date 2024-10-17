@@ -234,7 +234,7 @@ export async function getArchivedPost(c: Context) {
 
 }
 
-export async function getDraftedPost(c: Context) {
+export async function getDraftedPostShortned(c: Context) {
     const user = c.get("user");
 
     try {
@@ -266,6 +266,47 @@ export async function getDraftedPost(c: Context) {
         }
 
         return apiResponse(c, 200, posts, "Posts fetched successfully");
+
+    } catch (error: any) {
+        console.log("Get All Posts Error: ", error.message);
+        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+    }
+
+}
+
+export async function getDraftedPostFullContentById(c: Context) {
+    const user = c.get("user");
+
+    const postId = c.req.param('postId');
+
+    if (!postId) {
+        return apiError(c, 400, "Post Id is required");
+    }
+
+    try {
+        const prisma = c.get('prisma');
+
+        const post = await prisma.post.findFirst({
+            where: {
+                AND: [{
+                    id: postId,
+                    authorId: user.id,
+                    status: PostStatus.DRAFT
+                }]
+            },
+            select: {
+                title: true,
+                shortCaption: true,
+                body: true,
+                coverImage: true,
+            }
+        });
+
+        if (!post) {
+            return apiError(c, 404, "No Post Found");
+        }
+
+        return apiResponse(c, 200, post, "Posts fetched successfully");
 
     } catch (error: any) {
         console.log("Get All Posts Error: ", error.message);

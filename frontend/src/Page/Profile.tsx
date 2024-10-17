@@ -31,7 +31,7 @@ export const Profile = () => {
 
   const postsQuery = useGetUserPosts(currentPage);
 
-  const { data, isError, error, isLoading,isFetching } = postsQuery;
+  const { data, isError, error, isLoading, isFetching } = postsQuery;
 
   const pageCount = data ? Math.ceil(data.totalPosts / 6) : 6;
 
@@ -362,14 +362,13 @@ export const Profile = () => {
 
 export const UserBlogs = memo(
   ({
-    userId,
     title,
     shortCaption,
     url,
     date,
     slug,
   }: {
-    userId: number | string;
+    userId?: number | string;
     title: string;
     shortCaption: string;
     url: string;
