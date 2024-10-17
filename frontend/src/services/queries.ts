@@ -52,6 +52,6 @@ export function useGetDraftedPost() {
         queryKey: ["draftedPosts"],
         queryFn: () => getDraftPost(),
         enabled: true,
-        staleTime: Infinity,
+        retry: false,
     })
 }
