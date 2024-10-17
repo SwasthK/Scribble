@@ -21,6 +21,7 @@ import axios from "axios";
 import { Spinner } from "../components/Global/Spinner";
 import { useRecoilValue } from "recoil";
 import { authAtom } from "../atoms/auth.atoms";
+import { useGetDraftedPostFullContentByPostId } from "../services/queries";
 
 export enum statusType {
   DRAFT = "DRAFT",
@@ -55,25 +56,48 @@ export const HandlePost = () => {
   const { user: currentUser } = useRecoilValue(authAtom);
   const [errors, setErrors] = useState<FormErrors>({});
 
+  const { data: fullDraftData, isFetching: isFetchingFullDraftData } =
+    useGetDraftedPostFullContentByPostId({ postId });
+
+  // const {
+  //   isSuccess,
+  //   isError: isMutationError,
+  //   error: mutationError,
+  //   isPending,
+  //   mutate,
+  //   reset,
+  // } = useMutation({
+  //   mutationFn: (FormData: updateUserProfileMetaData) =>
+  //     handleUpdateUserProfileMetadata(FormData),
+  //   onSuccess: () => {
+     
+  //   },
+  //   onError: (error: any) => {
+  //     console.log("Error", error);
+  //   },
+  //   onSettled: () => {
+  //     setTimeout(() => {
+  //       reset();
+  //     }, 10000);
+  //   },
+  // });
+
   useEffect(() => {
-    if (location.state && state.postId && state.authorId && state.statusType) {
+    if (location.state && postId && authorId && statusType) {
       navigate(location.pathname, { replace: true, state: null });
     }
 
-    async function checkData() {
-      if (postId && authorId) {
-        if (currentUser.id !== authorId) {
-          navigate("/blogs");
-          return null;
-        } else {
-          console.log("I am getting the Data");
-          // get the data of the post by providing postId
-          // if error log it else set the recieved data to formData
-        }
+    if (postId && authorId) {
+      if (currentUser.id !== authorId) {
+        navigate("/blogs");
+        return;
       }
     }
-    checkData();
   }, []);
+
+  // useEffect(() => {
+  //   setFormData;
+  // }, [fullDraftData]);
 
   const handleDraft = async () => {
     setLoadDraft(true);
@@ -82,8 +106,15 @@ export const HandlePost = () => {
         statusTypeState === statusType.DRAFT) &&
       postId
     ) {
-      // backend call update content - def - draft ---1
-      setPublished(false);
+      try {
+        console.log("update the content - def - draft ---1");
+        // backend call update content - def - draft ---1
+        // setPublished(false);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoadDraft(false);
+      }
     } else if (statusTypeState === statusType.NEW) {
       setPublished(false);
       try {
@@ -131,33 +162,12 @@ export const HandlePost = () => {
   };
 
   const [formData, setFormData] = useState<createPostFormData>({
-    title: "",
-    shortCaption: "",
-    coverImage: null,
-    body: "",
+    title: fullDraftData.title || "",
+    shortCaption: fullDraftData.shortCaption || "",
+    coverImage: fullDraftData.coverImage || null,
+    body: fullDraftData.body || "",
+    allowComments: true,
   });
-
-  const getPostData = async () => {
-    try {
-      const res = await axios.get(`/posts/get/${postId}`, {
-        headers: {
-          accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
-      const { data } = res.data;
-      const { title, shortCaption, body, coverImage } = data;
-
-      setFormData({
-        title,
-        shortCaption,
-        body,
-        coverImage,
-      });
-      // setStatusTypeState(data.status);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setPublished(false);
@@ -286,70 +296,32 @@ export const HandlePost = () => {
   return (
     <div className="">
       <AppBar />
-      <div className="flex justify-center items-center px-8 py-8 sm:px-16">
-        <div className="fixed top-24 w-[95%]  max-w-[800px] flex items-center justify-between px-16 bg-slate-800 rounded-full">
-          <div className="flex gap-3 items-center  py-3">
-            <button
-              onClick={handleDraft}
-              disabled={loadDraft || loadPublish ? true : false}
-              className={`cursor-pointer h-[2.2rem] disabled:cursor-not-allowed ${
-                loadPublish
-                  ? "disabled:bg-[#8babce] "
-                  : "disabled:bg-transparent"
-              } bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold w-[5.5rem]`}
-            >
-              <div className="flex justify-center items-center gap-2">
-                {!loadDraft ? (
-                  <>
-                    <SaveFileIcon
-                      color={loadDraft ? "currentColor" : "currentColor"}
-                    />
-                    <p>Draft</p>
-                  </>
-                ) : (
-                  <>
-                    <Spinner size={5} />
-                  </>
-                )}
-              </div>
-            </button>
-          </div>
-
-          <div className="flex gap-3 items-center ">
-            {published ? (
-              <>
-                <p className="font-semibold">
-                  Live at <span className="text-cgreen ml-2">&#x2022;</span>
-                </p>
-
-                <Link to={""}>
-                  <GlobeIcon />
-                </Link>
-              </>
-            ) : (
-              <>
+      {isFetchingFullDraftData ? (
+        <>
+          {/* TODO */}
+          <p>Loading the data ...</p>
+        </>
+      ) : (
+        <>
+          <div className="flex justify-center items-center px-8 py-8 sm:px-16">
+            <div className="fixed top-24 w-[95%]  max-w-[800px] flex items-center justify-between px-16 bg-slate-800 rounded-full">
+              <div className="flex gap-3 items-center  py-3">
                 <button
-                  onClick={handlePublish}
-                  disabled={loadPublish || loadDraft ? true : false}
-                  className={`cursor-pointer h-[2.2rem] disabled:cursor-not-allowed bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold 
-                     ${
-                       loadDraft
-                         ? "disabled:bg-[#8babce] "
-                         : "disabled:bg-transparent"
-                     } w-[5.5rem]`}
+                  onClick={handleDraft}
+                  disabled={loadDraft || loadPublish ? true : false}
+                  className={`cursor-pointer h-[2.2rem] disabled:cursor-not-allowed ${
+                    loadPublish
+                      ? "disabled:bg-[#8babce] "
+                      : "disabled:bg-transparent"
+                  } bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold w-[5.5rem]`}
                 >
                   <div className="flex justify-center items-center gap-2">
-                    {!loadPublish ? (
+                    {!loadDraft ? (
                       <>
-                        <p>
-                          {state?.statusType === statusType.DRAFT
-                            ? "Publish"
-                            : statusTypeState === statusType.PUBLISHED
-                            ? "Republish"
-                            : state?.statusType === statusType.ARCHIEVED
-                            ? "Publish"
-                            : "Publish"}
-                        </p>
+                        <SaveFileIcon
+                          color={loadDraft ? "currentColor" : "currentColor"}
+                        />
+                        <p>Draft</p>
                       </>
                     ) : (
                       <>
@@ -358,123 +330,170 @@ export const HandlePost = () => {
                     )}
                   </div>
                 </button>
-              </>
-            )}
-          </div>
-        </div>
-        <div className="w-[95%] flex flex-col gap-8 max-w-[800px] h-3/4 fixed overflow-y-scroll top-44 pb-24 px-4 sm:px-8 ">
-          <div className="rounded-lg py-8 px-8 flex  gap-8 flex-col-reverse md:flex-row bg-[#262932] md:items-center">
-            <div className="flex flex-col gap-6 items-start ">
-              <div className="flex gap-3 flex-col w-full sm:w-96">
-                {/* <label htmlFor="title" className="font-semibold">
+              </div>
+
+              <div className="flex gap-3 items-center ">
+                {published ? (
+                  <>
+                    <p className="font-semibold">
+                      Live at <span className="text-cgreen ml-2">&#x2022;</span>
+                    </p>
+
+                    <Link to={""}>
+                      <GlobeIcon />
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={handlePublish}
+                      disabled={loadPublish || loadDraft ? true : false}
+                      className={`cursor-pointer h-[2.2rem] disabled:cursor-not-allowed bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold 
+                     ${
+                       loadDraft
+                         ? "disabled:bg-[#8babce] "
+                         : "disabled:bg-transparent"
+                     } w-[5.5rem]`}
+                    >
+                      <div className="flex justify-center items-center gap-2">
+                        {!loadPublish ? (
+                          <>
+                            <p>
+                              {state?.statusType === statusType.DRAFT
+                                ? "Publish"
+                                : statusTypeState === statusType.PUBLISHED
+                                ? "Republish"
+                                : state?.statusType === statusType.ARCHIEVED
+                                ? "Publish"
+                                : "Publish"}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <Spinner size={5} />
+                          </>
+                        )}
+                      </div>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="w-[95%] flex flex-col gap-8 max-w-[800px] h-3/4 fixed overflow-y-scroll top-44 pb-24 px-4 sm:px-8 ">
+              <div className="rounded-lg py-8 px-8 flex  gap-8 flex-col-reverse md:flex-row bg-[#262932] md:items-center">
+                <div className="flex flex-col gap-6 items-start ">
+                  <div className="flex gap-3 flex-col w-full sm:w-96">
+                    {/* <label htmlFor="title" className="font-semibold">
                   Main title
                 </label> */}
-                <p className="text-cgray ml-2 font-semibold">Main title</p>
-                <input
-                  className="input-style italic  text-xl"
-                  type="text"
-                  id="title"
-                  name="title"
-                  placeholder="eg. The ultimate next.js guide - 2024"
-                  value={formData.title || ""}
-                  onChange={handleInputChange}
-                  // disabled={loading}
-                />
-                {/* {errors.username ? (
+                    <p className="text-cgray ml-2 font-semibold">Main title</p>
+                    <input
+                      className="input-style italic  text-xl"
+                      type="text"
+                      id="title"
+                      name="title"
+                      placeholder="eg. The ultimate next.js guide - 2024"
+                      value={formData.title || ""}
+                      onChange={handleInputChange}
+                      // disabled={loading}
+                    />
+                    {/* {errors.username ? (
                 <p className="error">{errors.username}</p>
               ) : (
                 <p className="text-cgray">Your public username here.</p>
               )} */}
-              </div>
+                  </div>
 
-              <div className="flex gap-3 flex-col w-full sm:w-96">
-                {/* <label htmlFor="title" className="font-semibold">
+                  <div className="flex gap-3 flex-col w-full sm:w-96">
+                    {/* <label htmlFor="title" className="font-semibold">
                   Short description
                 </label> */}
-                <p className="text-cgray font-semibold ml-2">
-                  Short description
-                </p>
-                <input
-                  className="input-style  text-base italic"
-                  type="text"
-                  id="shortCaption"
-                  name="shortCaption"
-                  placeholder="eg.  Fast-track your Next.js journey - Step-by-step guide for beginners"
-                  value={formData.shortCaption || ""}
-                  onChange={handleInputChange}
-                  // disabled={loading}
-                />
-                {/* {errors.username ? (
+                    <p className="text-cgray font-semibold ml-2">
+                      Short description
+                    </p>
+                    <input
+                      className="input-style  text-base italic"
+                      type="text"
+                      id="shortCaption"
+                      name="shortCaption"
+                      placeholder="eg.  Fast-track your Next.js journey - Step-by-step guide for beginners"
+                      value={formData.shortCaption || ""}
+                      onChange={handleInputChange}
+                      // disabled={loading}
+                    />
+                    {/* {errors.username ? (
                 <p className="error">{errors.username}</p>
               ) : (
                 <p className="text-cgray">Your public username here.</p>
               )} */}
-              </div>
-            </div>
-
-            <div className="w-full sm:max-w-96 rounded-lg flex justify-center flex-col gap-3">
-              {/* <input type="file" name="" id="" className="border max-w-60" /> */}
-              <p className="text-cgray font-semibold ml-2">Cover Image</p>
-              <div className="flex items-center justify-center w-full">
-                <label
-                  htmlFor="coverImage"
-                  className="flex flex-col w-full border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-800 bg-gray-700 border-gray-600 hover:border-gray-500"
-                >
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <svg
-                      className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 20 16"
-                    >
-                      <path
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                      />
-                    </svg>
-                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                      <span className="font-semibold">Click to upload</span> or
-                      drag and drop
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      SVG, PNG, JPG or GIF (MAX. 800x400px)
-                    </p>
                   </div>
-                  <input
-                    id="coverImage"
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                  />
-                </label>
+                </div>
+
+                <div className="w-full sm:max-w-96 rounded-lg flex justify-center flex-col gap-3">
+                  {/* <input type="file" name="" id="" className="border max-w-60" /> */}
+                  <p className="text-cgray font-semibold ml-2">Cover Image</p>
+                  <div className="flex items-center justify-center w-full">
+                    <label
+                      htmlFor="coverImage"
+                      className="flex flex-col w-full border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-800 bg-gray-700 border-gray-600 hover:border-gray-500"
+                    >
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg
+                          className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 20 16"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                          />
+                        </svg>
+                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                          <span className="font-semibold">Click to upload</span>{" "}
+                          or drag and drop
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          SVG, PNG, JPG or GIF (MAX. 800x400px)
+                        </p>
+                      </div>
+                      <input
+                        id="coverImage"
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                      />
+                    </label>
+                  </div>
+                </div>
               </div>
+
+              <div className="pl-8 font-semibold">
+                <p>Blog Content</p>
+              </div>
+
+              <BlockNoteView
+                editor={editor}
+                editable={true}
+                data-changing-font-demo
+                data-theming-css-variables-demo
+                formattingToolbar={false}
+                // linkToolbar={false}
+                // filePanel={false}
+                // sideMenu={false}
+                // slashMenu={false}
+                // tableHandles={false}
+                onChange={handleBodyChange}
+              />
             </div>
           </div>
-
-          <div className="pl-8 font-semibold">
-            <p>Blog Content</p>
-          </div>
-
-          <BlockNoteView
-            editor={editor}
-            editable={true}
-            data-changing-font-demo
-            data-theming-css-variables-demo
-            formattingToolbar={false}
-            // linkToolbar={false}
-            // filePanel={false}
-            // sideMenu={false}
-            // slashMenu={false}
-            // tableHandles={false}
-            onChange={handleBodyChange}
-          />
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };
