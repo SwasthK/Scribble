@@ -52,4 +52,5 @@ export interface createPostFormData {
     shortCaption: string;
     coverImage: File | null;
     body: string;
+    allowComments: boolean;
 }
