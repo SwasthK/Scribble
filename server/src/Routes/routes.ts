@@ -25,9 +25,10 @@ import {
     getArchivedPost,
     getUserPosts,
     getPostBySlug,
-    getPostByAuthorId
+    getPostByAuthorId,
+    getDraftedPost
 } from '../Controllers/Posts/get.Posts'
-import { deletePost } from '../Controllers/Posts/delete.Post'
+import { deleteDraftBulk, deleteDraftPost, deleteDraftPostById, deletePost } from '../Controllers/Posts/delete.Post'
 
 //Import Category Route handlers
 import { createCategory } from '../Controllers/Category/create.controller'
@@ -45,7 +46,7 @@ import { deleteTag } from '../Controllers/Tags/delete.controller'
 import { likeAndUnlikePost } from '../Controllers/Like/like.Post'
 
 // Import Publish Post handlers
-import { publishPost } from '../Controllers/Posts/publish.Post'
+import { publishDraftedPost, publishPost } from '../Controllers/Posts/publish.Post'
 
 //Archive Post
 import { archivePost } from '../Controllers/Posts/archive.Post'
@@ -101,9 +102,6 @@ api
     //Post Routes
     .post('/post/createNewDraftPost', authMiddleware, findActiveUser, createDraftPost)
     .put('/post/updateDraftPost', authMiddleware, findActiveUser, updateDraftPost)
-
-
-
     .put('/post/update/:postId', authMiddleware, findActiveUser, updatePost)
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/get/:postId', authMiddleware, findActiveUser, getPostById)
@@ -112,8 +110,13 @@ api
     .get('/posts/getBy/slug/:postSlug', authMiddleware, findActiveUser, getPostBySlug)
     .get('posts/published', authMiddleware, findActiveUser, getPublishedPost)
     .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
-    .delete('/posts/delete/:postId', authMiddleware, findActiveUser, deletePost)
+    .delete('/posts/delete/post/:postId', authMiddleware, findActiveUser, deletePost)
     .post('/posts/upsert', authMiddleware, findActiveUser, upSertDraftPost)
+
+    // Draft Routes
+    .get('/posts/drafts', authMiddleware, findActiveUser, getDraftedPost)
+    .delete('/posts/delete/draftById/:draftId', authMiddleware, findActiveUser, deleteDraftPostById)
+    .delete('/posts/delete/draftBulk', authMiddleware, findActiveUser, deleteDraftBulk)
 
     //Notification Routes
     .post('/notification/createUserNotifications', authMiddleware, findActiveUser, createUserNotifications)
@@ -138,7 +141,8 @@ api
     .post('/post/like/:postId', authMiddleware, findActiveUser, likeAndUnlikePost)
 
     //Publish Post Routes
-    .post('/post/publish/:postId', authMiddleware, findActiveUser, publishPost)
+    .post('/post/publish/draft/:postId', authMiddleware, findActiveUser, publishPost)
+    .post('/post/publish/', authMiddleware, findActiveUser, publishDraftedPost)
 
     //Archive Post Routes
     .post('/post/archive/:postId', authMiddleware, findActiveUser, archivePost)
