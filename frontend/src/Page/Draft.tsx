@@ -11,7 +11,7 @@ import { statusType } from "./HandlePost";
 
 export const Draft = () => {
   const postsQuery = useGetDraftedPost();
-  const { data, isFetching, isError, error } = postsQuery;
+  const { data, isFetching, isError, error ,isLoading} = postsQuery;
   const [drafts, setDrafts] = useState(data || []);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export const Draft = () => {
               getting noticed !
             </span>
           </p>
-          {isFetching && (
+          {isLoading && (
             <>
               <div className="w-full grid place-content-center grid-cols-1 md:grid-cols-2 gap-8 mt-4 md:gap-14">
                 {Array.from({ length: 6 }, (_, index) => (
