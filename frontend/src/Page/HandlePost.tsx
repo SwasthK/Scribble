@@ -35,53 +35,15 @@ export const HandlePost = () => {
   const navigate = useNavigate();
   const { state } = location;
 
-  const [loadDraft, setLoadDraft] = useState(false);
-  const [loadPublish, setLoadPublish] = useState(false);
-
   const [postId, setPostId] = useState<string | null>(
     state ? state.postId : null
   );
-  const [authorId, setAuthorId] = useState<string | null>(
-    state ? state.authorId : null
-  );
-
-  const [published, setPublished] = useState<boolean>(
-    state?.statusType === statusType.PUBLISHED ? true : false
-  );
-
+  const authorId = state ? state.authorId : null;
   const [statusTypeState, setStatusTypeState] = useState<statusType>(
     state ? state.statusType : statusType.NEW
   );
 
-  const { user: currentUser } = useRecoilValue(authAtom);
-  const [errors, setErrors] = useState<FormErrors>({});
-
-  const { data: fullDraftData, isFetching: isFetchingFullDraftData } =
-    useGetDraftedPostFullContentByPostId({ postId });
-
-  // const {
-  //   isSuccess,
-  //   isError: isMutationError,
-  //   error: mutationError,
-  //   isPending,
-  //   mutate,
-  //   reset,
-  // } = useMutation({
-  //   mutationFn: (FormData: updateUserProfileMetaData) =>
-  //     handleUpdateUserProfileMetadata(FormData),
-  //   onSuccess: () => {
-     
-  //   },
-  //   onError: (error: any) => {
-  //     console.log("Error", error);
-  //   },
-  //   onSettled: () => {
-  //     setTimeout(() => {
-  //       reset();
-  //     }, 10000);
-  //   },
-  // });
-
+  // --------------EFFECTS----------------
   useEffect(() => {
     if (location.state && postId && authorId && statusType) {
       navigate(location.pathname, { replace: true, state: null });
@@ -94,10 +56,67 @@ export const HandlePost = () => {
       }
     }
   }, []);
+  // ---------------------------------------
 
-  // useEffect(() => {
-  //   setFormData;
-  // }, [fullDraftData]);
+  // ------------TANSTACK/REACT-QUERY----------------
+  const { data: fullDraftData, isFetching: isFetchingFullDraftDat,isLoading } =
+    useGetDraftedPostFullContentByPostId({ postId });
+
+  const updateDraftedData = async () => {
+    try {
+      // backend call update content - def - draft ---1
+
+      await axios.put(
+        `/posts/updateDraftById/${postId}`,
+        {
+          id: postId || "",
+          title: formData.title || "",
+          shortCaption: formData.shortCaption || "",
+          body: formData.body || "",
+          allowComments: true,
+          summary: "",
+        },
+        {
+          headers: {
+            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      setPublished(false);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadDraft(false);
+    }
+  };
+  // ------------------------------------------------
+
+  const [loadDraft, setLoadDraft] = useState(false);
+  const [loadPublish, setLoadPublish] = useState(false);
+
+  const [published, setPublished] = useState<boolean>(
+    state?.statusType === statusType.PUBLISHED ? true : false
+  );
+
+  const { user: currentUser } = useRecoilValue(authAtom);
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  // ---------------------------------------
+  useEffect(() => {
+    setFormData({
+      title: fullDraftData?.title || "",
+      shortCaption: fullDraftData?.shortCaption || "",
+      coverImage: null,
+      body: fullDraftData?.body || "",
+      allowComments: true,
+    });
+    const genrateEditorData = async () => {
+      const blocks = await editor.tryParseHTMLToBlocks(fullDraftData.body);
+      editor.replaceBlocks(editor.document, blocks);
+    };
+    genrateEditorData();
+  }, [fullDraftData]);
+  // ---------------------------------------
 
   const handleDraft = async () => {
     setLoadDraft(true);
@@ -106,15 +125,7 @@ export const HandlePost = () => {
         statusTypeState === statusType.DRAFT) &&
       postId
     ) {
-      try {
-        console.log("update the content - def - draft ---1");
-        // backend call update content - def - draft ---1
-        // setPublished(false);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoadDraft(false);
-      }
+      await updateDraftedData();
     } else if (statusTypeState === statusType.NEW) {
       setPublished(false);
       try {
@@ -162,10 +173,10 @@ export const HandlePost = () => {
   };
 
   const [formData, setFormData] = useState<createPostFormData>({
-    title: fullDraftData.title || "",
-    shortCaption: fullDraftData.shortCaption || "",
-    coverImage: fullDraftData.coverImage || null,
-    body: fullDraftData.body || "",
+    title: "",
+    shortCaption: "",
+    coverImage: null,
+    body: "",
     allowComments: true,
   });
 
@@ -296,7 +307,7 @@ export const HandlePost = () => {
   return (
     <div className="">
       <AppBar />
-      {isFetchingFullDraftData ? (
+      {isLoading ? (
         <>
           {/* TODO */}
           <p>Loading the data ...</p>
@@ -482,7 +493,7 @@ export const HandlePost = () => {
                 editable={true}
                 data-changing-font-demo
                 data-theming-css-variables-demo
-                formattingToolbar={false}
+                formattingToolbar={true}
                 // linkToolbar={false}
                 // filePanel={false}
                 // sideMenu={false}
