@@ -16,7 +16,7 @@ import { getFollowersDetails, getFollowingsDetails } from '../Controllers/Follow
 
 //Import Post Route handlers
 import { createDraftPost, updateDraftPost, upSertDraftPost } from 'Controllers/Posts/create.Post'
-import { updatePost } from '../Controllers/Posts/update.Post'
+import { updateDraftPostById, updatePost } from '../Controllers/Posts/update.Post'
 import {
     getPostById,
     getPostByTitle,
@@ -108,11 +108,11 @@ api
     .delete('profile/:id/unfollow', authMiddleware, findActiveUser, UnFollowUser)
     .get('/profile/getFollowersDetails', authMiddleware, findActiveUser, getFollowersDetails)
     .get('/profile/getFollowingsDetails', authMiddleware, findActiveUser, getFollowingsDetails)
+    .put('/posts/updateDraftById/:postId', authMiddleware, findActiveUser, updateDraftPostById)
 
     //Post Routes
     .post('/post/createNewDraftPost', authMiddleware, findActiveUser, createDraftPost)
     .put('/post/updateDraftPost', authMiddleware, findActiveUser, updateDraftPost)
-    .put('/post/update/:postId', authMiddleware, findActiveUser, updatePost)
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/get/:postId', authMiddleware, findActiveUser, getPostById)
     .get('/posts/getBy/authorId/:authorId', authMiddleware, findActiveUser, getPostByAuthorId)

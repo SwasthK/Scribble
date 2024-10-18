@@ -53,6 +53,7 @@ export function useGetDraftedPost() {
         queryFn: () => getDraftPost(),
         enabled: true,
         retry: false,
+        staleTime:0
     })
 }
 
@@ -62,6 +63,7 @@ export function useGetDraftedPostFullContentByPostId({ postId }: { postId: strin
         queryFn: () => getDraftPostFullContentByPostId({ postId }),
         enabled: !!postId,
         retry: false,
-        staleTime: 100000
+        staleTime: 0,
+        refetchOnWindowFocus: true,
     })
 }

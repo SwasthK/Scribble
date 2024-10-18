@@ -50,6 +50,7 @@ export const NovelPreview = () => {
 
         const blocks = await editor.tryParseHTMLToBlocks(receivedBlock);
         editor.replaceBlocks(editor.document, blocks);
+        
 
         setBlocks(receivedBlock);
       } catch (error: any) {
