@@ -16,7 +16,7 @@ export const validateShortCaption = (value: string) => {
 
 export const validateBlogBody = (value: string) => {
     if (!value) return "Content is required";
-    if (value.length < 300) return "Your Content Seems to be Small, Write More !";
+    if (value.length < 250) return "Your Content Seems to be Small, Write More !";
     if (value.length > 10000)
         return "You have Reached Your Content Limit";
     return "";

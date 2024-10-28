@@ -15,7 +15,7 @@ import {
   validateBlogBody,
   validateShortCaption,
   validateTitle,
-} from "../validation/FormValidations";
+} from "../validation/BlogFormValidations";
 import { debounce } from "./NoveEditor";
 import axios from "axios";
 import { Spinner } from "../components/Global/Spinner";
@@ -59,13 +59,45 @@ export const HandlePost = () => {
   // ---------------------------------------
 
   // ------------TANSTACK/REACT-QUERY----------------
-  const { data: fullDraftData, isFetching: isFetchingFullDraftDat,isLoading } =
+  const { data: fullDraftData, isLoading } =
     useGetDraftedPostFullContentByPostId({ postId });
 
-  const updateDraftedData = async () => {
-    try {
-      // backend call update content - def - draft ---1
+  const [loadDraft, setLoadDraft] = useState<boolean>(false);
+  const [loadPublish, setLoadPublish] = useState<boolean>(false);
+  const [published, setPublished] = useState<boolean>(
+    state?.statusType === statusType.PUBLISHED ? true : false
+  );
+  const { user: currentUser } = useRecoilValue(authAtom);
 
+  const createNewDraftData = async () => {
+    try {
+      const res = await axios.post(
+        `/post/createNewDraftPost`,
+        {
+          id: "",
+          title: formData.title || "",
+          shortCaption: formData.shortCaption || "",
+          body: formData.body || "",
+          allowComments: true,
+        },
+        {
+          headers: {
+            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      const { id: newPostId } = res.data.data;
+      setPostId(newPostId);
+      setPublished(false);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadDraft(false);
+    }
+  };
+
+  const updateDraftData = async () => {
+    try {
       await axios.put(
         `/posts/updateDraftById/${postId}`,
         {
@@ -89,19 +121,121 @@ export const HandlePost = () => {
       setLoadDraft(false);
     }
   };
+
+  const createNewPublishData = async () => {
+    try {
+      const data = new FormData();
+      console.log(formData.coverImage);
+      data.append("file", formData.coverImage || "");
+      data.append("title", formData.title || "");
+      data.append("shortCaption", formData.shortCaption || "");
+      data.append("body", formData.body || "");
+      data.append("allowComments", "false");
+      data.append("summary", "Just the randomized texts here");
+
+      const res = await axios.post(`/posts/createNewPublishPost`, data, {
+        headers: {
+          accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      const { id: newPostId } = res.data.data;
+      setPostId(newPostId);
+      setPublished(true);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadPublish(false);
+    }
+  };
+
+  const updatePublishData = async () => {
+    try {
+      await axios.put(
+        `/posts/updatePublishById/${postId}`,
+        {
+          id: postId || "",
+          title: formData.title || "",
+          shortCaption: formData.shortCaption || "",
+          body: formData.body || "",
+          allowComments: true,
+          summary: "Just the randomized texts here",
+        },
+        {
+          headers: {
+            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      setPublished(true);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadPublish(false);
+    }
+  };
+
+  const handleDraft = async () => {
+    setLoadDraft(true);
+    if (
+      (statusTypeState === statusType.PUBLISHED ||
+        statusTypeState === statusType.DRAFT) &&
+      postId
+    ) {
+      await updateDraftData();
+    } else if (statusTypeState === statusType.NEW) {
+      if (postId === null) {
+        await createNewDraftData();
+      } else {
+        await updateDraftData();
+      }
+    }
+  };
+
+  const handlePublish = async () => {
+    setLoadPublish(true);
+    if (checkClientErrors() === 0) {
+      setLoadPublish(false);
+      return;
+    }
+
+    if (
+      (statusTypeState === statusType.PUBLISHED ||
+        statusTypeState === statusType.DRAFT) &&
+      postId
+    ) {
+      // check for errors and update the content - def- published ---2
+      await updatePublishData();
+      console.log("Publishing Data - UPDATE- A");
+    } else if (statusTypeState === statusType.NEW) {
+      if (postId === null) {
+        // check for errors and create the content - def- published
+        await createNewPublishData();
+        console.log("Publihing - CREATE");
+      } else {
+        // check for errors and update the content - def- published ---2
+        await updatePublishData();
+        console.log("Publishing Data -UPDATE- B");
+      }
+    }
+  };
+
+  const checkClientErrors = () => {
+    const clientError = {
+      title: validateTitle(formData.title),
+      ShortCaption: validateShortCaption(formData.shortCaption),
+      body: validateBlogBody(formData.body),
+    };
+    if (clientError.title || clientError.ShortCaption || clientError.body) {
+      console.log(
+        clientError.title || clientError.ShortCaption || clientError.body
+      );
+      return 0;
+    }
+  };
+
   // ------------------------------------------------
 
-  const [loadDraft, setLoadDraft] = useState(false);
-  const [loadPublish, setLoadPublish] = useState(false);
-
-  const [published, setPublished] = useState<boolean>(
-    state?.statusType === statusType.PUBLISHED ? true : false
-  );
-
-  const { user: currentUser } = useRecoilValue(authAtom);
-  const [errors, setErrors] = useState<FormErrors>({});
-
-  // ---------------------------------------
+  // ------------------------------- Load content on mount
   useEffect(() => {
     setFormData({
       title: fullDraftData?.title || "",
@@ -118,59 +252,7 @@ export const HandlePost = () => {
   }, [fullDraftData]);
   // ---------------------------------------
 
-  const handleDraft = async () => {
-    setLoadDraft(true);
-    if (
-      (statusTypeState === statusType.PUBLISHED ||
-        statusTypeState === statusType.DRAFT) &&
-      postId
-    ) {
-      await updateDraftedData();
-    } else if (statusTypeState === statusType.NEW) {
-      setPublished(false);
-      try {
-        if (postId === null) {
-          const res = await axios.post(
-            `/post/createNewDraftPost`,
-            {
-              id: "",
-              title: formData.title || "",
-              shortCaption: formData.shortCaption || "",
-              body: formData.body || "",
-              allowComments: true,
-            },
-            {
-              headers: {
-                accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-              },
-            }
-          );
-          const { id: newPostId } = res.data.data;
-          setPostId(newPostId);
-        } else {
-          const res = await axios.put(
-            `/post/updateDraftPost`,
-            {
-              id: postId || "",
-              title: formData.title || "",
-              shortCaption: formData.shortCaption || "",
-              body: formData.body || "",
-              allowComments: true,
-            },
-            {
-              headers: {
-                accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-              },
-            }
-          );
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoadDraft(false);
-      }
-    }
-  };
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const [formData, setFormData] = useState<createPostFormData>({
     title: "",
@@ -229,62 +311,6 @@ export const HandlePost = () => {
     setFormData((prevData) => ({ ...prevData, body: formattedHTML }));
   };
 
-  const handlePublish = async () => {
-    setLoadPublish(true);
-    if (statusTypeState === statusType.PUBLISHED && postId) {
-      // check for errors and update the content - def- published ---2
-      setPublished(true);
-    } else if (statusTypeState === statusType.DRAFT && postId) {
-      // check for errors and update the content - def- published ---2
-      setPublished(true);
-    } else if (statusTypeState === statusType.NEW) {
-      try {
-        if (postId === null) {
-          const res = await axios.post(
-            `/post/publish`,
-            {
-              id: "",
-              title: formData.title || "",
-              shortCaption: formData.shortCaption || "",
-              body: formData.body || "",
-              allowComments: true,
-            },
-            {
-              headers: {
-                accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-              },
-            }
-          );
-          const { id: newPostId } = res.data.data;
-          setPostId(newPostId);
-          setPublished(true);
-        } else {
-          // check for errors and update the content - def- published ---2
-          const res = await axios.put(
-            `/post/updateDraftPost`,
-            {
-              id: postId || "",
-              title: formData.title || "",
-              shortCaption: formData.shortCaption || "",
-              body: formData.body || "",
-              allowComments: true,
-            },
-            {
-              headers: {
-                accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-              },
-            }
-          );
-          setPublished(true);
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoadPublish(false);
-      }
-    }
-  };
-
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === "d") {
@@ -299,6 +325,19 @@ export const HandlePost = () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
   }, [postId, formData]);
+
+  const [image, setImage] = useState("");
+  useEffect(() => {
+    console.log(formData);
+  },[formData]);
+
+  const handleImageChange = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      handleFileChange(event);
+      setImage(URL.createObjectURL(file));
+    }
+  };
 
   const editor = useCreateBlockNote({
     initialContent: state ? state.body : "",
@@ -441,43 +480,57 @@ export const HandlePost = () => {
                 </div>
 
                 <div className="w-full sm:max-w-96 rounded-lg flex justify-center flex-col gap-3">
-                  {/* <input type="file" name="" id="" className="border max-w-60" /> */}
                   <p className="text-cgray font-semibold ml-2">Cover Image</p>
                   <div className="flex items-center justify-center w-full">
                     <label
                       htmlFor="coverImage"
                       className="flex flex-col w-full border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-800 bg-gray-700 border-gray-600 hover:border-gray-500"
                     >
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg
-                          className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 20 16"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                      {image ? (
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <img
+                            src={image}
+                            alt="Preview"
+                            className="w-full max-h-48 object-cover rounded-md mb-4"
                           />
-                        </svg>
-                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                          <span className="font-semibold">Click to upload</span>{" "}
-                          or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          SVG, PNG, JPG or GIF (MAX. 800x400px)
-                        </p>
-                      </div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Change image
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <svg
+                            className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 20 16"
+                          >
+                            <path
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                            />
+                          </svg>
+                          <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                            <span className="font-semibold">
+                              Click to upload
+                            </span>{" "}
+                            or drag and drop
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            SVG, PNG, JPG or GIF (MAX. 800x400px)
+                          </p>
+                        </div>
+                      )}
                       <input
                         id="coverImage"
                         type="file"
                         className="hidden"
                         accept="image/*"
-                        onChange={handleFileChange}
+                        onChange={handleImageChange}
                       />
                     </label>
                   </div>
