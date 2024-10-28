@@ -7,39 +7,39 @@ import { dbConnect } from "../../Connection/db.connect";
 import { z } from 'zod';
 import { createSlug } from '../../utils/createSlug';
 
-export const createPostSchema = z.object({
-    coverImage: z.string().url({ message: "Invalid Cover Image URL" }).optional(),
-    title: z.string()
-        .min(10, { message: "Title must be atleast 6 Characters" })
-        .max(100, { message: "Title must be atmost 25 Characters" }),
-    shortCaption: z.string()
-        .min(10, { message: "Short Caption must be atleast 10 Characters" })
-        .max(100, { message: "Short Caption must be atmost 100 Characters" }),
-    body: z.string()
-        .min(300, { message: "Your Content Seems to be Small, Write More !" })
-        .max(10000, { message: "You have Reached Your Content Limit" }),
-    summary: z.string()
-        .min(10, { message: "Summary must be atleast 10 Characters" })
-        .max(200, { message: "Summary must be atmost 200 Characters" })
-        .optional(),
-    allowComments: z.boolean({ message: "Invalid Comment type" }),
-    multiMedias: z.array(z.object({
-        caption: z.string()
-            .min(10, { message: "Caption must be atleast 10 Characters" })
-            .max(50, { message: "Caption must be atmost 50 Characters" })
-            .optional(),
-        altText: z.string({ required_error: "Alt Text is required" })
-            .min(5, { message: "Alt Text must be atleast 5 Characters" }),
-        url: z.string({ required_error: "Media URL not found" }).url({ message: "Invalid Media URL" }),
-        type: z.enum([MediaType.IMAGE, MediaType.AUDIO, MediaType.DOCUMENT, MediaType.VIDEO], { message: "Invalid Media format" }),
-    }, { message: "Invalid Multimedia type" }), { message: "Invalid Multimedia type" }).optional(),
-    tags: z.array(z.string().uuid({ message: "Invalid Tag ID" }), { message: "Invalid Tag ID" })
-        .min(1, { message: "You must add atleast 1 Tag" })
-        .max(5, { message: "You can add atmost 5 Tags" }).optional(),
-    categories: z.array(z.string().uuid({ message: "Invalid Category ID" }), { message: "Invalid Category ID" })
-        .min(1, { message: "You must add atleast 1 Category" })
-        .max(5, { message: "You can add atmost 5 Categories" }).optional()
-})
+// export const createPostSchema = z.object({
+//     coverImage: z.string().url({ message: "Invalid Cover Image URL" }).optional(),
+//     title: z.string()
+//         .min(10, { message: "Title must be atleast 6 Characters" })
+//         .max(100, { message: "Title must be atmost 25 Characters" }),
+//     shortCaption: z.string()
+//         .min(10, { message: "Short Caption must be atleast 10 Characters" })
+//         .max(100, { message: "Short Caption must be atmost 100 Characters" }),
+//     body: z.string()
+//         .min(300, { message: "Your Content Seems to be Small, Write More !" })
+//         .max(10000, { message: "You have Reached Your Content Limit" }),
+//     summary: z.string()
+//         .min(10, { message: "Summary must be atleast 10 Characters" })
+//         .max(200, { message: "Summary must be atmost 200 Characters" })
+//         .optional(),
+//     allowComments: z.boolean({ message: "Invalid Comment type" }),
+//     multiMedias: z.array(z.object({
+//         caption: z.string()
+//             .min(10, { message: "Caption must be atleast 10 Characters" })
+//             .max(50, { message: "Caption must be atmost 50 Characters" })
+//             .optional(),
+//         altText: z.string({ required_error: "Alt Text is required" })
+//             .min(5, { message: "Alt Text must be atleast 5 Characters" }),
+//         url: z.string({ required_error: "Media URL not found" }).url({ message: "Invalid Media URL" }),
+//         type: z.enum([MediaType.IMAGE, MediaType.AUDIO, MediaType.DOCUMENT, MediaType.VIDEO], { message: "Invalid Media format" }),
+//     }, { message: "Invalid Multimedia type" }), { message: "Invalid Multimedia type" }).optional(),
+//     tags: z.array(z.string().uuid({ message: "Invalid Tag ID" }), { message: "Invalid Tag ID" })
+//         .min(1, { message: "You must add atleast 1 Tag" })
+//         .max(5, { message: "You can add atmost 5 Tags" }).optional(),
+//     categories: z.array(z.string().uuid({ message: "Invalid Category ID" }), { message: "Invalid Category ID" })
+//         .min(1, { message: "You must add atleast 1 Category" })
+//         .max(5, { message: "You can add atmost 5 Categories" }).optional()
+// })
 
 const createNewDraftPostSchema = z.object({
     coverImage: z.string().url({ message: "Invalid Cover Image URL" }).optional(),

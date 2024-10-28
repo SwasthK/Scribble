@@ -50,11 +50,12 @@ const routes = {
     signup: '/api/v1/signup',
     updateUserAvatar: '/api/v1/updateUserAvatar',
     blog: '/api/v1/blog',
+    createNewPublishedPost: '/api/v1/posts/createNewPublishPost'
 }
 
 const getAllowedMimeTypes = (url: string): Set<string> => {
 
-    if (url === routes.signup || url === routes.updateUserAvatar) {
+    if (url === routes.signup || url === routes.updateUserAvatar || url === routes.createNewPublishedPost) {
         return new Set(Object.values(mimeTypeSignup));
     }
     if (url === routes.blog) {
@@ -76,7 +77,7 @@ export async function getFileToUpload(c: Context, next: Next) {
 
         const files = formData.getAll('file') as File[];
 
-        if (path === routes.signup || path === routes.updateUserAvatar) {
+        if (path === routes.signup || path === routes.updateUserAvatar || path === routes.createNewPublishedPost) {
             if (files.length !== 1) {
                 c.set('fileUploadMessage', fileUploadMessage.NOFILE);
                 return await next();
