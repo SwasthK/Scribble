@@ -60,7 +60,7 @@ export async function updatePublishById(c: Context) {
         const postSlug = createSlug(data.title, 25)
 
         const isPostTitleExists = await prisma.post.findFirst({
-            where: { slug: postSlug }
+            where: { AND: [{ slug: postSlug, status: PostStatus.PUBLISHED }] }
         })
 
         if (isPostTitleExists) { return apiError(c, 400, "Post title already exists") }
@@ -89,7 +89,6 @@ export async function createNewPublishPost(c: Context) {
     try {
         const message = c.get('fileUploadMessage');
         const fileHandle: Record<string, any> = {};
-        console.log(message);
 
         switch (message) {
             case fileUploadMessage.TYPEERROR:
@@ -107,8 +106,10 @@ export async function createNewPublishPost(c: Context) {
                 break;
         }
 
+        const cloudinaryData = c.get('fileUploadResponse');
+
         const secure_url = fileHandle.success && !fileHandle.error ?
-            c.get('fileUploadResponse').secure_url || `https://picsum.photos/500/300`
+            cloudinaryData.secure_url || `https://picsum.photos/500/300`
             :
             `https://picsum.photos/500/300`;
 
@@ -129,6 +130,7 @@ export async function createNewPublishPost(c: Context) {
         const newPost = await prisma.post.create({
             data: {
                 coverImage: secure_url,
+                coverImagePublicId: cloudinaryData?.public_id ? cloudinaryData.public_id : null,
                 title: data.title,
                 slug: postSlug,
                 shortCaption: data.shortCaption,
@@ -141,6 +143,8 @@ export async function createNewPublishPost(c: Context) {
                 status: PostStatus.PUBLISHED,
             }
         });
+
+        if (!newPost) { return apiError(c, 400, "Failed to create a post") }
 
         return apiResponse(c, 200, newPost, "Post published successfully");
 

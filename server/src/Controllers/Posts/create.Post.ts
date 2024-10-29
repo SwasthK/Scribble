@@ -2,10 +2,10 @@ import { Context } from "hono";
 import { PostStatus, Prisma, MediaType } from '@prisma/client';
 import { apiError } from "../../utils/apiError";
 import { apiResponse } from "../../utils/apiResponse";
-import { dbConnect } from "../../Connection/db.connect";
 
 import { z } from 'zod';
 import { createSlug } from '../../utils/createSlug';
+import { fileUploadMessage } from "Middleware/cloudinary";
 
 // export const createPostSchema = z.object({
 //     coverImage: z.string().url({ message: "Invalid Cover Image URL" }).optional(),
@@ -41,8 +41,7 @@ import { createSlug } from '../../utils/createSlug';
 //         .max(5, { message: "You can add atmost 5 Categories" }).optional()
 // })
 
-const createNewDraftPostSchema = z.object({
-    coverImage: z.string().url({ message: "Invalid Cover Image URL" }).optional(),
+export const createNewDraftPostSchema = z.object({
     title: z.string(),
     shortCaption: z.string(),
     body: z.string(),
@@ -67,111 +66,130 @@ const createNewDraftPostSchema = z.object({
         .max(5, { message: "You can add atmost 5 Categories" }).optional()
 })
 
-export async function createDraftPost(c: Context) {
-    const authorId = c.get("user").id;
-
-    const prisma = c.get('prisma');
-
-    const requestBody = await c.req.json()
-
+export async function createNewDraftPost(c: Context) {
     try {
 
-        const response = createNewDraftPostSchema.safeParse(requestBody)
+        const message = c.get('fileUploadMessage');
+        const fileHandle: Record<string, any> = {};
 
-        if (!response.success) {
-            return apiError(c, 400, response.error.errors[0].message)
+        switch (message) {
+            case fileUploadMessage.TYPEERROR:
+                return apiError(c, 400, "Invalid file type");
+
+            case fileUploadMessage.NOFILE:
+                break;
+
+            case fileUploadMessage.SUCCESS:
+                fileHandle.success = true;
+                break;
+
+            default:
+                fileHandle.error = true;
+                break;
         }
 
-        const { title, shortCaption, summary, tags, categories, body, coverImage, allowComments, multiMedias } = response.data
+        const cloudinaryData = c.get('fileUploadResponse')
+        console.log(cloudinaryData);
 
-        // const slug = createSlug(title, 25)
+        const secure_url = (fileHandle.success && !fileHandle.error) ? cloudinaryData.secure_url : null;
 
-        // const isPostExist = await prisma.post.findFirst({
-        //     where: {
-        //         AND: [
-        //             { slug },
-        //             { status: PostStatus.PUBLISHED }
-        //         ]
-        //     }
-        // })
+        const authorId = c.get("user").id;
+        const prisma: any = c.get('prisma');
+        const data = c.get('draftData');
 
-        // if (isPostExist) {
-        //     return apiError(c, 400, "Post name already exist");
-        // }
-
-        const result = await prisma.$transaction(async (prisma: any) => {
-            const newPost = await prisma.post.create({
-                data: {
-                    coverImage: coverImage ?? null,
-                    title,
-                    shortCaption,
-                    body,
-                    summary,
-                    allowComments,
-                    author: {
-                        connect: { id: authorId }
-                    },
-                    status: PostStatus.DRAFT,
-                }
-            });
-
-            if (tags && tags.length > 0) {
-                await prisma.post.update({
-                    where: { id: newPost.id },
-                    data: {
-                        tags: {
-                            connect: tags.map((tagId: string | number) => ({ id: tagId }))
-                        }
-                    }
-                });
+        const newPost = await prisma.post.create({
+            data: {
+                coverImage: secure_url,
+                coverImagePublicId: cloudinaryData?.public_id ? cloudinaryData.public_id : null,
+                title: data.title,
+                shortCaption: data.shortCaption,
+                body: data.body,
+                summary: data?.summary,
+                allowComments: data.allowComments,
+                author: {
+                    connect: { id: authorId }
+                },
+                status: PostStatus.DRAFT
             }
-
-            if (categories && categories.length > 0) {
-                await prisma.post.update({
-                    where: { id: newPost.id },
-                    data: {
-                        categories: {
-                            connect: categories.map((categoryId: string | number) => ({ id: categoryId }))
-                        }
-                    }
-                });
-            }
-
-            if (multiMedias && multiMedias.length > 0) {
-                await prisma.multiMedia.createMany({
-                    data: multiMedias.map((media: any) => ({
-                        postId: newPost.id,
-                        caption: media.caption || null,
-                        altText: media.altText,
-                        url: media.url,
-                        type: media.type,
-                    })),
-                });
-
-                multiMedias.map((media: any) => {
-                    console.log("Post ID: ", newPost.id);
-                    console.log("Caption: ", media.caption);
-                    console.log("Alt Text: ", media.altText);
-                    console.log("URL: ", media.url);
-                    console.log("Type: ", media.type);
-                });
-            };
-
-            return newPost;
-        }, {
-            timeout: 10000,
         });
+        if (!newPost) { return apiError(c, 400, "Failed to create a post") }
 
-        return apiResponse(c, 200, result, "Post Created Successfully");
+        return apiResponse(c, 200, newPost, "Post Drafted successfully");
+
+        // const result = await prisma.$transaction(async (prisma: any) => {
+        //     const newPost = await prisma.post.create({
+        //         data: {
+        //             // coverImage: coverImage ?? null,
+        //             title,
+        //             shortCaption,
+        //             body,
+        //             summary,
+        //             allowComments,
+        //             author: {
+        //                 connect: { id: authorId }
+        //             },
+        //             status: PostStatus.DRAFT,
+        //         }
+        //     });
+
+        //     if (tags && tags.length > 0) {
+        //         await prisma.post.update({
+        //             where: { id: newPost.id },
+        //             data: {
+        //                 tags: {
+        //                     connect: tags.map((tagId: string | number) => ({ id: tagId }))
+        //                 }
+        //             }
+        //         });
+        //     }
+
+        //     if (categories && categories.length > 0) {
+        //         await prisma.post.update({
+        //             where: { id: newPost.id },
+        //             data: {
+        //                 categories: {
+        //                     connect: categories.map((categoryId: string | number) => ({ id: categoryId }))
+        //                 }
+        //             }
+        //         });
+        //     }
+
+        //     if (multiMedias && multiMedias.length > 0) {
+        //         await prisma.multiMedia.createMany({
+        //             data: multiMedias.map((media: any) => ({
+        //                 postId: newPost.id,
+        //                 caption: media.caption || null,
+        //                 altText: media.altText,
+        //                 url: media.url,
+        //                 type: media.type,
+        //             })),
+        //         });
+
+        //         multiMedias.map((media: any) => {
+        //             console.log("Post ID: ", newPost.id);
+        //             console.log("Caption: ", media.caption);
+        //             console.log("Alt Text: ", media.altText);
+        //             console.log("URL: ", media.url);
+        //             console.log("Type: ", media.type);
+        //         });
+        //     };
+
+        //     return newPost;
+        // }, {
+        //     timeout: 10000,
+        // });
+
+        //     return apiResponse(c, 200, result, "Post Created Successfully");
 
     } catch (error: any) {
-        console.log("Create Post Error: ", error.message);
+        console.log("Create Draft Post Error: ", error.message);
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             console.error("Prisma Transaction Error: ", error.message);
             return apiError(c, 400, "Post Creation Failed");
         }
         return apiError(c, 500, "Internal Server Error", { code: "CE" });
     }
+
 }
 
 export async function updateDraftPost(c: Context) {
@@ -190,7 +208,7 @@ export async function updateDraftPost(c: Context) {
             return apiError(c, 400, response.error.errors[0].message);
         }
 
-        const { title, shortCaption, summary, tags, categories, body, coverImage, allowComments, multiMedias } = response.data;
+        const { title, shortCaption, summary, tags, categories, body, allowComments, multiMedias } = response.data;
         // const slug = createSlug(title, 25);
 
         // Upsert Post (create or update if exists)
@@ -198,7 +216,7 @@ export async function updateDraftPost(c: Context) {
             const updatedPost = await prisma.post.update({
                 where: { id: requestBody.id },
                 data: {
-                    coverImage: coverImage ?? null,
+                    // coverImage: coverImage ?? null,
                     title,
                     shortCaption,
                     body,
@@ -261,114 +279,114 @@ export async function updateDraftPost(c: Context) {
     }
 }
 
-export async function upSertDraftPost(c: Context) {
-    const authorId = c.get("user").id;
-    const prisma = c.get('prisma');
-    const requestBody = await c.req.json();
+// export async function upSertDraftPost(c: Context) {
+//     const authorId = c.get("user").id;
+//     const prisma = c.get('prisma');
+//     const requestBody = await c.req.json();
 
 
-    try {
-        const response = createNewDraftPostSchema.safeParse(requestBody);
+//     try {
+//         const response = createNewDraftPostSchema.safeParse(requestBody);
 
-        console.log(requestBody);
+//         console.log(requestBody);
 
-        if (!response.success) {
-            return apiError(c, 400, response.error.errors[0].message);
-        }
+//         if (!response.success) {
+//             return apiError(c, 400, response.error.errors[0].message);
+//         }
 
-        const { title, shortCaption, summary, tags, categories, body, coverImage, allowComments, multiMedias } = response.data;
-        const slug = createSlug(title, 25);
+//         const { title, shortCaption, summary, tags, categories, body, coverImage, allowComments, multiMedias } = response.data;
+//         const slug = createSlug(title, 25);
 
-        // Upsert Post (create or update if exists)
-        const result = await prisma.$transaction(async (prisma: any) => {
-            const isPostExist = await prisma.post.findFirst({
-                where: {
-                    AND: [
-                        { slug },
-                        { status: PostStatus.PUBLISHED }
-                    ]
-                }
-            });
+//         // Upsert Post (create or update if exists)
+//         const result = await prisma.$transaction(async (prisma: any) => {
+//             const isPostExist = await prisma.post.findFirst({
+//                 where: {
+//                     AND: [
+//                         { slug },
+//                         { status: PostStatus.PUBLISHED }
+//                     ]
+//                 }
+//             });
 
-            if (isPostExist) {
-                return apiError(c, 400, "Post name already exist");
-            }
+//             if (isPostExist) {
+//                 return apiError(c, 400, "Post name already exist");
+//             }
 
-            const updatedPost = await prisma.post.upsert({
-                where: { id: requestBody.id },
-                update: {
-                    coverImage: coverImage ?? null,
-                    title,
-                    shortCaption,
-                    body,
-                    summary,
-                    allowComments,
-                },
-                create: {
-                    coverImage: coverImage ?? null,
-                    title,
-                    shortCaption,
-                    slug,
-                    body,
-                    summary,
-                    allowComments,
-                    author: {
-                        connect: { id: authorId }
-                    },
-                    status: PostStatus.DRAFT,
-                }
-            });
+//             const updatedPost = await prisma.post.upsert({
+//                 where: { id: requestBody.id },
+//                 update: {
+//                     coverImage: coverImage ?? null,
+//                     title,
+//                     shortCaption,
+//                     body,
+//                     summary,
+//                     allowComments,
+//                 },
+//                 create: {
+//                     coverImage: coverImage ?? null,
+//                     title,
+//                     shortCaption,
+//                     slug,
+//                     body,
+//                     summary,
+//                     allowComments,
+//                     author: {
+//                         connect: { id: authorId }
+//                     },
+//                     status: PostStatus.DRAFT,
+//                 }
+//             });
 
-            // Update tags if provided
-            if (tags && tags.length > 0) {
-                await prisma.post.update({
-                    where: { id: updatedPost.id },
-                    data: {
-                        tags: {
-                            connect: tags.map((tagId: string | number) => ({ id: tagId }))
-                        }
-                    }
-                });
-            }
+//             // Update tags if provided
+//             if (tags && tags.length > 0) {
+//                 await prisma.post.update({
+//                     where: { id: updatedPost.id },
+//                     data: {
+//                         tags: {
+//                             connect: tags.map((tagId: string | number) => ({ id: tagId }))
+//                         }
+//                     }
+//                 });
+//             }
 
-            // Update categories if provided
-            if (categories && categories.length > 0) {
-                await prisma.post.update({
-                    where: { id: updatedPost.id },
-                    data: {
-                        categories: {
-                            connect: categories.map((categoryId: string | number) => ({ id: categoryId }))
-                        }
-                    }
-                });
-            }
+//             // Update categories if provided
+//             if (categories && categories.length > 0) {
+//                 await prisma.post.update({
+//                     where: { id: updatedPost.id },
+//                     data: {
+//                         categories: {
+//                             connect: categories.map((categoryId: string | number) => ({ id: categoryId }))
+//                         }
+//                     }
+//                 });
+//             }
 
-            // Create multimedia if provided
-            if (multiMedias && multiMedias.length > 0) {
-                await prisma.multiMedia.createMany({
-                    data: multiMedias.map((media: any) => ({
-                        postId: updatedPost.id,
-                        caption: media.caption || null,
-                        altText: media.altText,
-                        url: media.url,
-                        type: media.type,
-                    })),
-                });
-            }
+//             // Create multimedia if provided
+//             if (multiMedias && multiMedias.length > 0) {
+//                 await prisma.multiMedia.createMany({
+//                     data: multiMedias.map((media: any) => ({
+//                         postId: updatedPost.id,
+//                         caption: media.caption || null,
+//                         altText: media.altText,
+//                         url: media.url,
+//                         type: media.type,
+//                     })),
+//                 });
+//             }
 
-            return updatedPost;
-        }, {
-            timeout: 10000,
-        });
+//             return updatedPost;
+//         }, {
+//             timeout: 10000,
+//         });
 
-        return apiResponse(c, 200, result, "Post Upserted Successfully");
+//         return apiResponse(c, 200, result, "Post Upserted Successfully");
 
-    } catch (error: any) {
-        console.log("Create Post Error: ", error.message);
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            console.error("Prisma Transaction Error: ", error.message);
-            return apiError(c, 400, "Post Upsert Failed");
-        }
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
-    }
-}
+//     } catch (error: any) {
+//         console.log("Create Post Error: ", error.message);
+//         if (error instanceof Prisma.PrismaClientKnownRequestError) {
+//             console.error("Prisma Transaction Error: ", error.message);
+//             return apiError(c, 400, "Post Upsert Failed");
+//         }
+//         return apiError(c, 500, "Internal Server Error", { code: "CE" });
+//     }
+// }
