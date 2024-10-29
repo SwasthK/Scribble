@@ -64,6 +64,6 @@ export function useGetDraftedPostFullContentByPostId({ postId }: { postId: strin
         enabled: !!postId,
         retry: false,
         staleTime: 0,
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus: false,
     })
 }

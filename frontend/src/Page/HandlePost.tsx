@@ -22,6 +22,7 @@ import { Spinner } from "../components/Global/Spinner";
 import { useRecoilValue } from "recoil";
 import { authAtom } from "../atoms/auth.atoms";
 import { useGetDraftedPostFullContentByPostId } from "../services/queries";
+import { Cancel } from "../assets/svg/Cancel";
 
 export enum statusType {
   DRAFT = "DRAFT",
@@ -71,21 +72,19 @@ export const HandlePost = () => {
 
   const createNewDraftData = async () => {
     try {
-      const res = await axios.post(
-        `/post/createNewDraftPost`,
-        {
-          id: "",
-          title: formData.title || "",
-          shortCaption: formData.shortCaption || "",
-          body: formData.body || "",
-          allowComments: true,
+      const data = new FormData();
+      data.append("file", formData.coverImage || "");
+      data.append("title", formData.title || "");
+      data.append("shortCaption", formData.shortCaption || "");
+      data.append("body", formData.body || "");
+      data.append("allowComments", "false");
+      data.append("summary", "Just the randomized texts here");
+
+      const res = await axios.post(`/post/createNewDraftPost`, data, {
+        headers: {
+          accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
         },
-        {
-          headers: {
-            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
+      });
       const { id: newPostId } = res.data.data;
       setPostId(newPostId);
       setPublished(false);
@@ -125,7 +124,7 @@ export const HandlePost = () => {
   const createNewPublishData = async () => {
     try {
       const data = new FormData();
-      console.log(formData.coverImage);
+
       data.append("file", formData.coverImage || "");
       data.append("title", formData.title || "");
       data.append("shortCaption", formData.shortCaption || "");
@@ -240,10 +239,13 @@ export const HandlePost = () => {
     setFormData({
       title: fullDraftData?.title || "",
       shortCaption: fullDraftData?.shortCaption || "",
-      coverImage: null,
+      coverImage: fullDraftData?.coverImage || null,
       body: fullDraftData?.body || "",
       allowComments: true,
     });
+
+    setImage(fullDraftData?.coverImage || "");
+
     const genrateEditorData = async () => {
       const blocks = await editor.tryParseHTMLToBlocks(fullDraftData.body);
       editor.replaceBlocks(editor.document, blocks);
@@ -288,18 +290,40 @@ export const HandlePost = () => {
       }
     }
   };
-  //   function formatHTML(html: any) {
-  //     return html.replace(/<p><\/p>/g, "<br>");
-  //   }
-  //   const html = await editor.blocksToHTMLLossy(editor.document);
-  //   const formattedHTML = formatHTML(html);
 
-  //   setFormData((prevData) => {
-  //     const newFormData = { ...prevData, body: formattedHTML };
-  //     debouncedHandleDraft(newFormData);
-  //     return newFormData;
-  //   });
+  // const handleImageChange = (e: any) => {
+  //   if (e.target.files && e.target.files.length > 0) {
+  //     const file = e.target.files[0];
+  //     const fileTypeError = validateFileType(file.type);
+  //     const fileSizeError = validateFileSize(file.size);
+  //     if (fileTypeError || fileSizeError) {
+  //       setErrors((prevErrors) => {
+  //         return {
+  //           ...prevErrors,
+  //           coverImage: fileTypeError || fileSizeError,
+  //         };
+  //       });
+  //       // Toast here
+  //       return;
+  //     } else {
+  //       setErrors((prevErrors) => {
+  //         return { ...prevErrors, coverImage: "" };
+  //       });
+  //       setFormData((prevData) => ({ ...prevData, coverImage: file }));
+  //       setImage(URL.createObjectURL(file));
+  //       if(postId){}
+  //     }
+  //   }
+
   // };
+
+  const handleImageChange = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      handleFileChange(event);
+      setImage(URL.createObjectURL(file));
+    }
+  };
 
   const handleBodyChange = async () => {
     function formatHTML(html: any) {
@@ -328,16 +352,8 @@ export const HandlePost = () => {
 
   const [image, setImage] = useState("");
   useEffect(() => {
-    console.log(formData);
-  },[formData]);
-
-  const handleImageChange = (event: any) => {
-    const file = event.target.files[0];
-    if (file) {
-      handleFileChange(event);
-      setImage(URL.createObjectURL(file));
-    }
-  };
+    console.log(errors);
+  }, [errors]);
 
   const editor = useCreateBlockNote({
     initialContent: state ? state.body : "",
@@ -480,22 +496,36 @@ export const HandlePost = () => {
                 </div>
 
                 <div className="w-full sm:max-w-96 rounded-lg flex justify-center flex-col gap-3">
-                  <p className="text-cgray font-semibold ml-2">Cover Image</p>
+                  <div className="flex justify-between pr-1 items-center">
+                    <p className="text-cgray font-semibold ml-2">Cover Image</p>
+                    {image && (
+                      <Cancel
+                        className={"cursor-pointer"}
+                        onClick={() => {
+                          setImage("");
+                        }}
+                        color={"yellow"}
+                        size={23}
+                      />
+                    )}
+                  </div>
                   <div className="flex items-center justify-center w-full">
                     <label
                       htmlFor="coverImage"
-                      className="flex flex-col w-full border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-800 bg-gray-700 border-gray-600 hover:border-gray-500"
+                      className={`overflow-hidden flex flex-col w-full ${
+                        !image
+                          ? "border-2 hover:bg-gray-800 bg-gray-700 border-gray-600 hover:border-gray-500"
+                          : "border-none"
+                      } border-dashed rounded-lg cursor-pointer `}
                     >
-                      {image ? (
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      {image && formData ? (
+                        <div className="flex flex-col items-center justify-center pb-1 h-[8.5rem] ">
                           <img
                             src={image}
                             alt="Preview"
-                            className="w-full max-h-48 object-cover rounded-md mb-4"
+                            className="w-full h-[7rem] object-cover mb-1 rounded-lg"
                           />
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Change image
-                          </p>
+                          <p className="text-sm text-gray-400">Change image</p>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
