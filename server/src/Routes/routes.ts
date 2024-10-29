@@ -15,7 +15,7 @@ import { FollowUser, UnFollowUser } from '../Controllers/FollowUser/user.Follow.
 import { getFollowersDetails, getFollowingsDetails } from '../Controllers/FollowUser/user.getFollow.Controller'
 
 //Import Post Route handlers
-import { createDraftPost, updateDraftPost, upSertDraftPost } from 'Controllers/Posts/create.Post'
+import { createNewDraftPost, updateDraftPost } from 'Controllers/Posts/create.Post'
 import { updateDraftPostById, updatePost } from '../Controllers/Posts/update.Post'
 import {
     getPostById,
@@ -72,7 +72,7 @@ import { dbConnect } from '../Connection/db.connect'
 import { apiResponse } from '../utils/apiResponse'
 import { apiError } from '../utils/apiError'
 import { getFileToUpload } from '../Middleware/cloudinary'
-import { createNewPublishPostParse, signupBodyParse } from '../Middleware/Body.Parse'
+import { createNewDraftPostParse, createNewPublishPostParse, signupBodyParse } from '../Middleware/Body.Parse'
 
 const api = new Hono();
 
@@ -100,7 +100,7 @@ api
     .delete('/posts/delete/draftById/:draftId', authMiddleware, findActiveUser, deleteDraftPostById)
     .delete('/posts/delete/draftBulk', authMiddleware, findActiveUser, deleteDraftBulk)
     .put('/posts/updateDraftById/:postId', authMiddleware, findActiveUser, updateDraftPostById)
-    .post('/post/createNewDraftPost', authMiddleware, findActiveUser, createDraftPost)
+    .post('/post/createNewDraftPost', authMiddleware, findActiveUser, createNewDraftPostParse, getFileToUpload, createNewDraftPost)
 
     // Publish Routes
     .post('/posts/createNewPublishPost', authMiddleware, findActiveUser, createNewPublishPostParse, getFileToUpload, createNewPublishPost)
@@ -122,7 +122,7 @@ api
     .get('posts/published', authMiddleware, findActiveUser, getPublishedPost)
     .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
     .delete('/posts/delete/post/:postId', authMiddleware, findActiveUser, deletePost)
-    .post('/posts/upsert', authMiddleware, findActiveUser, upSertDraftPost)
+    // .post('/posts/upsert', authMiddleware, findActiveUser, upSertDraftPost)
 
 
 
