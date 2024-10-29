@@ -3,6 +3,7 @@ import { ServerSignup } from "../Zod/zod";
 import { apiError } from "../utils/apiError";
 import { publishPostSchema } from "Controllers/Posts/publish.Post";
 import { apiResponse } from "utils/apiResponse";
+import { createNewDraftPostSchema } from "Controllers/Posts/create.Post";
 
 export async function signupBodyParse(c: Context, next: Next) {
     try {
@@ -29,6 +30,34 @@ export async function signupBodyParse(c: Context, next: Next) {
         return await next();
     } catch (error) {
         console.error('Signup Body Parse Middleware Error: ', error);
+        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+    }
+}
+
+export async function createNewDraftPostParse(c: Context, next: Next) {
+
+    try {
+        let formData;
+        try {
+            formData = await c.req.formData();
+        } catch (error) {
+            return apiError(c, 400, "Data is Invalid");
+        }
+
+        const title = formData.get('title') as string;
+        const shortCaption = formData.get('shortCaption') as string;
+        const body = formData.get('body') as string;
+        const allowComments = formData.get('allowComments') === 'true';;
+        const summary = formData.get('summary') as string;
+
+        const response = createNewDraftPostSchema.safeParse({ title, shortCaption, body, allowComments, summary });
+
+        if (!response.success) { return apiError(c, 400, response.error.errors[0].message) };
+        c.set('draftData', { ...response.data });
+
+        return await next();
+    } catch (error) {
+        console.error('createNewDraftPostParseBody Parse Middleware Error: ', error);
         return apiError(c, 500, "Internal Server Error", { code: "CE" });
     }
 }
