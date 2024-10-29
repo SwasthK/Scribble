@@ -50,12 +50,17 @@ const routes = {
     signup: '/api/v1/signup',
     updateUserAvatar: '/api/v1/updateUserAvatar',
     blog: '/api/v1/blog',
-    createNewPublishedPost: '/api/v1/posts/createNewPublishPost'
+    createNewPublishedPost: '/api/v1/posts/createNewPublishPost',
+    createNewDraftPost: '/api/v1/post/createNewDraftPost',
 }
 
 const getAllowedMimeTypes = (url: string): Set<string> => {
+    console.log(routes);
 
-    if (url === routes.signup || url === routes.updateUserAvatar || url === routes.createNewPublishedPost) {
+    if (url === routes.signup ||
+        url === routes.updateUserAvatar ||
+        url === routes.createNewPublishedPost ||
+        url === routes.createNewDraftPost) {
         return new Set(Object.values(mimeTypeSignup));
     }
     if (url === routes.blog) {
@@ -77,7 +82,11 @@ export async function getFileToUpload(c: Context, next: Next) {
 
         const files = formData.getAll('file') as File[];
 
-        if (path === routes.signup || path === routes.updateUserAvatar || path === routes.createNewPublishedPost) {
+        if (path === routes.signup ||
+            path === routes.updateUserAvatar ||
+            path === routes.createNewPublishedPost ||
+            path === routes.createNewDraftPost
+        ) {
             if (files.length !== 1) {
                 c.set('fileUploadMessage', fileUploadMessage.NOFILE);
                 return await next();
@@ -90,6 +99,7 @@ export async function getFileToUpload(c: Context, next: Next) {
         }
 
         const file = files[0];
+        console.log(file.type);
 
         if (!file) {
             c.set('fileUploadMessage', fileUploadMessage.NOFILE)
@@ -98,7 +108,9 @@ export async function getFileToUpload(c: Context, next: Next) {
 
         const allowedMimeTypes = getAllowedMimeTypes(c.req.path);
 
-        if (!allowedMimeTypes.has(file?.type || '')) {
+        if (!allowedMimeTypes.has(file?.type)) {
+            console.log(allowedMimeTypes);
+            console.log(file?.type);
             c.set('fileUploadMessage', fileUploadMessage.TYPEERROR);
             return await next();
         }
