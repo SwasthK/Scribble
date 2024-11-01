@@ -132,7 +132,7 @@ export const AppBar = () => {
           </h1>
         </div>
         <div className="menu flex flex-col gap-2 text-base">
-          <MenuItems icon={EditIcon} label="Write" url={"/create"} />
+          <MenuItems icon={EditIcon} label="Write" url={"/post/handle"} />
           <hr className="opacity-30 mt-2 mb-1" />
           <MenuItems
             icon={UserIcon}

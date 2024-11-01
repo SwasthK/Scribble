@@ -117,7 +117,7 @@ export const Blog_Card: React.FC<Blog_CardProps> = ({
           <img
             src={coverImage || ""}
             alt="blog"
-            className={`rounded-lg h-20 sm:h-24 md:h-28 lg:h-32 w-[25%] md:w-[12em] bg-white sm:max-w-[20%] lg:max-w-[100%]  ${
+            className={` object-cover rounded-lg h-20 sm:h-24 md:h-28 lg:h-32 w-[25%] md:w-[12em] bg-white sm:max-w-[20%] lg:max-w-[100%]  ${
               imgLoaded ? "" : "hidden"
             }`}
             onLoad={() => setImgLoaded(true)}

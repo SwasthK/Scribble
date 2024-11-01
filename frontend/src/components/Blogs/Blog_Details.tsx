@@ -8,7 +8,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { authAtom } from "../../atoms/auth.atoms";
 import { EditIcon } from "../../assets/svg/EditIcon";
-import { statusType } from "../../Page/HandlePost";
+import { statusType } from "../../Types/type";
 
 export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
   const { refetch, data, isLoading } = useGetPostByAuthorId(
@@ -85,15 +85,15 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               {currentUserId === authorId && (
                 <Link
                   to={"/post/handle"}
-                  state={{
+                  state={{  
                     postId: id,
                     authorId,
                     statusType: statusType.PUBLISHED,
                   }}
-                  className="flex justify-center items-center gap-2 px-4 py-2 rounded-lg bg-cdark-200 border-2"
+                  className="flex justify-center items-center gap-2 px-4 py-2 rounded-lg "
                 >
-                  <EditIcon />
-                  <p>Edit</p>
+                  <EditIcon size={20}/>
+                  <p className="italic font-semibold">Edit</p>
                 </Link>
               )}
             </div>
@@ -112,7 +112,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                 <img
                   src={coverImage}
                   alt=""
-                  className="aspect-video rounded-xl"
+                  className="aspect-video rounded-xl object-cover"
                   onLoad={() => setLoadImage(true)}
                   onError={() => setImageError(true)}
                 />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppBar } from "../components/AppBar/AppBar";
 import { GlobeIcon } from "../assets/svg/GlobeIcon";
@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { SaveFileIcon } from "../assets/svg/SaveFileIcon";
 import { BlockNoteView } from "@blocknote/mantine";
 import { useCreateBlockNote } from "@blocknote/react";
-import { createPostFormData, FormErrors } from "../Types/type";
+import { createPostFormData, statusType } from "../Types/type";
 import {
   validateFileSize,
   validateFileType,
@@ -16,20 +16,15 @@ import {
   validateShortCaption,
   validateTitle,
 } from "../validation/BlogFormValidations";
-import { debounce } from "./NoveEditor";
 import axios from "axios";
 import { Spinner } from "../components/Global/Spinner";
 import { useRecoilValue } from "recoil";
 import { authAtom } from "../atoms/auth.atoms";
 import { useGetDraftedPostFullContentByPostId } from "../services/queries";
 import { Cancel } from "../assets/svg/Cancel";
-
-export enum statusType {
-  DRAFT = "DRAFT",
-  PUBLISHED = "PUBLISHED",
-  ARCHIEVED = "ARCHIEVED",
-  NEW = "NEW",
-}
+import { Blog_Handle_Skeleton } from "../Skeleton/Blog_Handle_Skeleton";
+import { CloudUploadIcon } from "../assets/svg/CloudUploadIcon";
+import toast from "react-hot-toast";
 
 export const HandlePost = () => {
   const location = useLocation();
@@ -39,12 +34,30 @@ export const HandlePost = () => {
   const [postId, setPostId] = useState<string | null>(
     state ? state.postId : null
   );
-  const authorId = state ? state.authorId : null;
-  const [statusTypeState, setStatusTypeState] = useState<statusType>(
-    state ? state.statusType : statusType.NEW
-  );
+  const authorId: string | null = state ? state.authorId : null;
+  const statusTypeState: statusType = state ? state.statusType : statusType.NEW;
 
-  // --------------EFFECTS----------------
+  const [postURL, setPostURL] = useState<string>("");
+  const [loadDraft, setLoadDraft] = useState<boolean>(false);
+  const [loadPublish, setLoadPublish] = useState<boolean>(false);
+  const [published, setPublished] = useState<boolean>(
+    state?.statusType === statusType.PUBLISHED ? true : false
+  );
+  const { user: currentUser } = useRecoilValue(authAtom);
+  const [formData, setFormData] = useState<createPostFormData>({
+    title: "",
+    shortCaption: "",
+    coverImage: null,
+    body: "",
+    allowComments: true,
+    summary: "",
+  });
+  const [image, setImage] = useState<string>("");
+
+  const editor = useCreateBlockNote({
+    initialContent: state?.body || "",
+  });
+
   useEffect(() => {
     if (location.state && postId && authorId && statusType) {
       navigate(location.pathname, { replace: true, state: null });
@@ -57,18 +70,45 @@ export const HandlePost = () => {
       }
     }
   }, []);
-  // ---------------------------------------
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === "d") {
+        e.preventDefault();
+        handleDraft();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [postId, formData]);
 
   // ------------TANSTACK/REACT-QUERY----------------
   const { data: fullDraftData, isLoading } =
     useGetDraftedPostFullContentByPostId({ postId });
 
-  const [loadDraft, setLoadDraft] = useState<boolean>(false);
-  const [loadPublish, setLoadPublish] = useState<boolean>(false);
-  const [published, setPublished] = useState<boolean>(
-    state?.statusType === statusType.PUBLISHED ? true : false
-  );
-  const { user: currentUser } = useRecoilValue(authAtom);
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      title: fullDraftData?.title || "",
+      shortCaption: fullDraftData?.shortCaption || "",
+      body: fullDraftData?.body || "",
+      allowComments: fullDraftData?.allowComments || true,
+      summary: fullDraftData?.summary || "",
+    }));
+    setImage(fullDraftData?.coverImage || "");
+    const genrateEditorData = async () => {
+      const blocks = await editor.tryParseHTMLToBlocks(
+        fullDraftData?.body || ""
+      );
+      editor.replaceBlocks(editor.document, blocks);
+    };
+    genrateEditorData();
+  }, [fullDraftData]);
+  // -------------------------------------------------
 
   const createNewDraftData = async () => {
     try {
@@ -77,8 +117,8 @@ export const HandlePost = () => {
       data.append("title", formData.title || "");
       data.append("shortCaption", formData.shortCaption || "");
       data.append("body", formData.body || "");
-      data.append("allowComments", "false");
-      data.append("summary", "Just the randomized texts here");
+      data.append("allowComments", formData.allowComments ? "true" : "false");
+      data.append("summary", formData.summary || "");
 
       const res = await axios.post(`/post/createNewDraftPost`, data, {
         headers: {
@@ -86,10 +126,11 @@ export const HandlePost = () => {
         },
       });
       const { id: newPostId } = res.data.data;
+      setFormData((prevData) => ({ ...prevData, coverImage: null }));
       setPostId(newPostId);
       setPublished(false);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoadDraft(false);
     }
@@ -97,25 +138,22 @@ export const HandlePost = () => {
 
   const updateDraftData = async () => {
     try {
-      await axios.put(
-        `/posts/updateDraftById/${postId}`,
-        {
-          id: postId || "",
-          title: formData.title || "",
-          shortCaption: formData.shortCaption || "",
-          body: formData.body || "",
-          allowComments: true,
-          summary: "",
+      const data = new FormData();
+      data.append("file", formData.coverImage || "");
+      data.append("title", formData.title || "");
+      data.append("shortCaption", formData.shortCaption || "");
+      data.append("body", formData.body || "");
+      data.append("allowComments", formData.allowComments ? "true" : "false");
+      data.append("summary", formData.summary || "");
+      await axios.put(`/posts/updateDraftById/${postId}`, data, {
+        headers: {
+          accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
         },
-        {
-          headers: {
-            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
+      });
       setPublished(false);
-    } catch (error) {
-      console.log(error);
+      setFormData((prev) => ({ ...prev, coverImage: null }));
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoadDraft(false);
     }
@@ -129,19 +167,22 @@ export const HandlePost = () => {
       data.append("title", formData.title || "");
       data.append("shortCaption", formData.shortCaption || "");
       data.append("body", formData.body || "");
-      data.append("allowComments", "false");
-      data.append("summary", "Just the randomized texts here");
+      data.append("allowComments", formData.allowComments ? "true" : "false");
+      data.append("summary", formData.summary || "");
 
       const res = await axios.post(`/posts/createNewPublishPost`, data, {
         headers: {
           accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
         },
       });
-      const { id: newPostId } = res.data.data;
+      const { id: newPostId, slug } = res.data.data;
+      setFormData((prevData) => ({ ...prevData, coverImage: null }));
       setPostId(newPostId);
+      setPostURL(`/blog/${slug}`);
       setPublished(true);
-    } catch (error) {
-      console.log(error);
+      toast.success("Your post is live now !");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoadPublish(false);
     }
@@ -149,25 +190,26 @@ export const HandlePost = () => {
 
   const updatePublishData = async () => {
     try {
-      await axios.put(
-        `/posts/updatePublishById/${postId}`,
-        {
-          id: postId || "",
-          title: formData.title || "",
-          shortCaption: formData.shortCaption || "",
-          body: formData.body || "",
-          allowComments: true,
-          summary: "Just the randomized texts here",
+      const data = new FormData();
+      data.append("file", formData.coverImage || "");
+      data.append("title", formData.title || "");
+      data.append("shortCaption", formData.shortCaption || "");
+      data.append("body", formData.body || "");
+      data.append("allowComments", formData.allowComments ? "true" : "false");
+      data.append("summary", formData.summary || "");
+
+      const res = await axios.put(`/posts/updatePublishById/${postId}`, data, {
+        headers: {
+          accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
         },
-        {
-          headers: {
-            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
+      });
+      const { slug } = res.data.data;
+      setFormData((prev) => ({ ...prev, coverImage: null }));
+      setPostURL(`/blog/${slug}`);
       setPublished(true);
-    } catch (error) {
-      console.log(error);
+      toast.success("Your post is live now !");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoadPublish(false);
     }
@@ -202,18 +244,12 @@ export const HandlePost = () => {
         statusTypeState === statusType.DRAFT) &&
       postId
     ) {
-      // check for errors and update the content - def- published ---2
       await updatePublishData();
-      console.log("Publishing Data - UPDATE- A");
     } else if (statusTypeState === statusType.NEW) {
       if (postId === null) {
-        // check for errors and create the content - def- published
         await createNewPublishData();
-        console.log("Publihing - CREATE");
       } else {
-        // check for errors and update the content - def- published ---2
         await updatePublishData();
-        console.log("Publishing Data -UPDATE- B");
       }
     }
   };
@@ -225,44 +261,14 @@ export const HandlePost = () => {
       body: validateBlogBody(formData.body),
     };
     if (clientError.title || clientError.ShortCaption || clientError.body) {
-      console.log(
+      toast.error(
         clientError.title || clientError.ShortCaption || clientError.body
       );
       return 0;
     }
   };
 
-  // ------------------------------------------------
-
-  // ------------------------------- Load content on mount
-  useEffect(() => {
-    setFormData({
-      title: fullDraftData?.title || "",
-      shortCaption: fullDraftData?.shortCaption || "",
-      coverImage: fullDraftData?.coverImage || null,
-      body: fullDraftData?.body || "",
-      allowComments: true,
-    });
-
-    setImage(fullDraftData?.coverImage || "");
-
-    const genrateEditorData = async () => {
-      const blocks = await editor.tryParseHTMLToBlocks(fullDraftData.body);
-      editor.replaceBlocks(editor.document, blocks);
-    };
-    genrateEditorData();
-  }, [fullDraftData]);
-  // ---------------------------------------
-
-  const [errors, setErrors] = useState<FormErrors>({});
-
-  const [formData, setFormData] = useState<createPostFormData>({
-    title: "",
-    shortCaption: "",
-    coverImage: null,
-    body: "",
-    allowComments: true,
-  });
+  //---------------Handlers-------------
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setPublished(false);
@@ -276,52 +282,14 @@ export const HandlePost = () => {
       const fileTypeError = validateFileType(file.type);
       const fileSizeError = validateFileSize(file.size);
       if (fileTypeError || fileSizeError) {
-        setErrors((prevErrors) => {
-          return {
-            ...prevErrors,
-            coverImage: fileTypeError || fileSizeError,
-          };
-        });
+        setFormData((prevData) => ({ ...prevData, coverImage: null }));
+        setImage("");
+        toast.error(fileTypeError || fileSizeError);
+        return;
       } else {
-        setErrors((prevErrors) => {
-          return { ...prevErrors, coverImage: "" };
-        });
         setFormData((prevData) => ({ ...prevData, coverImage: file }));
+        setImage(URL.createObjectURL(file));
       }
-    }
-  };
-
-  // const handleImageChange = (e: any) => {
-  //   if (e.target.files && e.target.files.length > 0) {
-  //     const file = e.target.files[0];
-  //     const fileTypeError = validateFileType(file.type);
-  //     const fileSizeError = validateFileSize(file.size);
-  //     if (fileTypeError || fileSizeError) {
-  //       setErrors((prevErrors) => {
-  //         return {
-  //           ...prevErrors,
-  //           coverImage: fileTypeError || fileSizeError,
-  //         };
-  //       });
-  //       // Toast here
-  //       return;
-  //     } else {
-  //       setErrors((prevErrors) => {
-  //         return { ...prevErrors, coverImage: "" };
-  //       });
-  //       setFormData((prevData) => ({ ...prevData, coverImage: file }));
-  //       setImage(URL.createObjectURL(file));
-  //       if(postId){}
-  //     }
-  //   }
-
-  // };
-
-  const handleImageChange = (event: any) => {
-    const file = event.target.files[0];
-    if (file) {
-      handleFileChange(event);
-      setImage(URL.createObjectURL(file));
     }
   };
 
@@ -331,41 +299,17 @@ export const HandlePost = () => {
     }
     const html = await editor.blocksToHTMLLossy(editor.document);
     const formattedHTML = formatHTML(html);
-
     setFormData((prevData) => ({ ...prevData, body: formattedHTML }));
   };
 
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "d") {
-        e.preventDefault();
-        handleDraft();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [postId, formData]);
-
-  const [image, setImage] = useState("");
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
-
-  const editor = useCreateBlockNote({
-    initialContent: state ? state.body : "",
-  });
+  //-----------------------------------
 
   return (
-    <div className="">
+    <>
       <AppBar />
       {isLoading ? (
         <>
-          {/* TODO */}
-          <p>Loading the data ...</p>
+          <Blog_Handle_Skeleton />
         </>
       ) : (
         <>
@@ -405,8 +349,12 @@ export const HandlePost = () => {
                       Live at <span className="text-cgreen ml-2">&#x2022;</span>
                     </p>
 
-                    <Link to={""}>
-                      <GlobeIcon />
+                    <Link to={postURL}>
+                      <GlobeIcon
+                        className={
+                          "hover:stroke-[#8fc3fc] transition-colors duration-200"
+                        }
+                      />
                     </Link>
                   </>
                 ) : (
@@ -449,34 +397,33 @@ export const HandlePost = () => {
               <div className="rounded-lg py-8 px-8 flex  gap-8 flex-col-reverse md:flex-row bg-[#262932] md:items-center">
                 <div className="flex flex-col gap-6 items-start ">
                   <div className="flex gap-3 flex-col w-full sm:w-96">
-                    {/* <label htmlFor="title" className="font-semibold">
-                  Main title
-                </label> */}
-                    <p className="text-cgray ml-2 font-semibold">Main title</p>
+                    <label
+                      htmlFor="title"
+                      className="text-cgray ml-2 font-semibold"
+                    >
+                      Main title
+                    </label>
+
                     <input
                       className="input-style italic  text-xl"
                       type="text"
                       id="title"
                       name="title"
-                      placeholder="eg. The ultimate next.js guide - 2024"
+                      placeholder="eg. The ultimate Next.js guide - 2024"
                       value={formData.title || ""}
                       onChange={handleInputChange}
-                      // disabled={loading}
+                      disabled={loadDraft || loadPublish || isLoading}
                     />
-                    {/* {errors.username ? (
-                <p className="error">{errors.username}</p>
-              ) : (
-                <p className="text-cgray">Your public username here.</p>
-              )} */}
                   </div>
 
                   <div className="flex gap-3 flex-col w-full sm:w-96">
-                    {/* <label htmlFor="title" className="font-semibold">
-                  Short description
-                </label> */}
-                    <p className="text-cgray font-semibold ml-2">
+                    <label
+                      htmlFor="shortCaption"
+                      className="text-cgray font-semibold ml-2"
+                    >
                       Short description
-                    </p>
+                    </label>
+
                     <input
                       className="input-style  text-base italic"
                       type="text"
@@ -485,14 +432,14 @@ export const HandlePost = () => {
                       placeholder="eg.  Fast-track your Next.js journey - Step-by-step guide for beginners"
                       value={formData.shortCaption || ""}
                       onChange={handleInputChange}
-                      // disabled={loading}
+                      disabled={loadDraft || loadPublish || isLoading}
                     />
-                    {/* {errors.username ? (
-                <p className="error">{errors.username}</p>
-              ) : (
-                <p className="text-cgray">Your public username here.</p>
-              )} */}
                   </div>
+                  <ToggleComments
+                    setPublished={setPublished}
+                    formData={formData}
+                    setFormData={setFormData}
+                  />
                 </div>
 
                 <div className="w-full sm:max-w-96 rounded-lg flex justify-center flex-col gap-3">
@@ -502,6 +449,10 @@ export const HandlePost = () => {
                       <Cancel
                         className={"cursor-pointer"}
                         onClick={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            coverImage: null,
+                          }));
                           setImage("");
                         }}
                         color={"yellow"}
@@ -518,7 +469,7 @@ export const HandlePost = () => {
                           : "border-none"
                       } border-dashed rounded-lg cursor-pointer `}
                     >
-                      {image && formData ? (
+                      {image ? (
                         <div className="flex flex-col items-center justify-center pb-1 h-[8.5rem] ">
                           <img
                             src={image}
@@ -529,21 +480,7 @@ export const HandlePost = () => {
                         </div>
                       ) : (
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <svg
-                            className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 20 16"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                            />
-                          </svg>
+                          <CloudUploadIcon />
                           <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                             <span className="font-semibold">
                               Click to upload
@@ -551,7 +488,7 @@ export const HandlePost = () => {
                             or drag and drop
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            SVG, PNG, JPG or GIF (MAX. 800x400px)
+                            JPEG, PNG, WEBP ( MAX. 2mb )
                           </p>
                         </div>
                       )}
@@ -560,7 +497,7 @@ export const HandlePost = () => {
                         type="file"
                         className="hidden"
                         accept="image/*"
-                        onChange={handleImageChange}
+                        onChange={handleFileChange}
                       />
                     </label>
                   </div>
@@ -574,20 +511,62 @@ export const HandlePost = () => {
               <BlockNoteView
                 editor={editor}
                 editable={true}
-                data-changing-font-demo
+                // data-changing-font-demo
                 data-theming-css-variables-demo
                 formattingToolbar={true}
-                // linkToolbar={false}
-                // filePanel={false}
-                // sideMenu={false}
-                // slashMenu={false}
-                // tableHandles={false}
                 onChange={handleBodyChange}
               />
+
+              <div className=" font-semibold flex flex-col gap-4">
+                <p className="pl-8">Summary</p>
+                <input
+                  placeholder="eg. Next.js is a robust solution for server-side rendering, routing, and more."
+                  value={formData.summary || ""}
+                  type="text"
+                  id="summary"
+                  name="summary"
+                  maxLength={200}
+                  minLength={10}
+                  onChange={handleInputChange}
+                  className="min-h-16 max-h-28 border input-style italic"
+                ></input>
+              </div>
             </div>
           </div>
         </>
       )}
-    </div>
+    </>
   );
 };
+
+const ToggleComments = memo(({ formData, setFormData, setPublished }: any) => {
+  const handleToggle = () => {
+    setPublished(false);
+    setFormData((prev: any) => ({
+      ...prev,
+      allowComments: !prev.allowComments,
+    }));
+  };
+
+  return (
+    <>
+      <label
+        htmlFor="comments"
+        className="inline-flex items-center cursor-pointer"
+      >
+        <input
+          id="comments"
+          name="comments"
+          type="checkbox"
+          className="sr-only peer"
+          checked={formData.allowComments ? true : false}
+          onChange={handleToggle}
+        />
+        <div className="relative w-8 h-4 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[0px] after:start-[0px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-60 peer-checked:bg-blue-600"></div>
+        <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+          Allow Comments
+        </span>
+      </label>
+    </>
+  );
+});
