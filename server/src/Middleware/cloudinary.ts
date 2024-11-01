@@ -8,7 +8,7 @@ export enum fileUploadMessage {
     TYPEERROR = 'File type not allowed',
 }
 
-enum mimeTypeSignup {
+export enum mimeTypeSignup {
     JPEG = 'image/jpeg',
     PNG = 'image/png',
     WEBP = 'image/webp',
@@ -55,7 +55,6 @@ const routes = {
 }
 
 const getAllowedMimeTypes = (url: string): Set<string> => {
-    console.log(routes);
 
     if (url === routes.signup ||
         url === routes.updateUserAvatar ||
@@ -71,10 +70,7 @@ const getAllowedMimeTypes = (url: string): Set<string> => {
 
 export async function getFileToUpload(c: Context, next: Next) {
     try {
-
-        const CLOUDINARY_CLOUD_NAME = c.env.CLOUDINARY_CLOUD_NAME
-        const CLOUDINARY_API_KEY = c.env.CLOUDINARY_API_KEY
-        const CLOUDINARY_API_SECRET = c.env.CLOUDINARY_API_SECRET
+        let cloudinaryHelpers = getCloudinaryHelpers(c);
 
         const path = c.req.path
 
@@ -99,7 +95,6 @@ export async function getFileToUpload(c: Context, next: Next) {
         }
 
         const file = files[0];
-        console.log(file.type);
 
         if (!file) {
             c.set('fileUploadMessage', fileUploadMessage.NOFILE)
@@ -109,30 +104,22 @@ export async function getFileToUpload(c: Context, next: Next) {
         const allowedMimeTypes = getAllowedMimeTypes(c.req.path);
 
         if (!allowedMimeTypes.has(file?.type)) {
-            console.log(allowedMimeTypes);
-            console.log(file?.type);
             c.set('fileUploadMessage', fileUploadMessage.TYPEERROR);
             return await next();
         }
 
         const timestamp = Math.round((new Date).getTime() / 1000);
         const uniqueFilename = generateUniqueFilename(file.name);
-        const signature = await generateSignature(timestamp, uniqueFilename, CLOUDINARY_API_SECRET);
+        const signature = await generateSignature(timestamp, uniqueFilename, cloudinaryHelpers.CLOUDINARY_API_SECRET);
 
         const cloudinaryFormData = new FormData();
         cloudinaryFormData.append('file', file);
         cloudinaryFormData.append('timestamp', timestamp.toString());
-        cloudinaryFormData.append('api_key', CLOUDINARY_API_KEY);
+        cloudinaryFormData.append('api_key', cloudinaryHelpers.CLOUDINARY_API_KEY);
         cloudinaryFormData.append('signature', signature);
         cloudinaryFormData.append('public_id', uniqueFilename);
 
-        const uploadResponse = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-            {
-                method: 'POST',
-                body: cloudinaryFormData,
-            }
-        );
+        const uploadResponse = await cloudinaryUploader(cloudinaryFormData, cloudinaryHelpers);
 
         if (!uploadResponse.ok) {
             console.log('Upload File Middleware Error: ', uploadResponse);
@@ -151,17 +138,16 @@ export async function getFileToUpload(c: Context, next: Next) {
         c.set('fileUploadMessage', fileUploadMessage.ERROR)
         return await next();
     }
-
 }
 
-function generateUniqueFilename(originalFilename: string): string {
+export function generateUniqueFilename(originalFilename: string): string {
     const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
     const randomString = Math.random().toString(36).substring(2, 8);
     const extension = originalFilename.split('.').pop();
     return `image_${timestamp}_${randomString}.${extension}`;
 }
 
-async function generateSignature(timestamp: number, publicId: string, CLOUDINARY_API_SECRET: string): Promise<string> {
+export async function generateSignature(timestamp: number, publicId: string, CLOUDINARY_API_SECRET: string): Promise<string> {
     const str = `public_id=${publicId}&timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
     const msgUint8 = new TextEncoder().encode(str);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -169,6 +155,31 @@ async function generateSignature(timestamp: number, publicId: string, CLOUDINARY
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+export async function generateSignatureForReplace(timestamp: number, publicId: string, CLOUDINARY_API_SECRET: string, invalidate: boolean = true, overwrite: boolean = true) {
+    const str = `invalidate=${invalidate}&overwrite=${overwrite}&public_id=${publicId}&timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
+    const msgUint8 = new TextEncoder().encode(str);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export async function cloudinaryUploader(cloudinaryFormData: FormData, cloudinaryHelpers: any) {
+    return await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudinaryHelpers.CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+            method: 'POST',
+            body: cloudinaryFormData,
+        }
+    );
+}
+
+export function getCloudinaryHelpers(c: Context) {
+    return {
+        CLOUDINARY_CLOUD_NAME: c.env.CLOUDINARY_CLOUD_NAME,
+        CLOUDINARY_API_KEY: c.env.CLOUDINARY_API_KEY,
+        CLOUDINARY_API_SECRET: c.env.CLOUDINARY_API_SECRET
+    }
+}
 
 
 

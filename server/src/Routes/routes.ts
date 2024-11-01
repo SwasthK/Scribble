@@ -15,8 +15,8 @@ import { FollowUser, UnFollowUser } from '../Controllers/FollowUser/user.Follow.
 import { getFollowersDetails, getFollowingsDetails } from '../Controllers/FollowUser/user.getFollow.Controller'
 
 //Import Post Route handlers
-import { createNewDraftPost, updateDraftPost } from 'Controllers/Posts/create.Post'
-import { updateDraftPostById, updatePost } from '../Controllers/Posts/update.Post'
+import { createNewDraftPost} from 'Controllers/Posts/create.Post'
+import { updateDraftPostById } from '../Controllers/Posts/update.Post'
 import {
     getPostById,
     getPostByTitle,
@@ -72,7 +72,7 @@ import { dbConnect } from '../Connection/db.connect'
 import { apiResponse } from '../utils/apiResponse'
 import { apiError } from '../utils/apiError'
 import { getFileToUpload } from '../Middleware/cloudinary'
-import { createNewDraftPostParse, createNewPublishPostParse, signupBodyParse } from '../Middleware/Body.Parse'
+import { DraftPostBodyParse, publishPostBodyParse, signupBodyParse } from '../Middleware/Body.Parse'
 
 const api = new Hono();
 
@@ -99,12 +99,12 @@ api
     .get('/posts/drafts/fullContent/:postId', authMiddleware, findActiveUser, getDraftedPostFullContentById)
     .delete('/posts/delete/draftById/:draftId', authMiddleware, findActiveUser, deleteDraftPostById)
     .delete('/posts/delete/draftBulk', authMiddleware, findActiveUser, deleteDraftBulk)
-    .put('/posts/updateDraftById/:postId', authMiddleware, findActiveUser, updateDraftPostById)
-    .post('/post/createNewDraftPost', authMiddleware, findActiveUser, createNewDraftPostParse, getFileToUpload, createNewDraftPost)
+    .post('/post/createNewDraftPost', authMiddleware, findActiveUser, DraftPostBodyParse, getFileToUpload, createNewDraftPost)
+    .put('/posts/updateDraftById/:postId', authMiddleware, findActiveUser, DraftPostBodyParse, updateDraftPostById)
 
     // Publish Routes
-    .post('/posts/createNewPublishPost', authMiddleware, findActiveUser, createNewPublishPostParse, getFileToUpload, createNewPublishPost)
-    .put('/posts/updatePublishById/:postId', authMiddleware, findActiveUser, updatePublishById)
+    .post('/posts/createNewPublishPost', authMiddleware, findActiveUser, publishPostBodyParse, getFileToUpload, createNewPublishPost)
+    .put('/posts/updatePublishById/:postId', authMiddleware, findActiveUser,publishPostBodyParse, updatePublishById)
 
     //Follow Routes
     .post('profile/:id/follow', authMiddleware, findActiveUser, FollowUser)
@@ -113,7 +113,7 @@ api
     .get('/profile/getFollowingsDetails', authMiddleware, findActiveUser, getFollowingsDetails)
 
     //Post Routes
-    .put('/post/updateDraftPost', authMiddleware, findActiveUser, updateDraftPost)
+    // .put('/post/updateDraftPost', authMiddleware, findActiveUser, updateDraftPost)
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/get/:postId', authMiddleware, findActiveUser, getPostById)
     .get('/posts/getBy/authorId/:authorId', authMiddleware, findActiveUser, getPostByAuthorId)

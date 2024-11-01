@@ -261,10 +261,6 @@ export async function getDraftedPostShortned(c: Context) {
             return apiError(c, 404, "No Post Found");
         }
 
-        if (posts.length === 0) {
-            return apiError(c, 404, "0 Post Found");
-        }
-
         return apiResponse(c, 200, posts, "Posts fetched successfully");
 
     } catch (error: any) {
@@ -299,6 +295,8 @@ export async function getDraftedPostFullContentById(c: Context) {
                 shortCaption: true,
                 body: true,
                 coverImage: true,
+                summary: true,
+                allowComments: true,
             }
         });
 

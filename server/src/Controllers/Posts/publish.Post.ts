@@ -5,10 +5,10 @@ import { apiResponse } from "../../utils/apiResponse";
 import z from 'zod'
 import { PostStatus } from "@prisma/client";
 import { createSlug } from "utils/createSlug";
-import { fileUploadMessage } from "Middleware/cloudinary";
+import { cloudinaryUploader, fileUploadMessage, generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers, mimeTypeSignup } from "Middleware/cloudinary";
 
 export const publishPostSchema = z.object({
-    // coverImage: z.string().url({ message: "Invalid Cover Image URL" }).optional(),
+
     title: z.string()
         .min(6, { message: "Title must be atleast 6 Characters" })
         .max(25, { message: "Title must be atmost 25 Characters" }),
@@ -21,28 +21,20 @@ export const publishPostSchema = z.object({
     summary: z.string()
         .min(10, { message: "Summary must be atleast 10 Characters" })
         .max(200, { message: "Summary must be atmost 200 Characters" })
-        .optional(),
+        .optional().nullable().or(z.literal('')),
     allowComments: z.boolean({ message: "Invalid Comment type" }),
 })
 
 export async function updatePublishById(c: Context) {
     try {
 
+        const data = c.get('publishData')
         const userId = c.get('user').id
         const postId = c.req.param('postId')
-        if (!postId) {
-            return apiError(c, 400, "Post ID required")
-        }
-
         const prisma = c.get('prisma');
+        let cloudinaryHelpers = getCloudinaryHelpers(c);
 
-        const parsedBody = publishPostSchema.safeParse(await c.req.json());
-
-        if (!parsedBody.success) {
-            return apiError(c, 400, parsedBody.error.errors[0].message);
-        }
-
-        const data = parsedBody.data
+        if (!postId) { return apiError(c, 400, "Post ID required") }
 
         const post = await prisma.post.findFirst({
             where: {
@@ -52,37 +44,108 @@ export async function updatePublishById(c: Context) {
                 }]
             }
         })
-
         if (!post) { return apiError(c, 404, "Post not found") }
 
-        if (!post.coverImage) { return apiError(c, 404, "Cover Image is required") }
-
         const postSlug = createSlug(data.title, 25)
-
         const isPostTitleExists = await prisma.post.findFirst({
-            where: { AND: [{ slug: postSlug, status: PostStatus.PUBLISHED }] }
+            where: {
+                AND: [
+                    { slug: postSlug },
+                    { id: { not: postId } }
+                ]
+            }
         })
 
-        if (isPostTitleExists) { return apiError(c, 400, "Post title already exists") }
+    if (isPostTitleExists) { return apiError(c, 400, "Post title already exists") }
 
-        const updatedPost = await prisma.post.update({
-            where: { id: postId },
-            data: {
-                title: data.title,
-                slug: postSlug,
-                shortCaption: data.shortCaption,
-                body: data.body,
-                summary: data?.summary,
-                status: PostStatus.PUBLISHED
-            }
-        });
+    const timestamp = Math.round((new Date).getTime() / 1000);
+    let uniqueFilename = '';
+    const cloudinaryFormData = new FormData();
+    console.log(data);
 
-        return apiResponse(c, 200, updatedPost, "Post published successfully");
-
-    } catch (error: any) {
-        console.error("Publish Post Error:", error);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+    if (data.image) {
+        if (!Object.values(mimeTypeSignup).includes(data.image.type)) {
+            return apiError(c, 400, "Invalid file type");
+        }
+        uniqueFilename = generateUniqueFilename(data.image.name);
     }
+
+    if (!post.coverImage) {
+        if (data.image) {
+            const signature = await generateSignature(timestamp, uniqueFilename, cloudinaryHelpers.CLOUDINARY_API_SECRET);
+            cloudinaryFormData.append('public_id', uniqueFilename);
+            cloudinaryFormData.append('signature', signature);
+        } else {
+            return apiError(c, 400, "Cover Image is required")
+        }
+    } else {
+        if (data.image) {
+            const signature = await generateSignatureForReplace(
+                timestamp,
+                post.coverImagePublicId,
+                cloudinaryHelpers.CLOUDINARY_API_SECRET,
+                true,
+                true
+            );
+            cloudinaryFormData.append('public_id', post.coverImagePublicId);
+            cloudinaryFormData.append('overwrite', 'true');
+            cloudinaryFormData.append('invalidate', 'true');
+            cloudinaryFormData.append('signature', signature);
+        } else {
+            try {
+                const updatedPost = await prisma.post.update({
+                    where: { id: postId },
+                    data: {
+                        title: data.title,
+                        slug: postSlug,
+                        shortCaption: data.shortCaption,
+                        body: data.body,
+                        summary: data?.summary,
+                        status: PostStatus.PUBLISHED
+                    }
+                });
+
+                return apiResponse(c, 200, updatedPost, "Post published successfully");
+            } catch (error: any) {
+                console.error("Publish Post Error:", error);
+                return apiError(c, 500, "Internal Server Error", { code: "CE" });
+            }
+        }
+    }
+
+    cloudinaryFormData.append('file', data.image);
+    cloudinaryFormData.append('timestamp', timestamp.toString());
+    cloudinaryFormData.append('api_key', cloudinaryHelpers.CLOUDINARY_API_KEY);
+
+    const uploadResponse = await cloudinaryUploader(cloudinaryFormData, cloudinaryHelpers);
+
+    if (!uploadResponse.ok) {
+        console.log('Upload File Middleware Error: ', uploadResponse);
+        return apiError(c, 400, "Failed to upload an image");
+    }
+
+    const uploadResult: any = await uploadResponse.json();
+
+    const updatedPost = await prisma.post.update({
+        where: { id: postId },
+        data: {
+            coverImage: uploadResult.secure_url,
+            coverImagePublicId: uploadResult.public_id,
+            title: data.title,
+            slug: postSlug,
+            shortCaption: data.shortCaption,
+            body: data.body,
+            summary: data?.summary,
+            status: PostStatus.PUBLISHED
+        }
+    });
+
+    return apiResponse(c, 200, updatedPost, "Post published successfully");
+
+} catch (error: any) {
+    console.error("Publish Post Error:", error);
+    return apiError(c, 500, "Internal Server Error", { code: "CE" });
+}
 }
 
 export async function createNewPublishPost(c: Context) {

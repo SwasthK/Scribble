@@ -34,7 +34,7 @@ export async function signupBodyParse(c: Context, next: Next) {
     }
 }
 
-export async function createNewDraftPostParse(c: Context, next: Next) {
+export async function DraftPostBodyParse(c: Context, next: Next) {
 
     try {
         let formData;
@@ -44,6 +44,7 @@ export async function createNewDraftPostParse(c: Context, next: Next) {
             return apiError(c, 400, "Data is Invalid");
         }
 
+        const image = formData.get('file');
         const title = formData.get('title') as string;
         const shortCaption = formData.get('shortCaption') as string;
         const body = formData.get('body') as string;
@@ -53,7 +54,7 @@ export async function createNewDraftPostParse(c: Context, next: Next) {
         const response = createNewDraftPostSchema.safeParse({ title, shortCaption, body, allowComments, summary });
 
         if (!response.success) { return apiError(c, 400, response.error.errors[0].message) };
-        c.set('draftData', { ...response.data });
+        c.set('draftData', { ...response.data, image });
 
         return await next();
     } catch (error) {
@@ -62,7 +63,7 @@ export async function createNewDraftPostParse(c: Context, next: Next) {
     }
 }
 
-export async function createNewPublishPostParse(c: Context, next: Next) {
+export async function publishPostBodyParse(c: Context, next: Next) {
 
     try {
 
@@ -73,6 +74,7 @@ export async function createNewPublishPostParse(c: Context, next: Next) {
             return apiError(c, 400, "Data is Invalid");
         }
 
+        const image = formData.get('file');
         const title = formData.get('title') as string;
         const shortCaption = formData.get('shortCaption') as string;
         const body = formData.get('body') as string;
@@ -84,7 +86,7 @@ export async function createNewPublishPostParse(c: Context, next: Next) {
         if (!response.success) {
             return apiError(c, 400, response.error.errors[0].message)
         }
-        c.set('publishData', { ...response.data });
+        c.set('publishData', { ...response.data ,image});
 
         return await next();
     } catch (error) {
