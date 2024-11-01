@@ -67,28 +67,29 @@ model Notification {
 }
 
 model Post {
-  id            String       @id @default(uuid())
-  coverImage    String?
-  title         String
-  shortCaption  String?
-  slug          String?       @unique
-  body          String
-  summary       String?
-  author        User         @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
-  authorId      String
-  likes         Like[]
-  multiMedias   MultiMedia[] @relation("PostMultimedia")
-  savedBy       SavedBlog[]  @relation("PostSavedBlog")
-  revisions     Revision[]   @relation("UserRevision")
-  categories    Category[]   @relation("PostCategories")
-  tags          Tag[]        @relation("PostTags")
-  comments      Comment[]    @relation("PostComments")
-  reports       PostReport[] @relation("PostReports")
-  allowComments Boolean      @default(true)
-  status        PostStatus   @default(DRAFT)
-  publishedAt   DateTime?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id                 String       @id @default(uuid())
+  coverImage         String?
+  coverImagePublicId String?
+  title              String
+  shortCaption       String?
+  slug               String?      @unique
+  body               String
+  summary            String?
+  author             User         @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId           String
+  likes              Like[]
+  multiMedias        MultiMedia[] @relation("PostMultimedia")
+  savedBy            SavedBlog[]  @relation("PostSavedBlog")
+  revisions          Revision[]   @relation("UserRevision")
+  categories         Category[]   @relation("PostCategories")
+  tags               Tag[]        @relation("PostTags")
+  comments           Comment[]    @relation("PostComments")
+  reports            PostReport[] @relation("PostReports")
+  allowComments      Boolean      @default(true)
+  status             PostStatus   @default(DRAFT)
+  publishedAt        DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
 
   @@index([slug])
 }
@@ -153,19 +154,19 @@ model Tag {
   @@index([slug])
 }
 
-  model Comment {
-    id        String    @id @default(uuid())
-    content   String
-    author    User      @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
-    authorId  String
-    post      Post      @relation("PostComments", fields: [postId], references: [id], onDelete: Cascade)
-    postId    String
-    parent    Comment?  @relation("ParentComment", fields: [parentId], references: [id], onDelete: Cascade)
-    parentId  String?
-    replies   Comment[] @relation("ParentComment")
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-  }
+model Comment {
+  id        String    @id @default(uuid())
+  content   String
+  author    User      @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  post      Post      @relation("PostComments", fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  parent    Comment?  @relation("ParentComment", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId  String?
+  replies   Comment[] @relation("ParentComment")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
 
 model PostReport {
   id        String         @id @default(uuid())

@@ -1,17 +1,20 @@
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+
 import { RecoilRoot } from "recoil";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-import TimeAgo from 'javascript-time-ago'
+import TimeAgo from "javascript-time-ago";
 
-import en from 'javascript-time-ago/locale/en'
-import ru from 'javascript-time-ago/locale/ru'
+import en from "javascript-time-ago/locale/en";
+import ru from "javascript-time-ago/locale/ru";
 
-TimeAgo.addDefaultLocale(en)
-TimeAgo.addLocale(ru)
+import { Toaster } from "react-hot-toast";
+
+TimeAgo.addDefaultLocale(en);
+TimeAgo.addLocale(ru);
 
 // Axios - Config
 import axios from "axios";
@@ -26,11 +29,11 @@ const queryClient = new QueryClient({
   },
 });
 
-
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <RecoilRoot>
     <QueryClientProvider client={queryClient}>
       <App />
+      <Toaster />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </RecoilRoot>

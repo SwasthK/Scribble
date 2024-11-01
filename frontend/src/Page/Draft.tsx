@@ -3,16 +3,16 @@ import { AppBar } from "../components/AppBar/AppBar";
 import { useGetDraftedPost } from "../services/queries";
 import { Link } from "react-router-dom";
 import { RightArrow } from "../assets/svg/RightArrow";
-import { TrashIcon } from "./TrashIcon";
+import { TrashIcon } from "../assets/svg/TrashIcon";
 import { DraftCardSkeleton } from "../Skeleton/DraftCard_Skeleton";
 import ReactTimeAgo from "react-time-ago";
 import axios from "axios";
-import { statusType } from "./HandlePost";
+import { statusType } from "../Types/type";
 
 export const Draft = () => {
   const postsQuery = useGetDraftedPost();
-  const { data, isFetching, isError, error ,isLoading} = postsQuery;
-  const [drafts, setDrafts] = useState(data || []);
+  const { data, isFetching, isError, error } = postsQuery;
+  const [drafts, setDrafts] = useState([]);
 
   useEffect(() => {
     if (data) {
@@ -59,7 +59,7 @@ export const Draft = () => {
               getting noticed !
             </span>
           </p>
-          {isLoading && (
+          {isFetching && (
             <>
               <div className="w-full grid place-content-center grid-cols-1 md:grid-cols-2 gap-8 mt-4 md:gap-14">
                 {Array.from({ length: 6 }, (_, index) => (
@@ -69,7 +69,7 @@ export const Draft = () => {
             </>
           )}
           {isError && <p>{error.message}</p>}
-          {drafts && drafts.length === 0 && (
+          {data && data.length === 0 && (
             <div>
               <p className="text-base">
                 You have not drafted any post yet.{" "}
@@ -83,7 +83,7 @@ export const Draft = () => {
             </div>
           )}
 
-          {drafts && drafts.length > 0 && (
+          {data && data.length > 0 && (
             <>
               <div className="flex justify-end items-center w-full">
                 <button
@@ -94,8 +94,9 @@ export const Draft = () => {
                   <TrashIcon size={18} />
                 </button>
               </div>
+
               <div className="w-full grid place-content-center grid-cols-1 md:grid-cols-2 gap-8 md:gap-14">
-                {drafts.map((post: any) => (
+                {data.map((post: any) => (
                   <DraftCard
                     key={post.id}
                     title={post.title}

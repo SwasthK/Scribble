@@ -17,6 +17,8 @@ import { useMutation } from "@tanstack/react-query";
 import { handleUpdateUserProfileMetadata } from "../services/api";
 import { updateUserProfileMetaData } from "../Types/type";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
+import { TrashIcon } from "../assets/svg/TrashIcon";
 
 export const Profile = () => {
   const { user: userData } = useRecoilValue(authAtom);
@@ -127,14 +129,11 @@ export const Profile = () => {
           ...updatedData,
         },
       }));
+      toast.success("Profile Updated Successfully");
     },
     onError: (error: any) => {
-      console.log("Error", error);
-    },
-    onSettled: () => {
-      setTimeout(() => {
-        reset();
-      }, 10000);
+      toast.error(error.message);
+      return;
     },
   });
 
@@ -243,19 +242,7 @@ export const Profile = () => {
 
           {showAboutSection && (
             <>
-              <div className="w-full sm:max-w-[30rem] flex md:gap-8 gap-8 px-16 py-12 rounded-xl flex-col">
-                {isSuccess && (
-                  <p className="text-green-500 font-semibold">
-                    Profile updated successfully!
-                  </p>
-                )}
-
-                {isMutationError && (
-                  <p className="text-red-500 font-semibold">
-                    {mutationError?.message}
-                  </p>
-                )}
-
+              <div className="w-full sm:max-w-[30rem] flex md:gap-8 gap-8 px-16 pt-0 py-12 rounded-xl flex-col">
                 <div className="flex gap-3 flex-col">
                   <label htmlFor="username" className="font-semibold">
                     Username
@@ -382,10 +369,7 @@ export const UserBlogs = memo(
       <>
         <Link
           to={`/blog/${slug}`}
-          state={{
-            id: "i am from profile",
-          }}
-          className="bg-[#1F2937] overflow-hidden group hover:bg-[#304158] cursor-pointer transition-colors duration-300 ease-in max-w-72 pb-6 rounded-2xl flex flex-col gap-6 justify-center items-center md:max-w-60"
+          className="bg-[#1F2937] relative border-4 border-[#161616] hover:border-[#ffffff] overflow-hidden group hover:bg-[#304158] cursor-pointer transition-colors duration-300 ease-in max-w-72 pb-6 rounded-2xl flex flex-col gap-6 justify-center items-center md:max-w-60 overflow-visible"
         >
           {!isImageLoaded && !hasError && (
             <div className="aspect-video w-full rounded-2xl rounded-b-none bg-gray-200 animate-pulse" />
@@ -398,19 +382,21 @@ export const UserBlogs = memo(
               </span>
             </div>
           ) : (
-            <img
-              src={url}
-              alt="blog"
-              className={`aspect-video w-full group-hover:scale-[1.1] transition-transform duration-300 ease-in sm:max-w-full rounded-2xl rounded-b-none object-cover object-center ${
-                isImageLoaded ? "" : "hidden"
-              }`}
-              onLoad={() => setIsImageLoaded(true)}
-              onError={() => setHasError(true)}
-            />
+            <div className="overflow-hidden">
+              <img
+                src={url}
+                alt="blog"
+                className={`aspect-video w-full group-hover:scale-[1.1] transition-transform duration-300 ease-in sm:max-w-full rounded-2xl rounded-b-none object-cover object-center ${
+                  isImageLoaded ? "" : "hidden"
+                }`}
+                onLoad={() => setIsImageLoaded(true)}
+                onError={() => setHasError(true)}
+              />
+            </div>
           )}
 
-          <div className="flex flex-col gap-3 justify-center items-center px-3">
-            <h1 className="text-base font-semibold ">
+          <div className="flex flex-col gap-3 w-full px-3">
+            <h1 className="text-[1.1rem] font-semibold ">
               {title.length > 25 ? title.substring(0, 50) + " ..." : title}
             </h1>
             <h6 className="text-sm text-cgray font-semibold">
@@ -418,7 +404,16 @@ export const UserBlogs = memo(
                 ? shortCaption.substring(0, 50) + " ..."
                 : shortCaption}
             </h6>
-            <div className="text-xs flex items-start w-full">{date}</div>
+            <div className="text-xs flex justify-between items-start w-full">
+              <p>{date}</p>
+              <p className="text-green-500">Published</p>
+            </div>
+          </div>
+  
+          <div
+            className="absolute top-[-16px] right-[-10px] h-8 w-8 rounded-full bg-red-500 flex justify-center items-center"
+          >
+            <TrashIcon size={18} />
           </div>
         </Link>
       </>

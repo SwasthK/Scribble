@@ -15,8 +15,8 @@ import { FollowUser, UnFollowUser } from '../Controllers/FollowUser/user.Follow.
 import { getFollowersDetails, getFollowingsDetails } from '../Controllers/FollowUser/user.getFollow.Controller'
 
 //Import Post Route handlers
-import { createDraftPost, updateDraftPost, upSertDraftPost } from 'Controllers/Posts/create.Post'
-import { updateDraftPostById, updatePost } from '../Controllers/Posts/update.Post'
+import { createNewDraftPost} from 'Controllers/Posts/create.Post'
+import { updateDraftPostById } from '../Controllers/Posts/update.Post'
 import {
     getPostById,
     getPostByTitle,
@@ -47,7 +47,7 @@ import { deleteTag } from '../Controllers/Tags/delete.controller'
 import { likeAndUnlikePost } from '../Controllers/Like/like.Post'
 
 // Import Publish Post handlers
-import { publishDraftedPost, publishPost } from '../Controllers/Posts/publish.Post'
+import { createNewPublishPost, updatePublishById } from '../Controllers/Posts/publish.Post'
 
 //Archive Post
 import { archivePost } from '../Controllers/Posts/archive.Post'
@@ -72,7 +72,7 @@ import { dbConnect } from '../Connection/db.connect'
 import { apiResponse } from '../utils/apiResponse'
 import { apiError } from '../utils/apiError'
 import { getFileToUpload } from '../Middleware/cloudinary'
-import { signupBodyParse } from '../Middleware/signupBody.Parse'
+import { DraftPostBodyParse, publishPostBodyParse, signupBodyParse } from '../Middleware/Body.Parse'
 
 const api = new Hono();
 
@@ -99,20 +99,21 @@ api
     .get('/posts/drafts/fullContent/:postId', authMiddleware, findActiveUser, getDraftedPostFullContentById)
     .delete('/posts/delete/draftById/:draftId', authMiddleware, findActiveUser, deleteDraftPostById)
     .delete('/posts/delete/draftBulk', authMiddleware, findActiveUser, deleteDraftBulk)
+    .post('/post/createNewDraftPost', authMiddleware, findActiveUser, DraftPostBodyParse, getFileToUpload, createNewDraftPost)
+    .put('/posts/updateDraftById/:postId', authMiddleware, findActiveUser, DraftPostBodyParse, updateDraftPostById)
 
-
-
+    // Publish Routes
+    .post('/posts/createNewPublishPost', authMiddleware, findActiveUser, publishPostBodyParse, getFileToUpload, createNewPublishPost)
+    .put('/posts/updatePublishById/:postId', authMiddleware, findActiveUser,publishPostBodyParse, updatePublishById)
 
     //Follow Routes
     .post('profile/:id/follow', authMiddleware, findActiveUser, FollowUser)
     .delete('profile/:id/unfollow', authMiddleware, findActiveUser, UnFollowUser)
     .get('/profile/getFollowersDetails', authMiddleware, findActiveUser, getFollowersDetails)
     .get('/profile/getFollowingsDetails', authMiddleware, findActiveUser, getFollowingsDetails)
-    .put('/posts/updateDraftById/:postId', authMiddleware, findActiveUser, updateDraftPostById)
 
     //Post Routes
-    .post('/post/createNewDraftPost', authMiddleware, findActiveUser, createDraftPost)
-    .put('/post/updateDraftPost', authMiddleware, findActiveUser, updateDraftPost)
+    // .put('/post/updateDraftPost', authMiddleware, findActiveUser, updateDraftPost)
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/get/:postId', authMiddleware, findActiveUser, getPostById)
     .get('/posts/getBy/authorId/:authorId', authMiddleware, findActiveUser, getPostByAuthorId)
@@ -121,7 +122,7 @@ api
     .get('posts/published', authMiddleware, findActiveUser, getPublishedPost)
     .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
     .delete('/posts/delete/post/:postId', authMiddleware, findActiveUser, deletePost)
-    .post('/posts/upsert', authMiddleware, findActiveUser, upSertDraftPost)
+    // .post('/posts/upsert', authMiddleware, findActiveUser, upSertDraftPost)
 
 
 
@@ -147,9 +148,6 @@ api
     //Like Routes
     .post('/post/like/:postId', authMiddleware, findActiveUser, likeAndUnlikePost)
 
-    //Publish Post Routes
-    .post('/post/publish/draft/:postId', authMiddleware, findActiveUser, publishPost)
-    .post('/post/publish/', authMiddleware, findActiveUser, publishDraftedPost)
 
     //Archive Post Routes
     .post('/post/archive/:postId', authMiddleware, findActiveUser, archivePost)
@@ -192,7 +190,6 @@ api
 
         try {
             const userWithDetails = await prisma.post.findMany({
-
                 where: {
                     author: {
                         username: 'AlphaWolf'

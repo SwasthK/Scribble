@@ -51,9 +51,9 @@ export function useGetDraftedPost() {
     return useQuery({
         queryKey: ["draftedPosts"],
         queryFn: () => getDraftPost(),
-        enabled: true,
+        staleTime: 0,
+        refetchOnWindowFocus: false,
         retry: false,
-        staleTime:0
     })
 }
 
@@ -64,6 +64,6 @@ export function useGetDraftedPostFullContentByPostId({ postId }: { postId: strin
         enabled: !!postId,
         retry: false,
         staleTime: 0,
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus: false,
     })
 }

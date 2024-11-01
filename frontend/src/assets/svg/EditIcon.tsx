@@ -1,12 +1,12 @@
 import { memo } from "react";
 
-export const EditIcon = memo(() => {
+export const EditIcon = memo(({ size }: { size?: number }) => {
   return (
     <div>
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
+        width={size || 24}
+        height={size || 24}
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

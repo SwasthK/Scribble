@@ -52,5 +52,13 @@ export interface createPostFormData {
     shortCaption: string;
     coverImage: File | null;
     body: string;
+    summary: string;
     allowComments: boolean;
 }
+
+export enum statusType {
+    DRAFT = "DRAFT",
+    PUBLISHED = "PUBLISHED",
+    ARCHIEVED = "ARCHIEVED",
+    NEW = "NEW",
+  }
