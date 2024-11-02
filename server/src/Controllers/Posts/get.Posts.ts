@@ -69,6 +69,7 @@ export async function getPostByAuthorId(c: Context) {
     //Used
 
     const currentUser = c.get("user");
+    const currentSlug = c.req.query('slug');
 
     const author = c.req.param('authorId');
     const limitQuery = c.req.query("limit");
@@ -91,12 +92,26 @@ export async function getPostByAuthorId(c: Context) {
                 createdAt: 'desc',
             },
             where: {
-                AND: {
-                    authorId: {
-                        equals: author,
-                        not: currentUser.id
+                AND: [
+                    {
+                        authorId: {
+                            equals: author
+                        },
+                    },
+                    {
+                        authorId: {
+                            not: currentUser.id
+                        },
+                    },
+                    {
+                        slug: {
+                            not: currentSlug,
+                        },
+                    },
+                    {
+                        status: PostStatus.PUBLISHED
                     }
-                }
+                ]
             },
             select: {
                 id: true,
@@ -287,7 +302,6 @@ export async function getDraftedPostFullContentById(c: Context) {
                 AND: [{
                     id: postId,
                     authorId: user.id,
-                    status: PostStatus.DRAFT
                 }]
             },
             select: {
@@ -329,11 +343,11 @@ export async function getAllPosts(c: Context) {
 
         // Get total number of posts
         const totalPosts = await prisma.post.count(
-            // {
-            //     where: {
-            //         status: PostStatus.PUBLISHED
-            //     }
-            // }
+            {
+                where: {
+                    status: PostStatus.PUBLISHED
+                }
+            }
         );
 
         const totalPages = Math.ceil(totalPosts / limit);
@@ -393,7 +407,7 @@ export async function getAllPosts(c: Context) {
                 authorId: {
                     not: user.id
                 },
-                // status: PostStatus.PUBLISHED
+                status: PostStatus.PUBLISHED
             },
             orderBy: {
                 createdAt: 'desc',

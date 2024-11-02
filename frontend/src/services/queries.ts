@@ -34,14 +34,14 @@ export function useGetPostBySlug(slug: string | undefined) {
         queryKey: ["getPostBySlug", slug],
         queryFn: () => getPostBySlug(slug),
         retry: false,
-        staleTime: Infinity,
+        staleTime: 0,
     });
 }
 
-export function useGetPostByAuthorId(authorId: string) {
+export function useGetPostByAuthorId(authorId: string, slug: string) {
     return useQuery({
         queryKey: ["getPostByAuthorId", authorId],
-        queryFn: () => getPostByAuthorId(authorId),
+        queryFn: () => getPostByAuthorId(authorId, slug),
         enabled: false,
         staleTime: Infinity,
     });
@@ -61,7 +61,7 @@ export function useGetDraftedPostFullContentByPostId({ postId }: { postId: strin
     return useQuery({
         queryKey: ["draftedPostsFullContent"],
         queryFn: () => getDraftPostFullContentByPostId({ postId }),
-        enabled: !!postId,
+        // enabled: !!postId,
         retry: false,
         staleTime: 0,
         refetchOnWindowFocus: false,

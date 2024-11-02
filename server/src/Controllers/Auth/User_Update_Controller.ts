@@ -3,7 +3,7 @@ import { apiResponse } from "../../utils/apiResponse";
 import { updateUserProfileSchema } from "../../Zod/zod";
 import { dbConnect } from "../../Connection/db.connect";
 import { apiError } from "../../utils/apiError";
-import { fileUploadMessage } from "../../Middleware/cloudinary";
+import { cloudinaryUploader, fileUploadMessage, generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers } from "../../Middleware/cloudinary";
 
 export async function updateUserProfile(c: Context) {
     try {
@@ -56,50 +56,55 @@ export async function updateUserProfile(c: Context) {
 
 export async function updateUserAvatar(c: Context) {
     try {
+        const image = c.get('avatarUpdateImage')
         const userId = c.get('user').id
-        const message = c.get('fileUploadMessage');
+        const prisma: any = c.get('prisma');
 
-        const fileHandle: Record<string, any> = {};
+        const user = await prisma.user.findUnique({ where: { id: userId } })
+        if (!user) { return apiError(c, 404, "User not found!") }
 
-        switch (message) {
-            case fileUploadMessage.TYPEERROR:
-                return apiError(c, 400, "Invalid file type");
+        let cloudinaryHelpers = getCloudinaryHelpers(c);
+        const timestamp = Math.round((new Date).getTime() / 1000);
+        const uniqueFilename = generateUniqueFilename(image.name);
+        const cloudinaryFormData = new FormData();
+        cloudinaryFormData.append('file', image);
+        cloudinaryFormData.append('timestamp', timestamp.toString());
+        cloudinaryFormData.append('api_key', cloudinaryHelpers.CLOUDINARY_API_KEY);
 
-            case fileUploadMessage.NOFILE:
-                fileHandle.noFile = true;
-                break;
-
-            case fileUploadMessage.SUCCESS:
-                fileHandle.success = true;
-                break;
-
-            default:
-                fileHandle.error = true;
-                break;
+        if (user.avatarPublicId && user.avatarUrl) {
+            const signature = await generateSignatureForReplace(
+                timestamp,
+                user.avatarPublicId,
+                cloudinaryHelpers.CLOUDINARY_API_SECRET,
+                true,
+                true
+            );
+            cloudinaryFormData.append('public_id', user.avatarPublicId);
+            cloudinaryFormData.append('overwrite', 'true');
+            cloudinaryFormData.append('invalidate', 'true');
+            cloudinaryFormData.append('signature', signature);
+        } else {
+            const signature = await generateSignature(timestamp, uniqueFilename, cloudinaryHelpers.CLOUDINARY_API_SECRET);
+            cloudinaryFormData.append('public_id', uniqueFilename);
+            cloudinaryFormData.append('signature', signature);
         }
 
-        if (fileHandle.noFile) {
-            return apiError(c, 400, "No file uploaded");
+        const uploadResponse = await cloudinaryUploader(cloudinaryFormData, cloudinaryHelpers);
+
+        if (!uploadResponse.ok) {
+            console.log('Upload File Middleware Error: ', uploadResponse);
+            return apiError(c, 400, "Failed to upload an image");
         }
 
-        if (fileHandle.error) {
-            return apiError(c, 400, "Failed to upload file");
-        }
-
-        const fileUploadResponse = c.get('fileUploadResponse')
-
-        const prisma: any = await dbConnect(c);
+        const uploadResult: any = await uploadResponse.json();
 
         const updateUser = await prisma.user.update({
             where: { id: userId },
             data: {
-                avatarPublicId: fileUploadResponse.public_id,
-                avatarUrl: fileUploadResponse.secure_url
+                avatarPublicId: uploadResult.public_id,
+                avatarUrl: uploadResult.secure_url
             },
             select: {
-                id: true,
-                username: true,
-                avatarPublicId: true,
                 avatarUrl: true
             }
         });

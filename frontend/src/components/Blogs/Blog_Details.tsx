@@ -9,11 +9,10 @@ import { useRecoilValue } from "recoil";
 import { authAtom } from "../../atoms/auth.atoms";
 import { EditIcon } from "../../assets/svg/EditIcon";
 import { statusType } from "../../Types/type";
+import { useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteView } from "@blocknote/mantine";
 
 export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
-  const { refetch, data, isLoading } = useGetPostByAuthorId(
-    blogContent.authorId || ""
-  );
 
   const { ref, inView } = useInView({
     triggerOnce: true,
@@ -22,6 +21,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
   const {
     id,
     title,
+    slug,
     shortCaption,
     coverImage,
     createdAt,
@@ -30,6 +30,11 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
     body,
     summary,
   } = blogContent;
+
+  const { refetch, data, isLoading } = useGetPostByAuthorId(
+    blogContent.authorId || "",
+    slug
+  );
 
   const { formattedDate } = UseFormatDate(createdAt);
 
@@ -53,9 +58,21 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
     console.log("state : ", state);
   }, [state]);
 
+  const editor = useCreateBlockNote({
+    initialContent: state?.body || "",
+  });
+
+  useEffect(() => {
+    const genrateEditorData = async () => {
+      const blocks = await editor.tryParseHTMLToBlocks(body || "");
+      editor.replaceBlocks(editor.document, blocks);
+    };
+    genrateEditorData();
+  }, [blogContent]);
+
   return (
     <>
-      <div className="flex justify-center items-center px-8 py-16 sm:px-16">
+      <div className="flex justify-center items-center px-8  pt-8  sm:px-16">
         <div className="w-full flex flex-col gap-8 max-w-[700px]">
           <div className="min-h-96 max-w-3/4 ">
             <h1
@@ -65,13 +82,13 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               {title}
             </h1>
             <p
-              className="pt-6 text-lg lg:text-xl"
+              className="pt-4 text-lg lg:text-xl"
               style={{ wordBreak: "break-word", lineHeight: "1.9" }}
             >
               {shortCaption}
             </p>
             <div
-              className={`flex items-center gap-4 py-7 ${
+              className={`flex items-center gap-4 py-4 ${
                 currentUserId === authorId && "justify-between pr-8"
               } `}
             >
@@ -85,20 +102,20 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               {currentUserId === authorId && (
                 <Link
                   to={"/post/handle"}
-                  state={{  
+                  state={{
                     postId: id,
                     authorId,
                     statusType: statusType.PUBLISHED,
                   }}
                   className="flex justify-center items-center gap-2 px-4 py-2 rounded-lg "
                 >
-                  <EditIcon size={20}/>
+                  <EditIcon size={20} />
                   <p className="italic font-semibold">Edit</p>
                 </Link>
               )}
             </div>
 
-            <div className="py-6">
+            <div className="py-6 pb-3 pt-4">
               {!loadImage && !imageError && (
                 <div className="animate-pulse aspect-video bg-gray-200 rounded-xl"></div>
               )}
@@ -118,52 +135,72 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                 />
               )}
             </div>
-
-            <p
-              className="pt-6 text-lg lg:text-xl"
-              style={{ wordBreak: "break-word", lineHeight: "1.9" }}
-            >
-              {body}
-            </p>
-            <div ref={ref}></div>
-            <div className="mt-8 py-8">
-              <p className="italic">Summary</p>
-              <p
-                style={{ wordBreak: "break-word", lineHeight: "1.5" }}
-                className="mt-4 text-base md:text-lg"
-              >
-                {summary}
-              </p>
-            </div>
-
-            {/* <div className="flex mt-4 gap-4">
-              {tag
-                ? tag.map((tag: string) => (
-                    <div
-                      key={tag}
-                      className="px-4 py-1 font-semibold border rounded-full text-center bg-gray-300"
-                    >
-                      {tag}
-                    </div>
-                  ))
-                : null}
-            </div> */}
           </div>
+        </div>
+      </div>
+
+      {/* <div className="flex justify-center items-center px-8  pt-8 pb-2 sm:pb-16 sm:px-16"> */}
+      <div className="flex justify-center items-center">
+        <div className="w-full flex flex-col gap-8 max-w-[800px]">
+          <BlockNoteView
+            editor={editor}
+            editable={false}
+            data-theming-css-variables-demo-display-blog
+            data-theming-editor
+            formattingToolbar={true}
+          />
+        </div>
+      </div>
+
+      <div
+        className="flex justify-center items-center px-8 pb-16 sm:px-16 mt-[-3rem]"
+        ref={ref}
+      >
+        <div className="w-full flex flex-col gap-8 max-w-[700px]">
+          {summary && (
+            <div className="z-10 flex flex-col gap-4">
+              <h1 className="italic font-semibold">Summary</h1>
+              <div className="bg-[#7663630e] p-6 text-lg">
+                <h1 className="text-white">{summary}</h1>
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col gap-7">
-            <div>
-              <img
-                src={author.avatarUrl}
-                alt=""
-                className="h-16 w-16 rounded-full border-none"
-              />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold">
-                Written by {author.username}
-              </h1>
-              <p className="py-2">53K Followers</p>
-            </div>
+            {currentUserId !== authorId ? (
+              <>
+                <div className="z-10">
+                  <img
+                    src={author.avatarUrl}
+                    alt=""
+                    className="h-16 w-16 rounded-full border-none"
+                  />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-semibold">
+                    Written by {author.username}
+                  </h1>
+                  <p className="py-2">53K Followers</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="author-section z-10">
+                  <Link
+                    state={{ profile: false }}
+                    to={`/profile/@${author.username}`}
+                    className="text-lg font-semibold text-blue-600 hover:underline"
+                  >
+                    <p>{`More posts from you - @ ${author.username}`}</p>
+                  </Link>
+                  <blockquote className="text-sm italic text-gray-600 mb-2">
+                    "Writing is the painting of the voice." – Voltaire
+                  </blockquote>
+                </div>
+              </>
+            )}
           </div>
+
           {currentUserId !== authorId ? (
             <>
               {isLoading && <Blog_Recommendation_Skeleton />}
@@ -190,6 +227,31 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
           ) : null}
         </div>
       </div>
+
+      {/* <p
+              className="pt-6 text-lg lg:text-xl"
+              style={{ wordBreak: "break-word", lineHeight: "1.9" }}
+            >
+              {body}
+            </p> */}
+
+      {/* <div className="flex mt-4 gap-4">
+              {tag
+                ? tag.map((tag: string) => (
+                    <div
+                      key={tag}
+                      className="px-4 py-1 font-semibold border rounded-full text-center bg-gray-300"
+                    >
+                      {tag}
+                    </div>
+                  ))
+                : null}
+            </div> */}
+      {/* </div>
+         
+         
+        </div>
+      </div> */}
     </>
   );
 };
@@ -214,7 +276,11 @@ export const Blog_Recommendation = ({
     <>
       <Link to={`/blog/${slug}`} className="flex flex-col gap-6">
         <div className="">
-          <img src={coverImage} alt="" className="aspect-video rounded-lg" />
+          <img
+            src={coverImage}
+            alt=""
+            className="aspect-video rounded-lg object-cover object-center"
+          />
         </div>
         <div className="flex flex-col ">
           <div className="flex gap-4 items-center">
