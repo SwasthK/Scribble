@@ -62,7 +62,7 @@ export const Blogs = () => {
 
           <div className="hidden  lg:flex lg:sticky top-0 lg:right-0 p-6  space-y-16 flex-col  h-screen overflow-y-scroll">
             <div className="w-72  xl:w-80 overflow-x-hidden flex flex-col gap-8 text-white font-semibold">
-              {data.pages?.map((page: any,pageIndex) => (
+              {data.pages?.map((page: any, pageIndex) => (
                 <TopPicks key={pageIndex} blogs={page.posts} />
               ))}
 
@@ -73,7 +73,7 @@ export const Blogs = () => {
               />
               <TopicGrid />
 
-              {data.pages?.map((page: any,index) => (
+              {data.pages?.map((page: any, index) => (
                 <FollowRecommendation key={index} blogs={page.posts} />
               ))}
 
@@ -241,7 +241,7 @@ const FollowRecommendation = memo(({ blogs }: any) => {
               className="flex gap-2 justify-between items-center cursor-pointer"
             >
               <div className="flex gap-4 items-center ">
-                <Avatar size={7} url={blog.author.avatarUrl}/>
+                <Avatar size={7} url={blog.author.avatarUrl} />
                 <h1 className="capitalize text-lg">
                   {blog.author.username.length > 10
                     ? blog.author.username.substring(0, 10) + "..."

@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 // import { useParams, useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { AppBar } from "../components/AppBar/AppBar";
@@ -10,17 +10,23 @@ import { UserBlogs_Skeleton } from "../Skeleton/UserBlogs_Skeleton";
 import {
   validateBio,
   validateEmail,
+  validateFileSize,
+  validateFileType,
   validateUsername,
 } from "../components/Auth/register.validate";
 import { FormErrors } from "../Types/type";
 import { useMutation } from "@tanstack/react-query";
 import { handleUpdateUserProfileMetadata } from "../services/api";
 import { updateUserProfileMetaData } from "../Types/type";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { TrashIcon } from "../assets/svg/TrashIcon";
+import axios from "axios";
 
 export const Profile = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { state } = location;
   const { user: userData } = useRecoilValue(authAtom);
   const setUserData = useSetRecoilState(authAtom);
   const { formattedDate } = UseFormatDate(userData.createdAt);
@@ -44,6 +50,15 @@ export const Profile = () => {
   //   }
   // }, [username, userData, navigate]);
 
+  useEffect(() => {
+    if (state?.profile === false) {
+      HideBlogs(false);
+    }
+    if (location.state) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, []);
+
   const handlePrevClick = () => {
     setCurrentPage((prev) => prev - 1);
   };
@@ -52,14 +67,23 @@ export const Profile = () => {
     setCurrentPage((prev) => prev + 1);
   };
 
-  const [FormData, setFormData] = useState<updateUserProfileMetaData>({
+  const [formData, setformData] = useState<updateUserProfileMetaData>({
     username: userData.username || "",
     email: userData.email || "",
     bio: userData.bio || "",
   });
 
-  const [initialFormData, setInitialFormData] = useState(FormData);
+  const [initialformData, setInitialformData] = useState(formData);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [avatarPreview, setAvatarPreview] = useState(false);
+
+  const handleCloseAvatarPreview = () => {
+    setAvatarFile({
+      file: null,
+      url: "",
+    });
+    setAvatarPreview(false);
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -99,14 +123,14 @@ export const Profile = () => {
       ...clientSideError,
     }));
 
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    setformData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const isFormChanged = () => {
     return (
-      FormData.username !== initialFormData.username ||
-      FormData.email !== initialFormData.email ||
-      FormData.bio !== initialFormData.bio
+      formData.username !== initialformData.username ||
+      formData.email !== initialformData.email ||
+      formData.bio !== initialformData.bio
     );
   };
 
@@ -118,10 +142,10 @@ export const Profile = () => {
     mutate,
     reset,
   } = useMutation({
-    mutationFn: (FormData: updateUserProfileMetaData) =>
-      handleUpdateUserProfileMetadata(FormData),
+    mutationFn: (formData: updateUserProfileMetaData) =>
+      handleUpdateUserProfileMetadata(formData),
     onSuccess: (updatedData) => {
-      setInitialFormData(updatedData);
+      setInitialformData(updatedData);
       setUserData((prev) => ({
         ...prev,
         user: {
@@ -137,13 +161,137 @@ export const Profile = () => {
     },
   });
 
+  const [avatarFile, setAvatarFile] = useState<{
+    file: File | null;
+    url: string;
+  }>({
+    file: null,
+    url: "",
+  });
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const fileTypeError = validateFileType(file.type);
+      const fileSizeError = validateFileSize(file.size);
+      if (fileTypeError || fileSizeError) {
+        setAvatarFile({
+          file: null,
+          url: "",
+        });
+        setAvatarPreview(false);
+        toast.error(fileTypeError || fileSizeError);
+        return;
+      } else {
+        setAvatarFile({
+          file,
+          url: URL.createObjectURL(file),
+        });
+        setAvatarPreview(true);
+      }
+    }
+  };
+
+  const [loadAvatarUpload, setLoadAvatarupload] = useState(false);
+
+  const handleAvatarUploader = async () => {
+    if (!(avatarFile.file && avatarFile.url)) {
+      setAvatarPreview(false);
+      return;
+    }
+    try {
+      setLoadAvatarupload(true);
+      const data = new FormData();
+      data.append("file", avatarFile.file);
+      const res = await axios.put("/updateUserAvatar", data, {
+        headers: {
+          accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+
+      setUserData((prev) => ({
+        ...prev,
+        user: {
+          ...prev.user,
+          avatarUrl: res.data.data.avatarUrl,
+        },
+      }));
+      toast.success("Profile Updated Successfully");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setAvatarFile({
+        file: null,
+        url: "",
+      });
+      setLoadAvatarupload(false);
+      setAvatarPreview(false);
+    }
+  };
+
   return (
     <>
       <AppBar />
 
       <div className="w-screen lg:px-24 pb-8 text-white">
-        <div className="px-8 py-8  flex border-b-[1px] border-[#ffffff3f] shadow-sm items-center gap-8 max-w-[60rem]">
-          <Avatar url={userData.avatarUrl} size={16} />
+        <div className="relative px-8 py-8  flex border-b-[1px] border-[#ffffff3f] shadow-sm items-center gap-8 max-w-[60rem]">
+          <Avatar
+            url={userData.avatarUrl}
+            size={16}
+            onClick={() => setAvatarPreview(true)}
+          />
+
+          <div className="flex justify-center items-center absolute bottom-8 bg-white p-0 m-0 h-[1.2rem] rounded-full w-16">
+            <label
+              htmlFor="avatarFile"
+              className="text-[.8rem] text-black cursor-pointer"
+            >
+              Change
+              <input
+                type="file"
+                id="avatarFile"
+                className="hidden"
+                accept="image/*"
+                onChange={handleAvatarChange}
+              />
+            </label>
+          </div>
+
+          {avatarPreview && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center flex-col gap-4 justify-center border-none"
+              onClick={handleCloseAvatarPreview}
+            >
+              <div
+                className="  modal-image rounded-lg overflow-hidden border-none"
+                style={{ width: "80%", maxWidth: "200px", maxHeight: "80vh" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img
+                  src={avatarFile.url || userData.avatarUrl}
+                  alt="Enlarged Avatar"
+                  className="aspect-square border-none object-cover transform transition-all duration-700 ease-in-out scale-100 hover:scale-125"
+                />
+              </div>
+
+              {avatarFile.file && avatarFile.url && (
+                <div
+                onClick={(e) => e.stopPropagation()}
+                  className="w-full"
+                  style={{ width: "80%", maxWidth: "200px", maxHeight: "80vh" }}
+                >
+                  <button
+                    disabled={loadAvatarUpload}
+                    onClick={handleAvatarUploader}
+                    className="disabled:bg-green-200 disabled:cursor-not-allowed w-full px-2 text-center rounded-full bg-green-500 text-black font-semibold p-1 text-[.82rem]"
+                  >
+                    {loadAvatarUpload ? "Uploading" : "Update"}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-col gap-2">
             <h1 className="font-semibold text-4xl break-words  line-clamp-3 py-2">
               {userData.username}
@@ -253,7 +401,7 @@ export const Profile = () => {
                     id="username"
                     name="username"
                     placeholder="eg. JohnDoe"
-                    value={FormData.username}
+                    value={formData.username}
                     onChange={handleChange}
                     disabled={isPending}
                   />
@@ -276,7 +424,7 @@ export const Profile = () => {
                     id="email"
                     name="email"
                     placeholder="eg. johndoe@gmail.com"
-                    value={FormData.email}
+                    value={formData.email}
                     onChange={handleChange}
                     autoComplete="true"
                     disabled={isPending}
@@ -300,7 +448,7 @@ export const Profile = () => {
                     id="bio"
                     cols={10}
                     rows={10}
-                    value={FormData.bio}
+                    value={formData.bio}
                     maxLength={300}
                     disabled={isPending}
                     onChange={handleChange}
@@ -330,7 +478,7 @@ export const Profile = () => {
                             !errors.email &&
                             !errors.bio
                           ) {
-                            mutate(FormData);
+                            mutate(formData);
                           }
                         }}
                       >
@@ -369,14 +517,14 @@ export const UserBlogs = memo(
       <>
         <Link
           to={`/blog/${slug}`}
-          className="bg-[#1F2937] relative border-4 border-[#161616] hover:border-[#ffffff] overflow-hidden group hover:bg-[#304158] cursor-pointer transition-colors duration-300 ease-in max-w-72 pb-6 rounded-2xl flex flex-col gap-6 justify-center items-center md:max-w-60 overflow-visible"
+          className="bg-[#1F2937] relative border-4 border-[#161616] hover:border-[#ffffff] overflow-hidden group hover:bg-[#304158] cursor-pointer transition-colors duration-300 ease-in max-w-72 pb-6 rounded-2xl flex flex-col gap-6 justify-center items-center md:max-w-60 "
         >
-          {!isImageLoaded && !hasError && (
+          {/* {!isImageLoaded && !hasError && (
             <div className="aspect-video w-full rounded-2xl rounded-b-none bg-gray-200 animate-pulse" />
-          )}
+          )} */}
 
           {hasError ? (
-            <div className="aspect-video w-full rounded-2xl rounded-b-none bg-red-200 flex justify-center items-center">
+            <div className=" w-[64rem] h-[8rem] rounded-2xl rounded-b-none bg-red-200 flex justify-center items-center">
               <span className="text-red-500 font-semibold">
                 Failed to Load the Image
               </span>
@@ -409,12 +557,10 @@ export const UserBlogs = memo(
               <p className="text-green-500">Published</p>
             </div>
           </div>
-  
-          <div
-            className="absolute top-[-16px] right-[-10px] h-8 w-8 rounded-full bg-red-500 flex justify-center items-center"
-          >
+
+          {/* <div className="absolute top-[-16px] right-[-10px] h-8 w-8 rounded-full bg-red-500 flex justify-center items-center">
             <TrashIcon size={18} />
-          </div>
+          </div> */}
         </Link>
       </>
     );

@@ -68,11 +68,14 @@ export const getPostBySlug = async (slug: string | undefined) => {
     }
 }
 
-export const getPostByAuthorId = async (authorId: string) => {
+export const getPostByAuthorId = async (authorId: string, slug: string) => {
     try {
         const response = await axios.get<any>(`${baseUrl}/posts/getBy/authorId/${authorId}`, {
             headers: {
                 accessToken: `Bearer ${localStorage.getItem("accessToken")}`
+            },
+            params: {
+                slug
             }
         });
 

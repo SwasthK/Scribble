@@ -130,7 +130,16 @@ export const Blog_Card: React.FC<Blog_CardProps> = ({
 };
 
 export const Avatar = memo(
-  ({ size, url }: { name?: string; size: number; url?: string }) => {
+  ({
+    size,
+    url,
+    onClick,
+  }: {
+    name?: string;
+    size: number;
+    url?: string;
+    onClick?: any;
+  }) => {
     return (
       // <div
       //   className={`w-${size} border-black border rounded-full bg-gray-200 h-${size} flex justify-center items-center font-semibold cursor-pointer`}
@@ -144,6 +153,7 @@ export const Avatar = memo(
       // </div>
       <>
         <img
+          onClick={onClick}
           className={`w-${size} border-black border rounded-full bg-white h-${size} flex justify-center items-center font-semibold cursor-pointer`}
           src={url}
           loading="lazy"

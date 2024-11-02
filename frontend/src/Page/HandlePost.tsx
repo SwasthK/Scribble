@@ -91,6 +91,18 @@ export const HandlePost = () => {
     useGetDraftedPostFullContentByPostId({ postId });
 
   useEffect(() => {
+    if (!postId) {
+      setFormData({
+        title: "",
+        shortCaption: "",
+        coverImage: null,
+        body: "",
+        allowComments: true,
+        summary: "",
+      });
+      setImage('')
+      return;
+    }
     setFormData((prev) => ({
       ...prev,
       title: fullDraftData?.title || "",
@@ -294,6 +306,7 @@ export const HandlePost = () => {
   };
 
   const handleBodyChange = async () => {
+    setPublished(false);
     function formatHTML(html: any) {
       return html.replace(/<p><\/p>/g, "<br>");
     }

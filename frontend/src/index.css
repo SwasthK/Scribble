@@ -150,10 +150,52 @@ h3.bn-inline-content {
 
 .bn-container[data-theming-css-variables-demo][data-color-scheme="dark"] {
   --bn-colors-editor-background: #2e2c2c;
+  padding: 0px;
 }
 
-.bn-container .bn-editor{
-  min-height: 80vh;
+.bn-container[data-theming-css-variables-demo-display-blog][data-color-scheme] {
+  --bn-colors-editor-background: #212121;
+  line-height: 2.1rem;
+
+}
+
+.bn-container[data-theming-editor][data-color-scheme] .bn-editor * {
+  line-height: 2.1rem;
+
+}
+
+.bn-container .bn-editor {
+  /* min-height: 80vh; */
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+
+.modal-image {
+  animation: scaleUp 0.3s ease-in-out;
+}
+
+@keyframes scaleUp {
+  0% {
+      opacity: 0;
+      transform: scale(0.9);
+  }
+  100% {
+      opacity: 1;
+      transform: scale(1);
+  }
+}
+
+.modal-image-exit {
+  animation: scaleDown 0.3s ease-in-out;
+}
+
+@keyframes scaleDown {
+  0% {
+      opacity: 1;
+      transform: scale(1);
+  }
+  100% {
+      opacity: 0;
+      transform: scale(0.9);
+  }
 }
