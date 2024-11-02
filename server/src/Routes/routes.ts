@@ -72,7 +72,7 @@ import { dbConnect } from '../Connection/db.connect'
 import { apiResponse } from '../utils/apiResponse'
 import { apiError } from '../utils/apiError'
 import { getFileToUpload } from '../Middleware/cloudinary'
-import { DraftPostBodyParse, publishPostBodyParse, signupBodyParse } from '../Middleware/Body.Parse'
+import { DraftPostBodyParse, publishPostBodyParse, signupBodyParse, updateAvatarBodyParse } from '../Middleware/Body.Parse'
 
 const api = new Hono();
 
@@ -91,7 +91,7 @@ api
     .post('/refreshAccessToken', refreshAccessToken)
     .put('/updateUserProfile', authMiddleware, findActiveUser, updateUserProfile)
     .put('/updateUserPassword', authMiddleware, findActiveUser, updateUserPassword)
-    .put('/updateUserAvatar', authMiddleware, findActiveUser, getFileToUpload, updateUserAvatar)
+    .put('/updateUserAvatar', authMiddleware, findActiveUser,updateAvatarBodyParse,updateUserAvatar)
     .delete('/deleteUserProfile', authMiddleware, findActiveUser, deleteUserProfile)
 
     // Draft Routes
@@ -106,6 +106,11 @@ api
     .post('/posts/createNewPublishPost', authMiddleware, findActiveUser, publishPostBodyParse, getFileToUpload, createNewPublishPost)
     .put('/posts/updatePublishById/:postId', authMiddleware, findActiveUser,publishPostBodyParse, updatePublishById)
 
+
+    // Post Manipulations
+    .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
+    .get('/posts/getBy/authorId/:authorId', authMiddleware, findActiveUser, getPostByAuthorId)
+
     //Follow Routes
     .post('profile/:id/follow', authMiddleware, findActiveUser, FollowUser)
     .delete('profile/:id/unfollow', authMiddleware, findActiveUser, UnFollowUser)
@@ -114,9 +119,8 @@ api
 
     //Post Routes
     // .put('/post/updateDraftPost', authMiddleware, findActiveUser, updateDraftPost)
-    .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/get/:postId', authMiddleware, findActiveUser, getPostById)
-    .get('/posts/getBy/authorId/:authorId', authMiddleware, findActiveUser, getPostByAuthorId)
+
     .get('/posts/getBy/title/:postTitle', authMiddleware, findActiveUser, getPostByTitle)
     .get('/posts/getBy/slug/:postSlug', authMiddleware, findActiveUser, getPostBySlug)
     .get('posts/published', authMiddleware, findActiveUser, getPublishedPost)

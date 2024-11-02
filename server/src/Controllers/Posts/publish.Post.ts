@@ -56,96 +56,96 @@ export async function updatePublishById(c: Context) {
             }
         })
 
-    if (isPostTitleExists) { return apiError(c, 400, "Post title already exists") }
+        if (isPostTitleExists) { return apiError(c, 400, "Post title already exists") }
 
-    const timestamp = Math.round((new Date).getTime() / 1000);
-    let uniqueFilename = '';
-    const cloudinaryFormData = new FormData();
-    console.log(data);
+        const timestamp = Math.round((new Date).getTime() / 1000);
+        let uniqueFilename = '';
+        const cloudinaryFormData = new FormData();
+        console.log(data);
 
-    if (data.image) {
-        if (!Object.values(mimeTypeSignup).includes(data.image.type)) {
-            return apiError(c, 400, "Invalid file type");
-        }
-        uniqueFilename = generateUniqueFilename(data.image.name);
-    }
-
-    if (!post.coverImage) {
         if (data.image) {
-            const signature = await generateSignature(timestamp, uniqueFilename, cloudinaryHelpers.CLOUDINARY_API_SECRET);
-            cloudinaryFormData.append('public_id', uniqueFilename);
-            cloudinaryFormData.append('signature', signature);
-        } else {
-            return apiError(c, 400, "Cover Image is required")
+            if (!Object.values(mimeTypeSignup).includes(data.image.type)) {
+                return apiError(c, 400, "Invalid file type");
+            }
+            uniqueFilename = generateUniqueFilename(data.image.name);
         }
-    } else {
-        if (data.image) {
-            const signature = await generateSignatureForReplace(
-                timestamp,
-                post.coverImagePublicId,
-                cloudinaryHelpers.CLOUDINARY_API_SECRET,
-                true,
-                true
-            );
-            cloudinaryFormData.append('public_id', post.coverImagePublicId);
-            cloudinaryFormData.append('overwrite', 'true');
-            cloudinaryFormData.append('invalidate', 'true');
-            cloudinaryFormData.append('signature', signature);
-        } else {
-            try {
-                const updatedPost = await prisma.post.update({
-                    where: { id: postId },
-                    data: {
-                        title: data.title,
-                        slug: postSlug,
-                        shortCaption: data.shortCaption,
-                        body: data.body,
-                        summary: data?.summary,
-                        status: PostStatus.PUBLISHED
-                    }
-                });
 
-                return apiResponse(c, 200, updatedPost, "Post published successfully");
-            } catch (error: any) {
-                console.error("Publish Post Error:", error);
-                return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        if (!post.coverImage) {
+            if (data.image) {
+                const signature = await generateSignature(timestamp, uniqueFilename, cloudinaryHelpers.CLOUDINARY_API_SECRET);
+                cloudinaryFormData.append('public_id', uniqueFilename);
+                cloudinaryFormData.append('signature', signature);
+            } else {
+                return apiError(c, 400, "Cover Image is required")
+            }
+        } else {
+            if (data.image) {
+                const signature = await generateSignatureForReplace(
+                    timestamp,
+                    post.coverImagePublicId,
+                    cloudinaryHelpers.CLOUDINARY_API_SECRET,
+                    true,
+                    true
+                );
+                cloudinaryFormData.append('public_id', post.coverImagePublicId);
+                cloudinaryFormData.append('overwrite', 'true');
+                cloudinaryFormData.append('invalidate', 'true');
+                cloudinaryFormData.append('signature', signature);
+            } else {
+                try {
+                    const updatedPost = await prisma.post.update({
+                        where: { id: postId },
+                        data: {
+                            title: data.title,
+                            slug: postSlug,
+                            shortCaption: data.shortCaption,
+                            body: data.body,
+                            summary: data?.summary,
+                            status: PostStatus.PUBLISHED
+                        }
+                    });
+
+                    return apiResponse(c, 200, updatedPost, "Post published successfully");
+                } catch (error: any) {
+                    console.error("Publish Post Error:", error);
+                    return apiError(c, 500, "Internal Server Error", { code: "CE" });
+                }
             }
         }
-    }
 
-    cloudinaryFormData.append('file', data.image);
-    cloudinaryFormData.append('timestamp', timestamp.toString());
-    cloudinaryFormData.append('api_key', cloudinaryHelpers.CLOUDINARY_API_KEY);
+        cloudinaryFormData.append('file', data.image);
+        cloudinaryFormData.append('timestamp', timestamp.toString());
+        cloudinaryFormData.append('api_key', cloudinaryHelpers.CLOUDINARY_API_KEY);
 
-    const uploadResponse = await cloudinaryUploader(cloudinaryFormData, cloudinaryHelpers);
+        const uploadResponse = await cloudinaryUploader(cloudinaryFormData, cloudinaryHelpers);
 
-    if (!uploadResponse.ok) {
-        console.log('Upload File Middleware Error: ', uploadResponse);
-        return apiError(c, 400, "Failed to upload an image");
-    }
-
-    const uploadResult: any = await uploadResponse.json();
-
-    const updatedPost = await prisma.post.update({
-        where: { id: postId },
-        data: {
-            coverImage: uploadResult.secure_url,
-            coverImagePublicId: uploadResult.public_id,
-            title: data.title,
-            slug: postSlug,
-            shortCaption: data.shortCaption,
-            body: data.body,
-            summary: data?.summary,
-            status: PostStatus.PUBLISHED
+        if (!uploadResponse.ok) {
+            console.log('Upload File Middleware Error: ', uploadResponse);
+            return apiError(c, 400, "Failed to upload an image");
         }
-    });
 
-    return apiResponse(c, 200, updatedPost, "Post published successfully");
+        const uploadResult: any = await uploadResponse.json();
 
-} catch (error: any) {
-    console.error("Publish Post Error:", error);
-    return apiError(c, 500, "Internal Server Error", { code: "CE" });
-}
+        const updatedPost = await prisma.post.update({
+            where: { id: postId },
+            data: {
+                coverImage: uploadResult.secure_url,
+                coverImagePublicId: uploadResult.public_id,
+                title: data.title,
+                slug: postSlug,
+                shortCaption: data.shortCaption,
+                body: data.body,
+                summary: data?.summary,
+                status: PostStatus.PUBLISHED
+            }
+        });
+
+        return apiResponse(c, 200, updatedPost, "Post published successfully");
+
+    } catch (error: any) {
+        console.error("Publish Post Error:", error);
+        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+    }
 }
 
 export async function createNewPublishPost(c: Context) {
@@ -190,6 +190,8 @@ export async function createNewPublishPost(c: Context) {
             return apiError(c, 400, "Post title already exists");
         }
 
+        const cleanBody = data.body.replace(/(<br\s*\/?>\s*)+$/i, '');
+
         const newPost = await prisma.post.create({
             data: {
                 coverImage: secure_url,
@@ -197,7 +199,7 @@ export async function createNewPublishPost(c: Context) {
                 title: data.title,
                 slug: postSlug,
                 shortCaption: data.shortCaption,
-                body: data.body,
+                body: cleanBody,
                 summary: data?.summary,
                 allowComments: data.allowComments,
                 author: {

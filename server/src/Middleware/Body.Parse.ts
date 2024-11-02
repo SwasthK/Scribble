@@ -4,6 +4,7 @@ import { apiError } from "../utils/apiError";
 import { publishPostSchema } from "Controllers/Posts/publish.Post";
 import { apiResponse } from "utils/apiResponse";
 import { createNewDraftPostSchema } from "Controllers/Posts/create.Post";
+import { mimeTypeSignup } from "./cloudinary";
 
 export async function signupBodyParse(c: Context, next: Next) {
     try {
@@ -86,11 +87,31 @@ export async function publishPostBodyParse(c: Context, next: Next) {
         if (!response.success) {
             return apiError(c, 400, response.error.errors[0].message)
         }
-        c.set('publishData', { ...response.data ,image});
+        c.set('publishData', { ...response.data, image });
 
         return await next();
     } catch (error) {
         console.error('createNewPublishPostParse Body Parse Middleware Error: ', error);
         return apiError(c, 500, "Internal Server Error", { code: "CE" });
     }
+}
+
+export async function updateAvatarBodyParse(c: Context, next: Next) {
+    let formData;
+    try {
+        formData = await c.req.formData();
+    } catch (error) {
+        return apiError(c, 400, "Data is Invalid");
+    }
+
+    const image: any = formData.get('file');
+    if (!image) { return apiError(c, 400, "No file uploaded"); }
+
+    if (!(Object.values(mimeTypeSignup).includes(image.type as mimeTypeSignup))) {
+        return apiError(c, 404, "Invalid Image Type")
+    }
+
+    c.set('avatarUpdateImage', image)
+    return await next();
+
 }
