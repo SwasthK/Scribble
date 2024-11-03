@@ -15,7 +15,7 @@ import { FollowUser, UnFollowUser } from '../Controllers/FollowUser/user.Follow.
 import { getFollowersDetails, getFollowingsDetails } from '../Controllers/FollowUser/user.getFollow.Controller'
 
 //Import Post Route handlers
-import { createNewDraftPost} from 'Controllers/Posts/create.Post'
+import { createNewDraftPost } from 'Controllers/Posts/create.Post'
 import { updateDraftPostById } from '../Controllers/Posts/update.Post'
 import {
     getPostById,
@@ -29,7 +29,7 @@ import {
     getDraftedPostShortned,
     getDraftedPostFullContentById
 } from '../Controllers/Posts/get.Posts'
-import { deleteDraftBulk, deleteDraftPost, deleteDraftPostById, deletePost } from '../Controllers/Posts/delete.Post'
+import { deleteDraftBulk, deleteDraftPostById, deletePublishedPostById } from '../Controllers/Posts/delete.Post'
 
 //Import Category Route handlers
 import { createCategory } from '../Controllers/Category/create.controller'
@@ -91,7 +91,7 @@ api
     .post('/refreshAccessToken', refreshAccessToken)
     .put('/updateUserProfile', authMiddleware, findActiveUser, updateUserProfile)
     .put('/updateUserPassword', authMiddleware, findActiveUser, updateUserPassword)
-    .put('/updateUserAvatar', authMiddleware, findActiveUser,updateAvatarBodyParse,updateUserAvatar)
+    .put('/updateUserAvatar', authMiddleware, findActiveUser, updateAvatarBodyParse, updateUserAvatar)
     .delete('/deleteUserProfile', authMiddleware, findActiveUser, deleteUserProfile)
 
     // Draft Routes
@@ -104,8 +104,8 @@ api
 
     // Publish Routes
     .post('/posts/createNewPublishPost', authMiddleware, findActiveUser, publishPostBodyParse, getFileToUpload, createNewPublishPost)
-    .put('/posts/updatePublishById/:postId', authMiddleware, findActiveUser,publishPostBodyParse, updatePublishById)
-
+    .put('/posts/updatePublishById/:postId', authMiddleware, findActiveUser, publishPostBodyParse, updatePublishById)
+    .delete('/posts/delete/publishById/:publishId', authMiddleware, findActiveUser,deletePublishedPostById)
 
     // Post Manipulations
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
@@ -125,7 +125,7 @@ api
     .get('/posts/getBy/slug/:postSlug', authMiddleware, findActiveUser, getPostBySlug)
     .get('posts/published', authMiddleware, findActiveUser, getPublishedPost)
     .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
-    .delete('/posts/delete/post/:postId', authMiddleware, findActiveUser, deletePost)
+
     // .post('/posts/upsert', authMiddleware, findActiveUser, upSertDraftPost)
 
 
