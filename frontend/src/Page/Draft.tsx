@@ -8,10 +8,11 @@ import { DraftCardSkeleton } from "../Skeleton/DraftCard_Skeleton";
 import ReactTimeAgo from "react-time-ago";
 import axios from "axios";
 import { statusType } from "../Types/type";
+import { RefreshIcon } from "../assets/svg/RefreshIcon";
 
 export const Draft = () => {
   const postsQuery = useGetDraftedPost();
-  const { data, isFetching, isError, error } = postsQuery;
+  const { data, isFetching, isError, error, refetch } = postsQuery;
   const [drafts, setDrafts] = useState([]);
 
   useEffect(() => {
@@ -35,7 +36,11 @@ export const Draft = () => {
     }
   };
 
-  const hadnleDeleteDraftByBulk = async () => {
+  useEffect(() => {
+    console.log(drafts);
+  }, [drafts]);
+
+  const handleDeleteDraftByBulk = async () => {
     setDrafts([]);
     try {
       await axios.delete(`/posts/delete/draftBulk`, {
@@ -69,7 +74,7 @@ export const Draft = () => {
             </>
           )}
           {isError && <p>{error.message}</p>}
-          {data && data.length === 0 && (
+          {drafts && drafts.length === 0 && (
             <div>
               <p className="text-base">
                 You have not drafted any post yet.{" "}
@@ -83,20 +88,21 @@ export const Draft = () => {
             </div>
           )}
 
-          {data && data.length > 0 && (
+          {drafts && drafts.length > 0 && (
             <>
-              <div className="flex justify-end items-center w-full">
+              <div className="flex justify-end items-center w-full gap-14">
                 <button
-                  onClick={hadnleDeleteDraftByBulk}
+                  onClick={handleDeleteDraftByBulk}
                   className="flex gap-2 items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg  focus:ring-2 focus:outline-none bg-red-500 hover:bg-red-600 focus:ring-red-700"
                 >
                   <p>Clear All</p>
                   <TrashIcon size={18} />
                 </button>
+                <RefreshIcon onClick={() => refetch()} size={16} />
               </div>
 
               <div className="w-full grid place-content-center grid-cols-1 md:grid-cols-2 gap-8 md:gap-14">
-                {data.map((post: any) => (
+                {drafts.map((post: any) => (
                   <DraftCard
                     key={post.id}
                     title={post.title}

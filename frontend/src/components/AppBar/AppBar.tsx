@@ -121,7 +121,7 @@ export const AppBar = () => {
             ${
               showMenu
                 ? "translate-x-[0] opacity-100"
-                : "translate-x-[14rem] opacity-0"
+                : " translate-x-[20rem] pointer-events-none opacity-0"
             }`}
         ref={menuRef}
       >
