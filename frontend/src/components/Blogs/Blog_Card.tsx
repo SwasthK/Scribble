@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { CommentIcon } from "../../assets/svg/CommentIcon";
 import { LikeIcon } from "../../assets/svg/LikeIcon";
 import { memo, useState } from "react";
+import { BookMarkIcon } from "../../assets/svg/BookMarkIcon";
 
 interface Blog_CardProps {
   id: string;
@@ -91,12 +92,15 @@ export const Blog_Card: React.FC<Blog_CardProps> = ({
               </div>
               <div className="flex gap-8 items-center">
                 <div className="flex items-center gap-2">
+                  <LikeIcon size={17} />
+                  <p>{count.likes}</p>
+                </div>
+                <div className="flex items-center gap-2">
                   <CommentIcon size={17} />
                   <p>{count.comments}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <LikeIcon size={17} />
-                  <p>{count.likes}</p>
+                <div>
+                  <BookMarkIcon size={17} fill="white"/>
                 </div>
               </div>
             </div>

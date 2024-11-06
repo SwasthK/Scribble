@@ -22,6 +22,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { TrashIcon } from "../assets/svg/TrashIcon";
 import axios from "axios";
+import { RefreshIcon } from "../assets/svg/RefreshIcon";
 
 export const Profile = () => {
   const location = useLocation();
@@ -39,7 +40,7 @@ export const Profile = () => {
 
   const postsQuery = useGetUserPosts(currentPage);
 
-  const { data, isError, error, isLoading, isFetching } = postsQuery;
+  const { data, isError, error, isLoading, isFetching, refetch } = postsQuery;
 
   const pageCount = data ? Math.ceil(data.totalPosts / 6) : 6;
 
@@ -58,6 +59,15 @@ export const Profile = () => {
       navigate(location.pathname, { replace: true, state: null });
     }
   }, []);
+
+  const [posts, setPosts] = useState([]);
+
+  // Sync fetched data with local state
+  useEffect(() => {
+    if (data) {
+      setPosts(data.posts);
+    }
+  }, [data]);
 
   const handlePrevClick = () => {
     setCurrentPage((prev) => prev - 1);
@@ -169,7 +179,7 @@ export const Profile = () => {
     url: "",
   });
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       const fileTypeError = validateFileType(file.type);
@@ -229,6 +239,10 @@ export const Profile = () => {
     }
   };
 
+  const handleDeletePost = (id: string) => {
+    setPosts((prevPosts) => prevPosts.filter((post: any) => post.id !== id));
+  };
+
   return (
     <>
       <AppBar />
@@ -259,11 +273,11 @@ export const Profile = () => {
 
           {avatarPreview && (
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 flex items-center flex-col gap-4 justify-center border-none"
+              className="z-10 fixed inset-0 bg-black bg-opacity-50 flex items-center flex-col gap-4 justify-center border-none"
               onClick={handleCloseAvatarPreview}
             >
               <div
-                className="  modal-image rounded-lg overflow-hidden border-none"
+                className="modal-image rounded-lg overflow-hidden border-none"
                 style={{ width: "80%", maxWidth: "200px", maxHeight: "80vh" }}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -276,7 +290,7 @@ export const Profile = () => {
 
               {avatarFile.file && avatarFile.url && (
                 <div
-                onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
                   className="w-full"
                   style={{ width: "80%", maxWidth: "200px", maxHeight: "80vh" }}
                 >
@@ -303,7 +317,7 @@ export const Profile = () => {
             )}
           </div>
         </div>
-        <div className="px-12 py-8 flex gap-8">
+        <div className="px-12 py-8 flex gap-12 items-center">
           <h6
             onClick={() => HideBlogs(true)}
             className={`text-gray-80 cursor-pointer px-5 py-2 rounded-full ${
@@ -324,6 +338,9 @@ export const Profile = () => {
           >
             Blogs
           </h6>
+          {!showAboutSection && !isFetching && (
+            <RefreshIcon onClick={() => refetch()} size={26} className="p-1 rounded-full hover:bg-[#334155] transform transition-transform duration-300 hover:rotate-[-180deg]"/>
+          )}
         </div>
         <div className=" xl:min-w-[70vw]">
           {isError && <h1>{error.message}</h1>}
@@ -344,9 +361,11 @@ export const Profile = () => {
                       </div>
                     ) : (
                       <>
-                        {data?.posts.map((blog: any) => (
+                        {posts.map((blog: any) => (
                           <UserBlogs
+                            onDelete={handleDeletePost}
                             key={blog.id}
+                            id={blog.id}
                             userId={data?.user.id}
                             title={blog.title}
                             shortCaption={blog.shortCaption}
@@ -497,31 +516,45 @@ export const Profile = () => {
 
 export const UserBlogs = memo(
   ({
+    id,
     title,
     shortCaption,
     url,
     date,
     slug,
+    onDelete,
   }: {
+    id: string;
     userId?: number | string;
     title: string;
     shortCaption: string;
     url: string;
     date: string;
     slug: string;
+    onDelete: (id: string) => void;
   }) => {
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
+    const handleDelete = async () => {
+      try {
+        onDelete(id);
+        await axios.delete(`/posts/delete/publishById/${id}`, {
+          headers: {
+            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+        toast.success("Post deleted successfully");
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      }
+    };
 
     return (
-      <>
-        <Link
-          to={`/blog/${slug}`}
-          className="bg-[#1F2937] relative border-4 border-[#161616] hover:border-[#ffffff] overflow-hidden group hover:bg-[#304158] cursor-pointer transition-colors duration-300 ease-in max-w-72 pb-6 rounded-2xl flex flex-col gap-6 justify-center items-center md:max-w-60 "
-        >
-          {/* {!isImageLoaded && !hasError && (
-            <div className="aspect-video w-full rounded-2xl rounded-b-none bg-gray-200 animate-pulse" />
-          )} */}
+      <div className="bg-[#1F2937] relative border-2 border-[#161616] transition-all ease-in duration-700 hover:border-[#ffffff] overflow-hidden group max-w-72 pb-3 rounded-2xl flex flex-col gap-6 justify-center items-center md:max-w-60 ">
+        <Link to={`/blog/${slug}`}>
+          {!isImageLoaded && !hasError && (
+            <div className="w-[64rem] h-[8rem] rounded-2xl rounded-b-none bg-gray-200 animate-pulse" />
+          )}
 
           {hasError ? (
             <div className=" w-[64rem] h-[8rem] rounded-2xl rounded-b-none bg-red-200 flex justify-center items-center">
@@ -534,7 +567,7 @@ export const UserBlogs = memo(
               <img
                 src={url}
                 alt="blog"
-                className={`aspect-video w-full group-hover:scale-[1.1] transition-transform duration-300 ease-in sm:max-w-full rounded-2xl rounded-b-none object-cover object-center ${
+                className={`aspect-video w-full group-hover:scale-[1.2] transition-transform duration-300 ease-in sm:max-w-full rounded-2xl rounded-b-none object-cover object-center ${
                   isImageLoaded ? "" : "hidden"
                 }`}
                 onLoad={() => setIsImageLoaded(true)}
@@ -559,10 +592,19 @@ export const UserBlogs = memo(
           </div>
 
           {/* <div className="absolute top-[-16px] right-[-10px] h-8 w-8 rounded-full bg-red-500 flex justify-center items-center">
-            <TrashIcon size={18} />
+           
           </div> */}
         </Link>
-      </>
+        <div className="flex justify-end items-center w-full px-4">
+          <button onClick={handleDelete} className="p-1 rounded-full hover:bg-[#334155]">
+            <TrashIcon
+              className={"cursor-pointer"}
+              size={15}
+              color={"orange"}
+            />
+          </button>
+        </div>
+      </div>
     );
   }
 );
