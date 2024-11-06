@@ -73,6 +73,7 @@ import { apiResponse } from '../utils/apiResponse'
 import { apiError } from '../utils/apiError'
 import { getFileToUpload } from '../Middleware/cloudinary'
 import { DraftPostBodyParse, publishPostBodyParse, signupBodyParse, updateAvatarBodyParse } from '../Middleware/Body.Parse'
+import { handleSavePost } from 'Controllers/Posts/Save/save.Post'
 
 const api = new Hono();
 
@@ -94,6 +95,8 @@ api
     .put('/updateUserAvatar', authMiddleware, findActiveUser, updateAvatarBodyParse, updateUserAvatar)
     .delete('/deleteUserProfile', authMiddleware, findActiveUser, deleteUserProfile)
 
+    // ---------------------------------------------------------------------
+
     // Draft Routes
     .get('/posts/drafts/shortened', authMiddleware, findActiveUser, getDraftedPostShortned)
     .get('/posts/drafts/fullContent/:postId', authMiddleware, findActiveUser, getDraftedPostFullContentById)
@@ -105,11 +108,16 @@ api
     // Publish Routes
     .post('/posts/createNewPublishPost', authMiddleware, findActiveUser, publishPostBodyParse, getFileToUpload, createNewPublishPost)
     .put('/posts/updatePublishById/:postId', authMiddleware, findActiveUser, publishPostBodyParse, updatePublishById)
-    .delete('/posts/delete/publishById/:publishId', authMiddleware, findActiveUser,deletePublishedPostById)
+    .delete('/posts/delete/publishById/:publishId', authMiddleware, findActiveUser, deletePublishedPostById)
 
     // Post Manipulations
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/getBy/authorId/:authorId', authMiddleware, findActiveUser, getPostByAuthorId)
+
+    // Save & Unsave Post
+    .post('/posts/save/:postId', authMiddleware, findActiveUser, handleSavePost)
+
+    // --------------------------------------------------------------------------
 
     //Follow Routes
     .post('profile/:id/follow', authMiddleware, findActiveUser, FollowUser)
