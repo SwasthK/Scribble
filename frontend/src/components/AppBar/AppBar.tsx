@@ -95,14 +95,14 @@ export const AppBar = () => {
     <>
       {/* // <div className="sticky top-7 shadow-lg border-none mx-8 rounded-full z-50 bg-white/5 backdrop-blur-md flex justify-between items-center text-4xl md:hidden border-b py-4 px-10 font-bold text-white transition-all duration-300"> */}
       <div
-        className={`border sticky transition-transform duration-300 ${
+        className={`sticky transition-transform duration-300 ${
           visible ? "translate-y-0" : "-translate-y-full"
-        }  top-0 shadow-lg border-none z-50 bg-[#272727] flex justify-between items-center text-3xl sm:text-4xl  sm:px-16 md:pl-24  border-b py-4 px-6 font-bold text-white transition-all duration-300`}
+        }  top-0 shadow-lg border-none  z-50 bg-[#272727] flex justify-between items-center text-3xl sm:text-4xl  sm:px-16 md:pl-24  border-b py-4 px-6 font-bold text-white transition-all duration-300`}
       >
         <Link to={"/blogs"} className="font-semibold">
           Medium
         </Link>
-        <div className="flex justify-between items-center gap-10 px-16">
+        <div className="flex justify-between items-center gap-4 md:gap-6 md:pr-4">
           <NavItems icon={Search} tooltip={"Search"} />
           <NavItems icon={Bell} tooltip={"Notifications"} />
           <div ref={avatarRef}>
@@ -139,7 +139,7 @@ export const AppBar = () => {
             url={`/profile/@${currentUser.username}`}
             label="User"
           />
-          <MenuItems icon={SavedIcon} label="Saved" />
+          <MenuItems icon={SavedIcon} label="Saved" url="/post/saved" />
           <MenuItems icon={FollowersIcon} label="Followers" />
           <MenuItems icon={DraftIcon} url={"/post/draft"} label="Draft" />
           <MenuItems icon={ArchiveIcon} label="Archieved" />
