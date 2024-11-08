@@ -74,6 +74,7 @@ import { apiError } from '../utils/apiError'
 import { getFileToUpload } from '../Middleware/cloudinary'
 import { DraftPostBodyParse, publishPostBodyParse, signupBodyParse, updateAvatarBodyParse } from '../Middleware/Body.Parse'
 import { handleSavePost } from 'Controllers/Posts/Save/save.Post'
+import { getSavedPost } from 'Controllers/Posts/Save/getSavedPost'
 
 const api = new Hono();
 
@@ -113,8 +114,10 @@ api
     // Post Manipulations
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/getBy/authorId/:authorId', authMiddleware, findActiveUser, getPostByAuthorId)
+    .get('/posts/getBy/slug/:postSlug', authMiddleware, findActiveUser, getPostBySlug)
 
     // Save & Unsave Post
+    .get("/posts/saved/getAll", authMiddleware, findActiveUser, getSavedPost)
     .post('/posts/save/:postId', authMiddleware, findActiveUser, handleSavePost)
 
     // --------------------------------------------------------------------------
@@ -130,7 +133,6 @@ api
     .get('/posts/get/:postId', authMiddleware, findActiveUser, getPostById)
 
     .get('/posts/getBy/title/:postTitle', authMiddleware, findActiveUser, getPostByTitle)
-    .get('/posts/getBy/slug/:postSlug', authMiddleware, findActiveUser, getPostBySlug)
     .get('posts/published', authMiddleware, findActiveUser, getPublishedPost)
     .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
 
