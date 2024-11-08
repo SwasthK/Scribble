@@ -19,6 +19,7 @@ import NoveEditor from "./Page/NoveEditor";
 import { NovelPreview } from "./Page/NovelPreview";
 import { HandlePost } from "./Page/HandlePost";
 import { Draft } from "./Page/Draft";
+import { Save } from "./Page/Save";
 
 function App() {
   const [user, setUser] = useRecoilState(authAtom);
@@ -27,7 +28,7 @@ function App() {
       path: "/",
       element: (
         // <UnProtectedRoute>
-          <Home />
+        <Home />
         // </UnProtectedRoute>
       ),
     },
@@ -96,6 +97,16 @@ function App() {
       element: (
         <ProtectedRoute>
           <HandlePost />
+        </ProtectedRoute>
+      ),
+      errorElement: <NotFound />,
+    },
+
+    {
+      path: "/post/saved",
+      element: (
+        <ProtectedRoute>
+          <Save />
         </ProtectedRoute>
       ),
       errorElement: <NotFound />,
