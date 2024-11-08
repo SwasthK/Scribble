@@ -11,9 +11,11 @@ import { EditIcon } from "../../assets/svg/EditIcon";
 import { statusType } from "../../Types/type";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
+import { BookMarkIcon } from "../../assets/svg/BookMarkIcon";
+import axios from "axios";
+import { debounce } from "../../utils/debounce";
 
 export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
-
   const { ref, inView } = useInView({
     triggerOnce: true,
   });
@@ -29,6 +31,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
     authorId,
     body,
     summary,
+    savedBy,
   } = blogContent;
 
   const { refetch, data, isLoading } = useGetPostByAuthorId(
@@ -46,6 +49,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
 
   const [loadImage, setLoadImage] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [saved, setSaved] = useState(savedBy.length > 0 ? true : false);
 
   const {
     user: { id: currentUserId },
@@ -53,10 +57,6 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
 
   const location = useLocation();
   const { state } = location;
-
-  useEffect(() => {
-    console.log("state : ", state);
-  }, [state]);
 
   const editor = useCreateBlockNote({
     initialContent: state?.body || "",
@@ -69,6 +69,26 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
     };
     genrateEditorData();
   }, [blogContent]);
+
+  const handleSavePost = async () => {
+    let prevSaveState: boolean = saved;
+    setSaved(!saved);
+
+    await axios.post(
+      `/posts/save/${id}`,
+      {
+        action: !prevSaveState ? "save" : "unsave",
+      },
+      {
+        headers: {
+          accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }
+    );
+
+  };
+
+  const debounceSavePost = debounce(handleSavePost, 500);
 
   return (
     <>
@@ -88,8 +108,8 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               {shortCaption}
             </p>
             <div
-              className={`flex items-center gap-4 py-4 ${
-                currentUserId === authorId && "justify-between pr-8"
+              className={`flex items-center gap-4 py-4 justify-between pr-8 ${
+                currentUserId === authorId && ""
               } `}
             >
               <div className="flex gap-4 items-center justify-center">
@@ -113,6 +133,10 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                   <p className="italic font-semibold">Edit</p>
                 </Link>
               )}
+              <BookMarkIcon
+                onClick={debounceSavePost}
+                fill={saved ? "white" : "none"}
+              ></BookMarkIcon>    
             </div>
 
             <div className="py-6 pb-3 pt-4">

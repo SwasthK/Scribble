@@ -339,14 +339,22 @@ export const Profile = () => {
             Blogs
           </h6>
           {!showAboutSection && !isFetching && (
-            <RefreshIcon onClick={() => refetch()} size={26} className="p-1 rounded-full hover:bg-[#334155] transform transition-transform duration-300 hover:rotate-[-180deg]"/>
+            <RefreshIcon
+              onClick={() => refetch()}
+              size={26}
+              className="p-1 rounded-full hover:bg-[#334155] transform transition-transform duration-300 hover:rotate-[-180deg]"
+            />
           )}
         </div>
         <div className=" xl:min-w-[70vw]">
           {isError && <h1>{error.message}</h1>}
           {!showAboutSection && (
             <>
-              <div className="xl:max-w-[70%] lg:max-w-[90%]  grid grid-cols-1 place-items-center sm:grid-cols-2 px-6 md:grid-cols-3 md:px-6  gap-8 lg:gap-6  lg:px-0 pb-8">
+              <div
+                className={`xl:max-w-[70%] lg:max-w-[90%] px-6 ${
+                  data?.totalPosts <= 0 ? "place-items-start" : "place-items-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
+                } md:px-6  gap-8 lg:gap-6  lg:px-0 pb-8`}
+              >
                 {isFetching ? (
                   <>
                     {[...Array(6)].map((_, index) => (
@@ -356,8 +364,14 @@ export const Profile = () => {
                 ) : (
                   <>
                     {data?.totalPosts <= 0 ? (
-                      <div className="font-semibold px-8 py-8 ">
-                        No posts has been uploaded
+                      <div className="flex justify-center items-center gap-6 flex-col sm:flex-row font-semibold px-8 py-8">
+                        <p>No posts has been uploaded</p>
+                        <Link
+                          to={"/post/handle"}
+                          className="bg-gray-300 font-semibold cursor-pointer px-4 py-2 text-black text-sm text-center rounded-lg"
+                        >
+                          Get Started
+                        </Link>
                       </div>
                     ) : (
                       <>
@@ -596,7 +610,10 @@ export const UserBlogs = memo(
           </div> */}
         </Link>
         <div className="flex justify-end items-center w-full px-4">
-          <button onClick={handleDelete} className="p-1 rounded-full hover:bg-[#334155]">
+          <button
+            onClick={handleDelete}
+            className="p-1 rounded-full hover:bg-[#334155]"
+          >
             <TrashIcon
               className={"cursor-pointer"}
               size={15}

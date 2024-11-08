@@ -122,6 +122,8 @@ export async function getPostByAuthorId(c: Context) {
             }
         });
 
+        console.log(post);
+
         if (!post) {
             return apiError(c, 404, "Post Not Found");
         }
@@ -136,6 +138,7 @@ export async function getPostByAuthorId(c: Context) {
 
 export async function getPostBySlug(c: Context) {
     //Used
+    const userId = c.get("user").id;
     const slug = c.req.param('postSlug');
 
     if (!slug) {
@@ -158,6 +161,10 @@ export async function getPostBySlug(c: Context) {
                 body: true,
                 summary: true,
                 authorId: true,
+                savedBy: {
+                    where: { userId },
+                    select: { postId: true }
+                },
                 author: {
                     select: {
                         username: true,
@@ -400,7 +407,7 @@ export async function getAllPosts(c: Context) {
         // });
 
 
-        const posts = await prisma.post.findMany({
+        let posts = await prisma.post.findMany({
             skip: skip,
             take: limit,
             where: {
@@ -424,6 +431,10 @@ export async function getAllPosts(c: Context) {
                 title: true,
                 shortCaption: true,
                 slug: true,
+                savedBy: {
+                    where: { userId: user.id },
+                    select: { postId: true }
+                },
                 createdAt: true,
                 _count: {
                     select: {
@@ -433,6 +444,15 @@ export async function getAllPosts(c: Context) {
                 },
             }
         });
+
+
+        posts = posts.map((post: any) => {
+            const { savedBy, ...rest } = post;
+            return {
+                ...rest,
+                isSaved: savedBy.length > 0 ? true : false
+            }
+        })
 
         return apiResponse(c, 200, { posts, currentPage: page, totalPages, totalPosts, user }, "Posts fetched successfully");
 
