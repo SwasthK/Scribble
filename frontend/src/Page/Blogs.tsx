@@ -33,15 +33,15 @@ export const Blogs = () => {
 
       {isPending ? (
         <div className="h-screen absolute top-0 w-3/4 pt-20">
-          <Blogs_Skeleton />
-          <Blogs_Skeleton />
-          <Blogs_Skeleton />
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Blogs_Skeleton key={index} />
+          ))}
         </div>
       ) : isError ? (
         <div>{error.message}</div>
       ) : (
         <div className="flex w-screen">
-          <div className="flex flex-col px-5 sm:px-7 md:px-16 lg:px-8 xl:pl-52 lg:w-[70%] xl:w-[65%] ">
+          <div className="flex flex-col px-5 sm:px-7 md:px-16 lg:px-8 xl:pl-52 lg:w-[70%] xl:w-[65%] w-full">
             {data?.pages?.map((page: any, pageIndex) =>
               page.posts.map((blog: any) => (
                 <Blog_Card
@@ -53,6 +53,7 @@ export const Blogs = () => {
                   slug={blog.slug}
                   shortCaption={blog.shortCaption}
                   count={blog._count}
+                  isSaved={blog.isSaved}
                   createdAt={blog.createdAt}
                 />
               ))
