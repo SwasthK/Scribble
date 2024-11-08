@@ -162,3 +162,22 @@ export const getDraftPostFullContentByPostId = async ({ postId }: { postId: stri
         }
     }
 }
+
+export const getAllUserSavedPosts = async () => {
+    try {
+        const response = await axios.get<any>(`/posts/saved/getAll`, {
+            headers: {
+                accessToken: `Bearer ${localStorage.getItem("accessToken")}`
+            }
+        });
+        if (response.data) {
+            return response.data.data;
+        }
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data.message || 'Unexpected error');
+        } else {
+            throw new Error('Something went wrong. Please try again later.');
+        }
+    }
+}
