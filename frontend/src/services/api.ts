@@ -181,3 +181,22 @@ export const getAllUserSavedPosts = async () => {
         }
     }
 }
+
+export const getAllUserArchivedPosts = async () => {
+    try {
+        const response = await axios.get<any>(`/posts/archived/getAll`, {
+            headers: {
+                accessToken: `Bearer ${localStorage.getItem("accessToken")}`
+            }
+        });
+        if (response.data) {
+            return response.data.data;
+        }
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data.message || 'Unexpected error');
+        } else {
+            throw new Error('Something went wrong. Please try again later.');
+        }
+    }
+}
