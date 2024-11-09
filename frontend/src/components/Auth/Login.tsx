@@ -141,7 +141,7 @@ export const Login = () => {
               <button
                 type="submit"
                 className={`${
-                  loading ? "" : "btn"
+                  loading ? "" : "bg-custom-gradient-1 cursor-pointer hover:bg-custom-gradient-2"
                 } rounded-lg py-3 px-4 disabled:cursor-not-allowed font-semibold w-full`}
                 disabled={!!(loading && errors["password"])}
               >

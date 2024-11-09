@@ -85,7 +85,6 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
         },
       }
     );
-
   };
 
   const debounceSavePost = debounce(handleSavePost, 500);
@@ -119,7 +118,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                   <p>4 min read · {formattedDate}</p>
                 </div>
               </div>
-              {currentUserId === authorId && (
+              {currentUserId === authorId ? (
                 <Link
                   to={"/post/handle"}
                   state={{
@@ -132,11 +131,12 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                   <EditIcon size={20} />
                   <p className="italic font-semibold">Edit</p>
                 </Link>
+              ) : (
+                <BookMarkIcon
+                  onClick={debounceSavePost}
+                  fill={saved ? "white" : "none"}
+                ></BookMarkIcon>
               )}
-              <BookMarkIcon
-                onClick={debounceSavePost}
-                fill={saved ? "white" : "none"}
-              ></BookMarkIcon>    
             </div>
 
             <div className="py-6 pb-3 pt-4">

@@ -209,7 +209,9 @@ export const Register = () => {
                 <div className="h-full w-full flex items-center pr-6 outline-none rounded-lg  font-medium ">
                   <div className="flex gap-8 justify-center items-center h-full">
                     <label
-                      className={`btn p-4 rounded-full font-medium
+                      className={`
+                        p-4 rounded-full font-medium  
+                        bg-custom-gradient-1 cursor-pointer hover:bg-custom-gradient-2
                      `}
                       htmlFor="file"
                     >
@@ -320,7 +322,7 @@ export const Register = () => {
             <div className="flex justify-between items-center">
               <LinkToLogin path="/login" text={"If account already exists ."} />
               <button
-                className="btn p-3 rounded-full disabled:cursor-not-allowed"
+                className="bg-custom-gradient-1 cursor-pointer hover:bg-custom-gradient-2 p-3 rounded-full disabled:cursor-not-allowed"
                 type="button"
                 onClick={nextStep}
                 disabled={!formData.username || loading || !formData.email}
@@ -361,7 +363,7 @@ export const Register = () => {
             </div>
             <div className="flex justify-between pt-8">
               <button
-                className="btn rounded-lg py-3 px-4"
+                className="bg-custom-gradient-1 cursor-pointer hover:bg-custom-gradient-2 rounded-lg py-3 px-4"
                 type="button"
                 onClick={prevStep}
                 disabled={loading}
@@ -395,9 +397,11 @@ export const Register = () => {
                 </>
               ) : (
                 <button
-                  type="submit"
+                  type="submit" 
                   className={`${
-                    loading ? "" : "btn"
+                    loading
+                      ? ""
+                      : "bg-custom-gradient-1 cursor-pointer hover:bg-custom-gradient-2"
                   } rounded-lg py-3 px-4 disabled:cursor-not-allowed font-semibold w-24`}
                   disabled={!!(loading && errors["password"])}
                 >

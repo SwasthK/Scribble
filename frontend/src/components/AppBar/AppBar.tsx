@@ -142,7 +142,7 @@ export const AppBar = () => {
           <MenuItems icon={SavedIcon} label="Saved" url="/post/saved" />
           <MenuItems icon={FollowersIcon} label="Followers" />
           <MenuItems icon={DraftIcon} url={"/post/draft"} label="Draft" />
-          <MenuItems icon={ArchiveIcon} label="Archieved" />
+          <MenuItems icon={ArchiveIcon} label="Archieved" url="/post/archived"/>
 
           {currentUser.email && (
             <MenuItems className="mt-4 text-cgray" label={currentUser.email} />
