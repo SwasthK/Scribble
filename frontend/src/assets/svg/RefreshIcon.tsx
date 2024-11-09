@@ -9,7 +9,6 @@ interface RefreshIconProps {
 
 export const RefreshIcon = memo(
   ({ onClick, size, disabled, className }: RefreshIconProps) => {
-    console.log(onClick);
     return (
       <>
         <button onClick={onClick} disabled={disabled}>
