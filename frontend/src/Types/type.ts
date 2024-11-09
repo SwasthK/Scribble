@@ -38,7 +38,13 @@ export interface FormErrors {
 }
 
 export type SvgIconType = {
-    size?: number
+    size?: number,
+    className?: string,
+    onClick?: any,
+    color?: string,
+    fill?: string,
+    stroke?: string,
+    strokeWidth?: string;
 }
 
 export interface updateUserProfileMetaData {
@@ -61,4 +67,4 @@ export enum statusType {
     PUBLISHED = "PUBLISHED",
     ARCHIEVED = "ARCHIEVED",
     NEW = "NEW",
-  }
+}

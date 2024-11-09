@@ -225,37 +225,6 @@ export async function getPublishedPost(c: Context) {
 
 }
 
-export async function getArchivedPost(c: Context) {
-    const user = c.get("user");
-
-    try {
-        const prisma = c.get('prisma');
-
-        const posts = await prisma.post.findMany({
-            where: { status: PostStatus.ARCHIVED },
-            select: {
-                id: true,
-                status: true
-            }
-        });
-
-        if (!posts) {
-            return apiError(c, 404, "No Post Found");
-        }
-
-        if (posts.length === 0) {
-            return apiError(c, 404, "0 Post Found");
-        }
-
-        return apiResponse(c, 200, posts, "Posts fetched successfully");
-
-    } catch (error: any) {
-        console.log("Get All Posts Error: ", error.message);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
-    }
-
-}
-
 export async function getDraftedPostShortned(c: Context) {
     const user = c.get("user");
 

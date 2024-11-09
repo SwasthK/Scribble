@@ -6,6 +6,7 @@ import api from './Routes/routes'
 // import { prettyJSON } from 'hono/pretty-json'
 import { cors } from 'hono/cors'
 import { connectPrismaClient } from 'Client/prismaClient'
+import { Context } from 'hono/jsx';
 
 const app = new Hono<{
   Bindings: {
@@ -17,14 +18,25 @@ const app = new Hono<{
 app.use('*', connectPrismaClient)
 
 //Middlewares
-app.use('/*', cors(
-  // {
-  //   origin: '*',
-  //   allowHeaders: ['Content-Type', 'Authorization'],
-  //   allowMethods: ['POST', 'GET', 'DELETE', 'PUT'],
-  //   credentials: true,
-  // }
-))
+app.use('*', cors({
+  origin: 'http://localhost:5173',
+  allowHeaders: ['Content-Type', 'Authorization', 'accessToken', 'refreshToken'],
+  allowMethods: ['POST', 'GET', 'DELETE', 'PUT', 'OPTIONS'],
+  credentials: true,
+  exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
+  maxAge: 86400, 
+}))
+
+// app.options('*', (req) => {
+//   return new Response(null, {
+//     status: 204,
+//     headers: {
+//       'Access-Control-Allow-Origin': 'http://localhost:5173',
+//       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+//       'Access-Control-Allow-Headers': 'Content-Type, Authorization, accessToken, refreshToken',
+//     },
+//   });
+// });
 
 // app.use(prettyJSON())
 // app.use(logger())

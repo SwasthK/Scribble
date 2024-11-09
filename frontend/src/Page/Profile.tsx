@@ -23,6 +23,7 @@ import toast from "react-hot-toast";
 import { TrashIcon } from "../assets/svg/TrashIcon";
 import axios from "axios";
 import { RefreshIcon } from "../assets/svg/RefreshIcon";
+import { ArchiveIcon } from "../assets/svg/ArchiveIcon";
 
 export const Profile = () => {
   const location = useLocation();
@@ -68,6 +69,13 @@ export const Profile = () => {
       setPosts(data.posts);
     }
   }, [data]);
+
+  const handleRefetch = async () => {
+    const { data: newData } = await refetch();
+    if (newData) {
+      setPosts(newData.posts);
+    }
+  };
 
   const handlePrevClick = () => {
     setCurrentPage((prev) => prev - 1);
@@ -239,8 +247,11 @@ export const Profile = () => {
     }
   };
 
-  const handleDeletePost = (id: string) => {
-    setPosts((prevPosts) => prevPosts.filter((post: any) => post.id !== id));
+  const handleDeleteAndArchivePost = (id: string) => {
+    console.log(posts.length);
+    setPosts((prevPosts: any) =>
+      prevPosts.filter((post: any) => post.id !== id)
+    );
   };
 
   return (
@@ -307,13 +318,17 @@ export const Profile = () => {
           )}
 
           <div className="flex flex-col gap-2">
-            <h1 className="font-semibold text-4xl break-words  line-clamp-3 py-2">
+            <h1 className="font-semibold text-4xl break-words line-clamp-3 py-2">
               {userData.username}
             </h1>
-            {data?.totalPosts != 0 ? (
-              <h6>{data?.totalPosts} Posts</h6>
+            {isFetching ? (
+              <p className="w-16 h-4 skeleton-parent rounded-md">
+                <p className="w-16 h-4 skeleton-child"></p>
+              </p>
+            ) : data?.totalPosts != 0 ? (
+              <h6 className="h-4 text-sm">{data?.totalPosts} Posts</h6>
             ) : (
-              <h6>No Posts</h6>
+              <h6 className="h-4 text-sm">No Posts</h6>
             )}
           </div>
         </div>
@@ -340,7 +355,7 @@ export const Profile = () => {
           </h6>
           {!showAboutSection && !isFetching && (
             <RefreshIcon
-              onClick={() => refetch()}
+              onClick={handleRefetch}
               size={26}
               className="p-1 rounded-full hover:bg-[#334155] transform transition-transform duration-300 hover:rotate-[-180deg]"
             />
@@ -351,9 +366,12 @@ export const Profile = () => {
           {!showAboutSection && (
             <>
               <div
-                className={`xl:max-w-[70%] lg:max-w-[90%] px-6 ${
-                  data?.totalPosts <= 0 ? "place-items-start" : "place-items-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
-                } md:px-6  gap-8 lg:gap-6  lg:px-0 pb-8`}
+                className={`xl:max-w-[70%] lg:max-w-[90%] px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 
+                   ${
+                     posts.length <= 0 || data?.totalPosts <= 0
+                       ? "place-items-start"
+                       : "place-items-center "
+                   } md:px-6 gap-8 lg:gap-6  lg:px-0 pb-8`}
               >
                 {isFetching ? (
                   <>
@@ -363,8 +381,8 @@ export const Profile = () => {
                   </>
                 ) : (
                   <>
-                    {data?.totalPosts <= 0 ? (
-                      <div className="flex justify-center items-center gap-6 flex-col sm:flex-row font-semibold px-8 py-8">
+                    {posts.length <= 0 || data?.totalPosts <= 0 ? (
+                      <div className="flex justify-center col-span-2 items-center gap-6 flex-col sm:flex-row font-semibold px-8 py-8">
                         <p>No posts has been uploaded</p>
                         <Link
                           to={"/post/handle"}
@@ -377,7 +395,7 @@ export const Profile = () => {
                       <>
                         {posts.map((blog: any) => (
                           <UserBlogs
-                            onDelete={handleDeletePost}
+                            onDeleteAndArchive={handleDeleteAndArchivePost}
                             key={blog.id}
                             id={blog.id}
                             userId={data?.user.id}
@@ -393,7 +411,7 @@ export const Profile = () => {
                   </>
                 )}
               </div>
-              {data?.totalPosts > 0 ? (
+              {posts.length > 0 && data?.totalPosts > 0 ? (
                 <div
                   className={`xl:max-w-[70%] sm:px-20 px-6 lg:max-w-[90%] flex justify-between items-center ${
                     isLoading ? "hidden" : "block"
@@ -406,7 +424,7 @@ export const Profile = () => {
                   >
                     Previous
                   </button>
-                  <h1 className="text-lg font-semibold">
+                  <h1 className="text-md font-semibold">
                     Page - {currentPage}
                   </h1>
                   <button
@@ -536,7 +554,7 @@ export const UserBlogs = memo(
     url,
     date,
     slug,
-    onDelete,
+    onDeleteAndArchive,
   }: {
     id: string;
     userId?: number | string;
@@ -545,29 +563,51 @@ export const UserBlogs = memo(
     url: string;
     date: string;
     slug: string;
-    onDelete: (id: string) => void;
+    onDeleteAndArchive: (id: string) => void;
   }) => {
     const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
-    const handleDelete = async () => {
+
+    const handleDeleteAndArchive = async ({ action }: { action: string }) => {
       try {
-        onDelete(id);
-        await axios.delete(`/posts/delete/publishById/${id}`, {
-          headers: {
-            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        });
-        toast.success("Post deleted successfully");
+        if (!action || (action !== "archive" && action !== "delete")) {
+          return;
+        }
+        onDeleteAndArchive(id);
+
+        switch (action) {
+          case "delete":
+            await axios.delete(`/posts/delete/publishById/${id}`, {
+              headers: {
+                accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+            });
+            break;
+          case "archive":
+            await axios.post(
+              `/post/archive/${id}`,
+              {},
+              {
+                headers: {
+                  accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+                },
+              }
+            );
+            break;
+          default:
+            toast.error("Something went wrong");
+            break;
+        }
       } catch (error: any) {
         toast.error(error.response?.data?.message || "Something went wrong");
       }
     };
 
     return (
-      <div className="bg-[#1F2937] relative border-2 border-[#161616] transition-all ease-in duration-700 hover:border-[#ffffff] overflow-hidden group max-w-72 pb-3 rounded-2xl flex flex-col gap-6 justify-center items-center md:max-w-60 ">
-        <Link to={`/blog/${slug}`}>
+      <div className="bg-[#1F2937] relative border-2 min-w-[16rem] border-[#212121] transition-all ease-in duration-700 hover:border-[#ffffff] overflow-hidden group max-w-72 pb-3 rounded-2xl flex flex-col gap-6 justify-center items-center md:max-w-60 ">
+        <Link to={`/blog/${slug}`} className="w-full">
           {!isImageLoaded && !hasError && (
-            <div className="w-[64rem] h-[8rem] rounded-2xl rounded-b-none bg-gray-200 animate-pulse" />
+            <div className="w-[20rem] h-[8rem] rounded-2xl rounded-b-none bg-gray-200 animate-pulse" />
           )}
 
           {hasError ? (
@@ -590,7 +630,7 @@ export const UserBlogs = memo(
             </div>
           )}
 
-          <div className="flex flex-col gap-3 w-full px-3">
+          <div className="flex flex-col gap-3 w-full  px-3 mt-2">
             <h1 className="text-[1.1rem] font-semibold ">
               {title.length > 25 ? title.substring(0, 50) + " ..." : title}
             </h1>
@@ -609,15 +649,25 @@ export const UserBlogs = memo(
            
           </div> */}
         </Link>
-        <div className="flex justify-end items-center w-full px-4">
+        <div className="flex justify-end items-center w-full px-4 gap-6">
           <button
-            onClick={handleDelete}
+            onClick={() => handleDeleteAndArchive({ action: "delete" })}
             className="p-1 rounded-full hover:bg-[#334155]"
           >
             <TrashIcon
               className={"cursor-pointer"}
               size={15}
               color={"orange"}
+            />
+          </button>
+          <button
+            onClick={() => handleDeleteAndArchive({ action: "archive" })}
+            className="p-1 rounded-full hover:bg-[#334155]"
+          >
+            <ArchiveIcon
+              className={"cursor-pointer"}
+              size={15}
+              color={"white"}
             />
           </button>
         </div>

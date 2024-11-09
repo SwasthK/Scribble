@@ -1,5 +1,4 @@
-export const Search = ({ size }: { size: number }) => {
-  console.log(size);
+export const Search = ({ size }: { size?: number }) => {
   return (
     <div>
       <svg

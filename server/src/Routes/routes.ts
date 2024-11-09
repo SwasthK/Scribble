@@ -22,7 +22,7 @@ import {
     getPostByTitle,
     getAllPosts,
     getPublishedPost,
-    getArchivedPost,
+
     getUserPosts,
     getPostBySlug,
     getPostByAuthorId,
@@ -50,7 +50,7 @@ import { likeAndUnlikePost } from '../Controllers/Like/like.Post'
 import { createNewPublishPost, updatePublishById } from '../Controllers/Posts/publish.Post'
 
 //Archive Post
-import { archivePost } from '../Controllers/Posts/archive.Post'
+import { archivePost, getArchivedPost, unArchivePost } from '../Controllers/Posts/Archive/archive.Post'
 
 //Import Notification Route handlers
 import {
@@ -120,6 +120,11 @@ api
     .get("/posts/saved/getAll", authMiddleware, findActiveUser, getSavedPost)
     .post('/posts/save/:postId', authMiddleware, findActiveUser, handleSavePost)
 
+    //Archive Post Routes
+    .post('/post/archive/:postId', authMiddleware, findActiveUser, archivePost)
+    .post('/post/unarchive/:postId', authMiddleware, findActiveUser, unArchivePost)
+    .get('posts/archived/getAll', authMiddleware, findActiveUser, getArchivedPost)
+
     // --------------------------------------------------------------------------
 
     //Follow Routes
@@ -163,9 +168,7 @@ api
     .post('/post/like/:postId', authMiddleware, findActiveUser, likeAndUnlikePost)
 
 
-    //Archive Post Routes
-    .post('/post/archive/:postId', authMiddleware, findActiveUser, archivePost)
-    .get('posts/archived', authMiddleware, findActiveUser, getArchivedPost)
+
 
     //Comment Routes
     .post('/comment/add', authMiddleware, findActiveUser, addComments)

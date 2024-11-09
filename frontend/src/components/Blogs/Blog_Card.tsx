@@ -5,6 +5,7 @@ import { memo, useState } from "react";
 import { BookMarkIcon } from "../../assets/svg/BookMarkIcon";
 import axios from "axios";
 import { debounce } from "../../Page/NoveEditor";
+import { trimTitle } from "../../utils/trimTitle";
 
 interface Blog_CardProps {
   id: string;
@@ -61,7 +62,6 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
           },
         }
       );
-
     };
 
     const debounceSavePost = debounce(handleSavePost, 500);
@@ -97,8 +97,8 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
             >
               <div className="mb-6">
                 <h1 className="font-bold text-xl text-wrap break-words sm:text-xl md:text-2xl ">
-                  {title.length > 55 ? title.substring(0, 55) + " ..." : title}
-                </h1>
+                  {trimTitle(title, 55)}
+                </h1> 
                 <p className="text-[#9CA3AF] mt-2 break-words line-clamp-3 sm:text-base">
                   {shortCaption}
                 </p>
