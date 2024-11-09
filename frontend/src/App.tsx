@@ -20,6 +20,7 @@ import { NovelPreview } from "./Page/NovelPreview";
 import { HandlePost } from "./Page/HandlePost";
 import { Draft } from "./Page/Draft";
 import { Save } from "./Page/Save";
+import { Archived } from "./Page/Archived";
 
 function App() {
   const [user, setUser] = useRecoilState(authAtom);
@@ -107,6 +108,16 @@ function App() {
       element: (
         <ProtectedRoute>
           <Save />
+        </ProtectedRoute>
+      ),
+      errorElement: <NotFound />,
+    },
+
+    {
+      path: "/post/archived",
+      element: (
+        <ProtectedRoute>
+          <Archived />
         </ProtectedRoute>
       ),
       errorElement: <NotFound />,
