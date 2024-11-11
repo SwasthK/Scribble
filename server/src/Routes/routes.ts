@@ -125,6 +125,9 @@ api
     .post('/post/unarchive/:postId', authMiddleware, findActiveUser, unArchivePost)
     .get('posts/archived/getAll', authMiddleware, findActiveUser, getArchivedPost)
 
+    //Like Routes
+    .post('/post/like/:postId', authMiddleware, findActiveUser, likeAndUnlikePost)
+
     // --------------------------------------------------------------------------
 
     //Follow Routes
@@ -164,8 +167,7 @@ api
     .get('/tag/getall', authMiddleware, findActiveUser, getAllTag)
     .get('/tag/get', authMiddleware, findActiveUser, getTag)
 
-    //Like Routes
-    .post('/post/like/:postId', authMiddleware, findActiveUser, likeAndUnlikePost)
+
 
 
 
