@@ -14,8 +14,11 @@ import { BlockNoteView } from "@blocknote/mantine";
 import { BookMarkIcon } from "../../assets/svg/BookMarkIcon";
 import axios from "axios";
 import { debounce } from "../../utils/debounce";
+import { LikeIcon } from "../../assets/svg/LikeIcon";
+import toast from "react-hot-toast";
 
 export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
+  console.log(blogContent);
   const { ref, inView } = useInView({
     triggerOnce: true,
   });
@@ -31,6 +34,8 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
     authorId,
     body,
     summary,
+    _count: count,
+    likes,
     savedBy,
   } = blogContent;
 
@@ -89,6 +94,49 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
 
   const debounceSavePost = debounce(handleSavePost, 500);
 
+  const [likeState, setLikeState] = useState({
+    count: count.likes,
+    isLiked: likes.length > 0,
+    load: false,
+  });
+
+  const handleLikeCount = async () => {
+    if (likeState.load) {
+      return;
+    }
+
+    const updatedLikeStatus = !likeState.isLiked;
+    setLikeState((prev) => ({
+      count: updatedLikeStatus ? prev.count + 1 : prev.count - 1,
+      isLiked: updatedLikeStatus,
+      load: true,
+    }));
+
+    try {
+      await axios.post(
+        `/post/like/${id}`,
+        {},
+        {
+          headers: {
+            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+    } catch (error: any) {
+      setLikeState((prev) => ({
+        ...prev,
+        count: updatedLikeStatus ? prev.count - 1 : prev.count + 1,
+        isLiked: !updatedLikeStatus,
+      }));
+      toast.error(error.response?.data.message || "Something went wrong");
+    } finally {
+      setLikeState((prev) => ({
+        ...prev,
+        load: false,
+      }));
+    }
+  };
+
   return (
     <>
       <div className="flex justify-center items-center px-8  pt-8  sm:px-16">
@@ -132,10 +180,22 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                   <p className="italic font-semibold">Edit</p>
                 </Link>
               ) : (
-                <BookMarkIcon
-                  onClick={debounceSavePost}
-                  fill={saved ? "white" : "none"}
-                ></BookMarkIcon>
+                <>
+                  <div className="flex gap-8 items-center">
+                    <div className="flex items-center gap-3">
+                      <LikeIcon
+                        size={24}
+                        onClick={handleLikeCount}
+                        fill={likeState.isLiked ? "red" : "white"}
+                      />
+                      {likeState.count > 4 && <p>{likeState.count}</p>}
+                    </div>
+                    <BookMarkIcon
+                      onClick={debounceSavePost}
+                      fill={saved ? "white" : "none"}
+                    ></BookMarkIcon>
+                  </div>
+                </>
               )}
             </div>
 

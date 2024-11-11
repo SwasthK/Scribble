@@ -53,6 +53,7 @@ export const Blogs = () => {
                   slug={blog.slug}
                   shortCaption={blog.shortCaption}
                   count={blog._count}
+                  likes={blog.likes}
                   isSaved={blog.isSaved}
                   createdAt={blog.createdAt}
                 />
