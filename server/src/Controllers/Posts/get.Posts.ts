@@ -171,6 +171,10 @@ export async function getPostBySlug(c: Context) {
                         avatarUrl: true
                     }
                 },
+                likes: {
+                    where: { userId },
+                    select: { postId: true }
+                },
                 _count: {
                     select: {
                         likes: true,
@@ -401,6 +405,10 @@ export async function getAllPosts(c: Context) {
                 shortCaption: true,
                 slug: true,
                 savedBy: {
+                    where: { userId: user.id },
+                    select: { postId: true }
+                },
+                likes: {
                     where: { userId: user.id },
                     select: { postId: true }
                 },

@@ -33,6 +33,43 @@ model User {
   refreshTokenExpiresAt DateTime?
 }
 
+model Post {
+  id                 String       @id @default(uuid())
+  coverImage         String?
+  coverImagePublicId String?
+  title              String
+  shortCaption       String?
+  slug               String?      @unique
+  body               String
+  summary            String?
+  author             User         @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId           String
+  likes              Like[]
+  multiMedias        MultiMedia[] @relation("PostMultimedia")
+  savedBy            SavedBlog[]  @relation("PostSavedBlog")
+  revisions          Revision[]   @relation("UserRevision")
+  categories         Category[]   @relation("PostCategories")
+  tags               Tag[]        @relation("PostTags")
+  comments           Comment[]    @relation("PostComments")
+  reports            PostReport[] @relation("PostReports")
+  allowComments      Boolean      @default(true)
+  status             PostStatus   @default(DRAFT)
+  publishedAt        DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  @@index([slug])
+}
+
+model SavedBlog {
+  id        String   @id @default(uuid())
+  user      User     @relation("UserSavedBlogs", fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  Post      Post     @relation("PostSavedBlog", fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  createdAt DateTime @default(now())
+}
+
 model Social {
   id        String   @id @default(uuid())
   platform  String
@@ -66,33 +103,7 @@ model Notification {
   updatedAt DateTime         @updatedAt
 }
 
-model Post {
-  id                 String       @id @default(uuid())
-  coverImage         String?
-  coverImagePublicId String?
-  title              String
-  shortCaption       String?
-  slug               String?      @unique
-  body               String
-  summary            String?
-  author             User         @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
-  authorId           String
-  likes              Like[]
-  multiMedias        MultiMedia[] @relation("PostMultimedia")
-  savedBy            SavedBlog[]  @relation("PostSavedBlog")
-  revisions          Revision[]   @relation("UserRevision")
-  categories         Category[]   @relation("PostCategories")
-  tags               Tag[]        @relation("PostTags")
-  comments           Comment[]    @relation("PostComments")
-  reports            PostReport[] @relation("PostReports")
-  allowComments      Boolean      @default(true)
-  status             PostStatus   @default(DRAFT)
-  publishedAt        DateTime?
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
 
-  @@index([slug])
-}
 
 model Like {
   id        String   @id @default(uuid())
@@ -115,14 +126,7 @@ model MultiMedia {
   uploadedAt DateTime  @default(now())
 }
 
-model SavedBlog {
-  id        String   @id @default(uuid())
-  user      User     @relation("UserSavedBlogs", fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  Post      Post     @relation("PostSavedBlog", fields: [postId], references: [id], onDelete: Cascade)
-  postId    String
-  createdAt DateTime @default(now())
-}
+
 
 model Revision {
   id        String   @id @default(uuid())

@@ -6,6 +6,7 @@ import { BookMarkIcon } from "../../assets/svg/BookMarkIcon";
 import axios from "axios";
 import { debounce } from "../../Page/NoveEditor";
 import { trimTitle } from "../../utils/trimTitle";
+import toast from "react-hot-toast";
 
 interface Blog_CardProps {
   id: string;
@@ -21,6 +22,7 @@ interface Blog_CardProps {
     comments: number;
     likes: number;
   };
+  likes: string[];
   isSaved?: boolean;
   createdAt: string;
 }
@@ -34,6 +36,7 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
     slug,
     shortCaption,
     count,
+    likes,
     isSaved,
     createdAt,
   }) => {
@@ -65,6 +68,47 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
     };
 
     const debounceSavePost = debounce(handleSavePost, 500);
+
+    const [likeLoad, setLikeLoad] = useState(false);
+
+    const [likeState, setLikeState] = useState({
+      count: count.likes,
+      isLiked: likes.length > 0,
+    });
+
+    const handleLikeCount = async () => {
+      if (likeLoad) {
+        return;
+      }
+
+      const updatedLikeStatus = !likeState.isLiked;
+      setLikeState((prev) => ({
+        count: updatedLikeStatus ? prev.count + 1 : prev.count - 1,
+        isLiked: updatedLikeStatus,
+      }));
+
+      setLikeLoad(true);
+
+      try {
+        await axios.post(
+          `/post/like/${id}`,
+          {},
+          {
+            headers: {
+              accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+      } catch (error: any) {
+        setLikeState((prev) => ({
+          count: updatedLikeStatus ? prev.count - 1 : prev.count + 1,
+          isLiked: !updatedLikeStatus,
+        }));
+        toast.error(error.response?.data.message || "Something went wrong");
+      } finally {
+        setLikeLoad(false);
+      }
+    };
 
     return (
       <>
@@ -98,7 +142,7 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
               <div className="mb-6">
                 <h1 className="font-bold text-xl text-wrap break-words sm:text-xl md:text-2xl ">
                   {trimTitle(title, 55)}
-                </h1> 
+                </h1>
                 <p className="text-[#9CA3AF] mt-2 break-words line-clamp-3 sm:text-base">
                   {shortCaption}
                 </p>
@@ -121,8 +165,12 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
               </div>
               <div className="flex gap-8 items-center">
                 <div className="flex items-center gap-2 cursor-pointer">
-                  <LikeIcon size={18} />
-                  <p>{count.likes}</p>
+                  <LikeIcon
+                    size={18}
+                    onClick={handleLikeCount}
+                    fill={likeState.isLiked ? "red" : "white"}
+                  />
+                  {likeState.count > 4 && <p>{likeState.count}</p>}
                 </div>
                 <div className="flex items-center gap-2 cursor-pointer">
                   <CommentIcon size={18} />

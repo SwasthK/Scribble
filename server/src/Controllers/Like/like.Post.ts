@@ -1,7 +1,8 @@
 import { Context } from "hono";
 import { apiError } from "../../utils/apiError";
-import { dbConnect } from "../../Connection/db.connect";
 import { apiResponse } from "../../utils/apiResponse";
+import { GlobalResponse } from "utils/responses";
+import { LikesResponse } from "utils/responseData";
 
 export async function likeAndUnlikePost(c: Context) {
 
@@ -9,13 +10,11 @@ export async function likeAndUnlikePost(c: Context) {
         const postId = c.req.param('postId');
         const userId = c.get('user').id;
 
-        if (!postId || !userId) {
-            return apiError(c, 400, 'Request failed');
-        }
+        if (!postId) { return apiError(c, 400, LikesResponse.PostIdRequired); }
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = c.get('prisma');
 
-        const [action, count] = await prisma.$transaction(async (prisma: any) => {
+        const response = await prisma.$transaction(async (prisma: any) => {
 
             const existingLike = await prisma.like.findFirst({
                 where: {
@@ -23,16 +22,13 @@ export async function likeAndUnlikePost(c: Context) {
                     postId: postId
                 }
             });
-
-            let action: "liked" | "unliked";
-
             if (existingLike) {
                 await prisma.like.delete({
                     where: {
                         id: existingLike.id
                     }
                 });
-                action = "unliked";
+                return LikesResponse.Unliked
             } else {
                 await prisma.like.create({
                     data: {
@@ -40,23 +36,20 @@ export async function likeAndUnlikePost(c: Context) {
                         postId: postId
                     }
                 });
-                action = "liked";
+                return LikesResponse.Liked
             }
-
-            const likesCount = await prisma.like.count({
-                where: {
-                    postId: postId
-                }
-            });
-
-            return [action, likesCount];
         });
 
-        return apiResponse(c, 200, { action, count });
+        if (!response) { return apiError(c, 400, LikesResponse.LikesError) }
+
+        return apiResponse(c, 200, response);
 
     } catch (error: any) {
-        console.error("Like Post Error:", error);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        console.error(LikesResponse.ConsoleError, error);
+        if (error.message === LikesResponse.LikesError) {
+            return apiError(c, 400, error.message)
+        }
+        return apiError(c, 500, GlobalResponse.INTERNALERROR);
     }
-    
+
 }

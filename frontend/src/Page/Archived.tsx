@@ -132,7 +132,7 @@ const ArchivedCard = memo(
             className="h-16 w-16 bg-gray-300 rounded-l-md object-cover"
           ></img>
           <div className="flex justify-between items-center gap-2">
-            <Link to={`/blog/${slug}`} className="min-w-52 font-semibold border">
+            <Link to={`/blog/${slug}`} className="min-w-52 font-semibold">
               <h1> {trimTitle(title, 30)}</h1>
             </Link>
             <UnArchiveIcon size={26} onclick={handleOnUnArchive} />
