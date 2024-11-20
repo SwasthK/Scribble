@@ -38,6 +38,7 @@ export interface FormErrors {
 }
 
 export type SvgIconType = {
+    url?: string;
     size?: number,
     className?: string,
     onClick?: any,
@@ -67,4 +68,16 @@ export enum statusType {
     PUBLISHED = "PUBLISHED",
     ARCHIEVED = "ARCHIEVED",
     NEW = "NEW",
+}
+
+export enum pageSection {
+    ABOUT = "about",
+    BLOGS = "blogs",
+    SOCIALS = "socials",
+}
+
+export enum socialPlatforms {
+    GITHUB = "github",
+    X = "x",
+    INSTAGRAM = "instagram",
 }
