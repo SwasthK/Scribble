@@ -16,9 +16,11 @@ import axios from "axios";
 import { debounce } from "../../utils/debounce";
 import { LikeIcon } from "../../assets/svg/LikeIcon";
 import toast from "react-hot-toast";
+import { InstagramIcon } from "../../assets/svg/InstagramIcon";
+import { TwitterIcon } from "../../assets/svg/TwitterIcon";
+import { GitHubIcon } from "../../assets/svg/GitHubIcon";
 
 export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
-  console.log(blogContent);
   const { ref, inView } = useInView({
     triggerOnce: true,
   });
@@ -265,6 +267,11 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                     Written by {author.username}
                   </h1>
                   <p className="py-2">53K Followers</p>
+                </div>
+                <div className="flex items-center gap-5">
+                  <GitHubIcon size={20} />
+                  <TwitterIcon size={17} />
+                  <InstagramIcon size={20} />
                 </div>
               </>
             ) : (
