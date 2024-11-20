@@ -142,7 +142,7 @@ export async function logout(c: Context) {
         const user = c.get('user');
         console.log(user);
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const updateUser = await prisma.user.update({
             where: { id: user.id },
@@ -174,7 +174,28 @@ export async function refreshAccessToken(c: Context) {
 
         const prisma = c.get('prisma')
 
-        const dbUser = await prisma.user.findUnique({ where: { id: verifiedToken.id } })
+        // const dbUsers = await prisma.user.findUnique({ where: { id: verifiedToken.id } })
+        // console.log(dbUser);
+
+        const dbUser = await prisma.user.findUnique({
+            where: { id: verifiedToken.id },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                avatarUrl: true,
+                bio: true,
+                createdAt: true,
+                socials: {
+                    select: {
+                        platform: true,
+                        url: true
+                    }
+                },
+                refreshToken: true
+            },
+        });
+
         if (!dbUser) return apiError(c, 401, "Failed to Authorize User")
 
         if (dbUser.refreshToken !== recievedRefreshToken) return apiError(c, 401, "Failed to Authorize User")
@@ -190,7 +211,8 @@ export async function refreshAccessToken(c: Context) {
                 email: dbUser.email,
                 avatarUrl: dbUser.avatarUrl,
                 bio: dbUser.bio,
-                createdAt: dbUser.createdAt
+                createdAt: dbUser.createdAt,
+                socials: dbUser.socials
             }
         }, "Access Token Refreshed")
     } catch (error: any) {

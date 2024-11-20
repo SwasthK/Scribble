@@ -75,6 +75,7 @@ import { getFileToUpload } from '../Middleware/cloudinary'
 import { DraftPostBodyParse, publishPostBodyParse, signupBodyParse, updateAvatarBodyParse } from '../Middleware/Body.Parse'
 import { handleSavePost } from 'Controllers/Posts/Save/save.Post'
 import { getSavedPost } from 'Controllers/Posts/Save/getSavedPost'
+import { updateUserSocials } from 'Controllers/Socials/socials'
 
 const api = new Hono();
 
@@ -127,6 +128,9 @@ api
 
     //Like Routes
     .post('/post/like/:postId', authMiddleware, findActiveUser, likeAndUnlikePost)
+
+    //Social Routes
+    .put('/user/socials/update', authMiddleware, findActiveUser, updateUserSocials)
 
     // --------------------------------------------------------------------------
 

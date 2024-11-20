@@ -1,7 +1,6 @@
 import { Context } from "hono";
 import { apiResponse } from "../../utils/apiResponse";
 import { updateUserProfileSchema } from "../../Zod/zod";
-import { dbConnect } from "../../Connection/db.connect";
 import { apiError } from "../../utils/apiError";
 import { cloudinaryUploader, fileUploadMessage, generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers } from "../../Middleware/cloudinary";
 
@@ -20,7 +19,7 @@ export async function updateUserProfile(c: Context) {
             ...(response.data.bio && { bio: response.data.bio }),
         };
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = c.get('prisma');
 
         const existingUser = await prisma.user.findFirst({
             where: {
@@ -36,7 +35,6 @@ export async function updateUserProfile(c: Context) {
             where: { id: user.id },
             data: updateData,
             select: {
-                id: true,
                 username: true,
                 email: true,
                 bio: true

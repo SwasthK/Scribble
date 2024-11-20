@@ -113,10 +113,6 @@ model Notification {
   updatedAt DateTime         @updatedAt
 }
 
-
-
-
-
 model MultiMedia {
   id         String    @id @default(uuid())
   caption    String?
@@ -127,8 +123,6 @@ model MultiMedia {
   postId     String?
   uploadedAt DateTime  @default(now())
 }
-
-
 
 model Revision {
   id        String   @id @default(uuid())
