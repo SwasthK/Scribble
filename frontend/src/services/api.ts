@@ -200,3 +200,28 @@ export const getAllUserArchivedPosts = async () => {
         }
     }
 }
+
+export const handleUpdateUserSocials = async (socials: any) => {
+    try {
+        const response = await axios.put<any>(
+            `${baseUrl}/user/socials/update`,
+            socials,
+            {
+                headers: {
+                    accessToken: `Bearer ${localStorage.getItem("accessToken")}`
+                }
+            }
+        );
+
+        if (response.data) {
+            return response.data.data;
+        }
+
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data.message || 'Unexpected error');
+        } else {
+            throw new Error('Something went wrong. Please try again later.');
+        }
+    }
+}
