@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 // import { useParams, useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { AppBar } from "../components/AppBar/AppBar";
@@ -14,9 +14,12 @@ import {
   validateFileType,
   validateUsername,
 } from "../components/Auth/register.validate";
-import { FormErrors } from "../Types/type";
+import { FormErrors, pageSection, socialPlatforms } from "../Types/type";
 import { useMutation } from "@tanstack/react-query";
-import { handleUpdateUserProfileMetadata } from "../services/api";
+import {
+  handleUpdateUserProfileMetadata,
+  handleUpdateUserSocials,
+} from "../services/api";
 import { updateUserProfileMetaData } from "../Types/type";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -24,6 +27,9 @@ import { TrashIcon } from "../assets/svg/TrashIcon";
 import axios from "axios";
 import { RefreshIcon } from "../assets/svg/RefreshIcon";
 import { ArchiveIcon } from "../assets/svg/ArchiveIcon";
+import { GitHubIcon } from "../assets/svg/GitHubIcon";
+import { TwitterIcon } from "../assets/svg/TwitterIcon";
+import { InstagramIcon } from "../assets/svg/InstagramIcon";
 
 export const Profile = () => {
   const location = useLocation();
@@ -33,9 +39,8 @@ export const Profile = () => {
   const setUserData = useSetRecoilState(authAtom);
   const { formattedDate } = UseFormatDate(userData.createdAt);
   const [showAboutSection, HideBlogs] = useState(true);
-  // const StateUser = "@" + userData.username;
-  // const navigate = useNavigate();
-  // const { username } = useParams<{ username: string }>();
+
+  const [section, setSection] = useState(pageSection.ABOUT);
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -44,13 +49,6 @@ export const Profile = () => {
   const { data, isError, error, isLoading, isFetching, refetch } = postsQuery;
 
   const pageCount = data ? Math.ceil(data.totalPosts / 6) : 6;
-
-  // useEffect(() => {
-  //     console.log(userData);
-  //   if (username !== StateUser) {
-  //     navigate("/blogs");
-  //   }
-  // }, [username, userData, navigate]);
 
   useEffect(() => {
     if (state?.profile === false) {
@@ -63,7 +61,6 @@ export const Profile = () => {
 
   const [posts, setPosts] = useState([]);
 
-  // Sync fetched data with local state
   useEffect(() => {
     if (data) {
       setPosts(data.posts);
@@ -152,6 +149,48 @@ export const Profile = () => {
     );
   };
 
+  const [socials, setSocials] = useState([
+    {
+      platform: socialPlatforms.GITHUB,
+      url:
+        userData.socials.find(
+          (social: any) => social.platform === socialPlatforms.GITHUB
+        )?.url || null,
+    },
+    {
+      platform: socialPlatforms.X,
+      url:
+        userData.socials.find(
+          (social: any) => social.platform === socialPlatforms.X
+        )?.url || null,
+    },
+    {
+      platform: socialPlatforms.INSTAGRAM,
+      url:
+        userData.socials.find(
+          (social: any) => social.platform === socialPlatforms.INSTAGRAM
+        )?.url || null,
+    },
+  ]);
+
+  const [initialSocialData, setInitialSocialData] = useState(socials);
+
+  const handleSocialsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSocials((prev) =>
+      prev.map((social: any) =>
+        social.platform === name ? { ...social, url: value } : social
+      )
+    );
+  };
+
+  const isSocialChange = () => {
+    return socials.some(
+      (social: any, index: number) =>
+        social.url !== initialSocialData[index]?.url
+    );
+  };
+
   const {
     isSuccess,
     isError: isMutationError,
@@ -163,7 +202,14 @@ export const Profile = () => {
     mutationFn: (formData: updateUserProfileMetaData) =>
       handleUpdateUserProfileMetadata(formData),
     onSuccess: (updatedData) => {
-      setInitialformData(updatedData);
+      setformData((prev) => ({
+        ...prev,
+        ...updatedData,
+      }));
+      setInitialformData((prev) => ({
+        ...prev,
+        ...updatedData,
+      }));
       setUserData((prev) => ({
         ...prev,
         user: {
@@ -171,6 +217,7 @@ export const Profile = () => {
           ...updatedData,
         },
       }));
+
       toast.success("Profile Updated Successfully");
     },
     onError: (error: any) => {
@@ -248,11 +295,57 @@ export const Profile = () => {
   };
 
   const handleDeleteAndArchivePost = (id: string) => {
-    console.log(posts.length);
     setPosts((prevPosts: any) =>
       prevPosts.filter((post: any) => post.id !== id)
     );
   };
+
+  const { isPending: socialUpdatePending, mutate: handleSocialsUpdate } =
+    useMutation({
+      mutationFn: (socials: any) => handleUpdateUserSocials(socials),
+      onSuccess: (updatedData) => {
+        let stateData = [
+          {
+            platform: socialPlatforms.GITHUB,
+            url:
+              updatedData.find(
+                (social: any) => social.platform === socialPlatforms.GITHUB
+              )?.url || null,
+          },
+          {
+            platform: socialPlatforms.X,
+            url:
+              updatedData.find(
+                (social: any) => social.platform === socialPlatforms.X
+              )?.url || null,
+          },
+          {
+            platform: socialPlatforms.INSTAGRAM,
+            url:
+              updatedData.find(
+                (social: any) => social.platform === socialPlatforms.INSTAGRAM
+              )?.url || null,
+          },
+        ];
+
+        const updateStateData = (data: any) => {
+          setSocials(data);
+          setInitialSocialData(data);
+          setUserData((prev) => ({
+            ...prev,
+            user: { ...prev.user, socials: data },
+          }));
+        };
+
+        updateStateData(stateData);
+
+        toast.success("Socials Updated Successfully");
+      },
+      onError: (error: any) => {
+        toast.error(error.message);
+        return;
+      },
+    });
 
   return (
     <>
@@ -332,28 +425,27 @@ export const Profile = () => {
             )}
           </div>
         </div>
-        <div className="px-12 py-8 flex gap-12 items-center">
-          <h6
-            onClick={() => HideBlogs(true)}
-            className={`text-gray-80 cursor-pointer px-5 py-2 rounded-full ${
-              showAboutSection
-                ? "font-bold bg-blue-300 text-black"
-                : "text-cgray "
-            }`}
-          >
-            About
-          </h6>
-          <h6
-            onClick={() => HideBlogs(false)}
-            className={`text-gray-80 cursor-pointer px-5 py-2 rounded-full ${
-              showAboutSection
-                ? "font-normal"
-                : "font-bold bg-blue-300 text-black"
-            }`}
-          >
-            Blogs
-          </h6>
-          {!showAboutSection && !isFetching && (
+
+        <div className="px-12 py-8 flex gap-12 items-center max-w-[60rem]">
+          <SectionBar
+            label={"about"}
+            section={section}
+            setSection={setSection}
+          />
+
+          <SectionBar
+            label={"socials"}
+            section={section}
+            setSection={setSection}
+          />
+
+          <SectionBar
+            label={"blogs"}
+            section={section}
+            setSection={setSection}
+          />
+
+          {section === pageSection.BLOGS && !isFetching && (
             <RefreshIcon
               onClick={handleRefetch}
               size={26}
@@ -361,9 +453,11 @@ export const Profile = () => {
             />
           )}
         </div>
+
         <div className=" xl:min-w-[70vw]">
           {isError && <h1>{error.message}</h1>}
-          {!showAboutSection && (
+
+          {section === pageSection.BLOGS && (
             <>
               <div
                 className={`xl:max-w-[70%] lg:max-w-[90%] px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 
@@ -439,7 +533,7 @@ export const Profile = () => {
             </>
           )}
 
-          {showAboutSection && (
+          {section == pageSection.ABOUT && (
             <>
               <div className="w-full sm:max-w-[30rem] flex md:gap-8 gap-8 px-16 pt-0 py-12 rounded-xl flex-col">
                 <div className="flex gap-3 flex-col">
@@ -537,6 +631,52 @@ export const Profile = () => {
                       </button>
                     </div>
                   )}
+              </div>
+            </>
+          )}
+
+          {section === pageSection.SOCIALS && (
+            <>
+              <div className="w-full sm:max-w-[30rem] flex md:gap-8 gap-8 px-16 pt-0 py-12 rounded-xl flex-col">
+                {socials.map((social: any) => (
+                  <div key={social.platform} className="flex gap-3 flex-col">
+                    <div className=" flex gap-5 items-center">
+                      {social.platform === socialPlatforms.GITHUB ? (
+                        <GitHubIcon size={24} url={social.url || ""} />
+                      ) : social.platform === socialPlatforms.X ? (
+                        <TwitterIcon size={19} url={social.url || ""} />
+                      ) : social.platform === socialPlatforms.INSTAGRAM ? (
+                        <InstagramIcon size={24} url={social.url || ""} />
+                      ) : null}
+                      <input
+                        className="input-style flex-grow"
+                        type="text"
+                        id={social.platform}
+                        name={social.platform}
+                        placeholder={`eg. https://${social.platform}.com/${
+                          userData.username || "username"
+                        }`}
+                        value={social.url}
+                        onChange={handleSocialsChange}
+                        autoComplete="true"
+                        disabled={socialUpdatePending}
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                {isSocialChange() && (
+                  <div>
+                    <button
+                      disabled={socialUpdatePending}
+                      type="submit"
+                      className="bg-[#1d58aa]   disabled:cursor-not-allowed font-semibold cursor-pointer px-8 py-3 rounded-lg"
+                      onClick={() => handleSocialsUpdate(socials)}
+                    >
+                      {socialUpdatePending ? "Updating..." : "Update"}
+                    </button>
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -672,6 +812,31 @@ export const UserBlogs = memo(
           </button>
         </div>
       </div>
+    );
+  }
+);
+
+export const SectionBar = memo(
+  ({
+    label,
+    section,
+    setSection,
+  }: {
+    label: any;
+    section: any;
+    setSection: any;
+  }) => {
+    return (
+      <h6
+        onClick={() => setSection(label)}
+        className={`text-gray-80 cursor-pointer px-5 py-2 rounded-full capitalize
+        ${
+          section === label ? "font-bold bg-blue-300 text-black" : "text-cgray "
+        }
+      }`}
+      >
+        {label}
+      </h6>
     );
   }
 );
