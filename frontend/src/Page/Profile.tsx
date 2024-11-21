@@ -51,9 +51,16 @@ export const Profile = () => {
   const pageCount = data ? Math.ceil(data.totalPosts / 6) : 6;
 
   useEffect(() => {
-    if (state?.profile === false) {
-      HideBlogs(false);
+    if (state?.section === pageSection.ABOUT) {
+      setSection(pageSection.ABOUT);
+    } else if (state?.section === pageSection.SOCIALS) {
+      setSection(pageSection.SOCIALS);
+    } else if (state?.section === pageSection.BLOGS) {
+      setSection(pageSection.BLOGS);
+    } else {
+      setSection(pageSection.ABOUT);
     }
+    
     if (location.state) {
       navigate(location.pathname, { replace: true, state: null });
     }
