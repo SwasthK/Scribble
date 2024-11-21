@@ -6,6 +6,7 @@ import { apiResponse } from "../../utils/apiResponse";
 import { accessToken, verifyTokens, generateAccessAndRefreshToken } from "../../utils/jwt";
 import { ServerSignin, ServerSignup } from "../../Zod/zod";
 import { fileUploadMessage } from "../../Middleware/cloudinary";
+import { PostStatus } from "@prisma/client";
 
 export async function signup(c: Context) {
 
@@ -174,9 +175,6 @@ export async function refreshAccessToken(c: Context) {
 
         const prisma = c.get('prisma')
 
-        // const dbUsers = await prisma.user.findUnique({ where: { id: verifiedToken.id } })
-        // console.log(dbUser);
-
         const dbUser = await prisma.user.findUnique({
             where: { id: verifiedToken.id },
             select: {
@@ -204,6 +202,15 @@ export async function refreshAccessToken(c: Context) {
             },
         });
 
+        const posts = await prisma.post.findMany({
+            where: {
+                status: PostStatus.PUBLISHED
+            },
+            select: {
+                slug: true,
+            }
+        });
+
         if (!dbUser) return apiError(c, 401, "Failed to Authorize User")
 
         if (dbUser.refreshToken !== recievedRefreshToken) return apiError(c, 401, "Failed to Authorize User")
@@ -222,7 +229,8 @@ export async function refreshAccessToken(c: Context) {
                 createdAt: dbUser.createdAt,
                 socials: dbUser.socials,
             },
-            following: dbUser.followers.map((follower: { followingId: string }) => follower.followingId)
+            following: dbUser.followers.map((follower: { followingId: string }) => follower.followingId),
+            posts: posts.map((post: { slug: string }) => post.slug)
         }, "Access Token Refreshed")
     } catch (error: any) {
         console.log("Error while refreshing token : ", error);
