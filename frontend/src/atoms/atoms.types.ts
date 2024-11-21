@@ -28,3 +28,7 @@ export interface authAtomType {
     accessToken: string | null;
     refreshToken: string | null;
 }
+
+export interface followAtomType {
+    following: string[];
+}
