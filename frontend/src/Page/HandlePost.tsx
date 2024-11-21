@@ -407,7 +407,7 @@ export const HandlePost = () => {
               </div>
             </div>
             <div className="w-[95%] flex flex-col gap-8 max-w-[800px] h-3/4 fixed overflow-y-scroll top-44 pb-24 px-4 sm:px-8 ">
-              <div className="rounded-lg py-8 px-8 flex  gap-8 flex-col-reverse md:flex-row bg-[#262932] md:items-center">
+              <div className="rounded-lg py-5 px-8 flex  gap-8 flex-col-reverse md:flex-row bg-[#262932] md:items-center">
                 <div className="flex flex-col gap-6 items-start ">
                   <div className="flex gap-3 flex-col w-full sm:w-96">
                     <label
@@ -530,7 +530,7 @@ export const HandlePost = () => {
                 onChange={handleBodyChange}
               />
 
-              <div className=" font-semibold flex flex-col gap-4">
+              <div className=" font-semibold flex flex-col gap-4 ">
                 <p className="pl-8">Summary</p>
                 <input
                   placeholder="eg. Next.js is a robust solution for server-side rendering, routing, and more."
