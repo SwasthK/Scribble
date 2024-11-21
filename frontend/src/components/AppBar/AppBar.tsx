@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useEffect, useRef, useState } from "react";
 import { UserIcon } from "../../assets/svg/UserIcon";
-import { Search } from "../../assets/svg/Search";
 import { Bell } from "../../assets/svg/Bell";
 import { EditIcon } from "../../assets/svg/EditIcon";
 import { LogoutIcon } from "../../assets/svg/LogoutIcon";
@@ -14,6 +13,7 @@ import axios from "axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { DraftIcon } from "../../assets/svg/DraftIcon";
 import { ArchiveIcon } from "../../assets/svg/ArchiveIcon";
+import { SearchComponent } from "./Search";
 
 export const AppBar = () => {
   const { user: currentUser } = useRecoilValue(authAtom);
@@ -103,7 +103,9 @@ export const AppBar = () => {
           Medium
         </Link>
         <div className="flex justify-between items-center gap-4 md:gap-6 md:pr-4">
-          <NavItems icon={Search} tooltip={"Search"} />
+          <div className="">
+            <SearchComponent></SearchComponent>
+          </div>
           <NavItems icon={Bell} tooltip={"Notifications"} />
           <div ref={avatarRef}>
             <NavItems
@@ -142,10 +144,14 @@ export const AppBar = () => {
           <MenuItems icon={SavedIcon} label="Saved" url="/post/saved" />
           <MenuItems icon={FollowersIcon} label="Followers" />
           <MenuItems icon={DraftIcon} url={"/post/draft"} label="Draft" />
-          <MenuItems icon={ArchiveIcon} label="Archieved" url="/post/archived"/>
+          <MenuItems
+            icon={ArchiveIcon}
+            label="Archieved"
+            url="/post/archived"
+          />
 
           {currentUser.email && (
-            <h1 className="mt-4 text-cgray menuItems" >{currentUser.email}</h1>
+            <h1 className="mt-4 text-cgray menuItems">{currentUser.email}</h1>
           )}
 
           <MenuItems
