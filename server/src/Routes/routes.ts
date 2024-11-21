@@ -132,13 +132,14 @@ api
     //Social Routes
     .put('/user/socials/update', authMiddleware, findActiveUser, updateUserSocials)
 
-    // --------------------------------------------------------------------------
-
     //Follow Routes
-    .post('profile/:id/follow', authMiddleware, findActiveUser, FollowUser)
-    .delete('profile/:id/unfollow', authMiddleware, findActiveUser, UnFollowUser)
+    .post('/user/profile/:id/follow', authMiddleware, findActiveUser, FollowUser)
+    .delete('/user/profile/:id/unfollow', authMiddleware, findActiveUser, UnFollowUser)
     .get('/profile/getFollowersDetails', authMiddleware, findActiveUser, getFollowersDetails)
     .get('/profile/getFollowingsDetails', authMiddleware, findActiveUser, getFollowingsDetails)
+
+    // --------------------------------------------------------------------------
+
 
     //Post Routes
     // .put('/post/updateDraftPost', authMiddleware, findActiveUser, updateDraftPost)
