@@ -192,7 +192,15 @@ export async function refreshAccessToken(c: Context) {
                         url: true
                     }
                 },
-                refreshToken: true
+                refreshToken: true,
+                followers: {
+                    where: {
+                        followerId: verifiedToken.id
+                    },
+                    select: {
+                        followingId: true
+                    }
+                }
             },
         });
 
@@ -212,8 +220,9 @@ export async function refreshAccessToken(c: Context) {
                 avatarUrl: dbUser.avatarUrl,
                 bio: dbUser.bio,
                 createdAt: dbUser.createdAt,
-                socials: dbUser.socials
-            }
+                socials: dbUser.socials,
+            },
+            following: dbUser.followers.map((follower: { followingId: string }) => follower.followingId)
         }, "Access Token Refreshed")
     } catch (error: any) {
         console.log("Error while refreshing token : ", error);
