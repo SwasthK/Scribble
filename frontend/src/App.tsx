@@ -1,7 +1,7 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ProtectedRoute, UnProtectedRoute } from "./utils/Route.Protect";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 import Home from "./Page/Home";
 import { NotFound } from "./Page/NotFound";
@@ -21,9 +21,11 @@ import { HandlePost } from "./Page/HandlePost";
 import { Draft } from "./Page/Draft";
 import { Save } from "./Page/Save";
 import { Archived } from "./Page/Archived";
+import { followAtom } from "./atoms/followAtom";
 
 function App() {
   const [user, setUser] = useRecoilState(authAtom);
+  const setFollowing = useSetRecoilState(followAtom);
   const router = createBrowserRouter([
     {
       path: "/",
@@ -164,9 +166,11 @@ function App() {
       return;
     }
 
-    const { accessToken, user: userData } = await refreshAccessToken(
-      user.refreshToken
-    );
+    const {
+      accessToken,
+      user: userData,
+      following,
+    } = await refreshAccessToken(user.refreshToken);
 
     if (accessToken) {
       setUser((prev) => ({
@@ -178,6 +182,7 @@ function App() {
         isAuthenticated: true,
         accessToken: accessToken,
       }));
+      setFollowing((prev: any) => ({ ...prev, following }));
       return;
     } else {
       resetAuthAtom();
