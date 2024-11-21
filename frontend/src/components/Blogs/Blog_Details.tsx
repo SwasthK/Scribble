@@ -5,7 +5,7 @@ import { useInView } from "react-intersection-observer";
 import { useGetPostByAuthorId } from "../../services/queries";
 import { Blog_Recommendation_Skeleton } from "../../Skeleton/Blog_Recommendation_Skeleton";
 import { Link, useLocation } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { authAtom } from "../../atoms/auth.atoms";
 import { EditIcon } from "../../assets/svg/EditIcon";
 import { statusType } from "../../Types/type";
@@ -19,6 +19,7 @@ import toast from "react-hot-toast";
 import { InstagramIcon } from "../../assets/svg/InstagramIcon";
 import { TwitterIcon } from "../../assets/svg/TwitterIcon";
 import { GitHubIcon } from "../../assets/svg/GitHubIcon";
+import { followAtom } from "../../atoms/followAtom";
 
 export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
   const { ref, inView } = useInView({
@@ -139,6 +140,54 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
     }
   };
 
+  const [followingAtom, setFollowAtom] = useRecoilState(followAtom);
+  const isFollowing = followingAtom.following.includes(authorId);
+
+  const handleFollowRequest = async () => {
+    let prevFollowState = isFollowing;
+    let optimisticState: string[];
+
+    setFollowAtom((prev) => {
+      optimisticState = prev.following;
+      if (isFollowing) {
+        return {
+          ...prev,
+          following: prev.following.filter((item) => item !== authorId),
+        };
+      } else {
+        return {
+          ...prev,
+          following: [...prev.following, authorId],
+        };
+      }
+    });
+
+    try {
+      if (prevFollowState) {
+        await axios.delete(`/user/profile/${authorId}/unfollow`, {
+          headers: {
+            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+      } else {
+        await axios.post(
+          `/user/profile/${authorId}/follow`,
+          {},
+          {
+            headers: {
+              accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+      }
+    } catch (error: any) {
+      setFollowAtom((prev) => ({
+        ...prev,
+        following: optimisticState,
+      }));
+    }
+  };
+
   return (
     <>
       <div className="flex justify-center items-center px-8  pt-8  sm:px-16">
@@ -157,14 +206,27 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               {shortCaption}
             </p>
             <div
-              className={`flex items-center gap-4 py-4 justify-between pr-8 ${
+              className={`flex items-center gap-4 py-4 justify-between pr-8  ${
                 currentUserId === authorId && ""
               } `}
             >
               <div className="flex gap-4 items-center justify-center">
                 <Avatar size={10} url={author.avatarUrl} />
                 <div>
-                  <p>{author.username} · Follow</p>
+                  <div className="justify-between flex items-center mb-1">
+                    <p>{author.username}</p>
+
+                    {currentUserId !== authorId && (
+                      <button
+                        onClick={handleFollowRequest}
+                        className={`${
+                          isFollowing ? " bg-[#162C35]" : "bg-[#0D82DF]"
+                        }  text-white font-semibold px-2 rounded-md text-sm py-[0.10rem]`}
+                      >
+                        {isFollowing ? "Following" : "Follow"}
+                      </button>
+                    )}
+                  </div>
                   <p>4 min read · {formattedDate}</p>
                 </div>
               </div>
