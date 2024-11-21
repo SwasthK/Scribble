@@ -1,8 +1,16 @@
 // import React from 'react';
+// import { AppBar } from "../components/AppBar/AppBar";
 import { LandingBg } from "../components/Home/LandingBg";
+// import { Outlet } from "react-router-dom";
 
 const Home = () => {
   return (
+    // <>
+    //   <AppBar />
+    //   <div>
+    //     <Outlet></Outlet>
+    //   </div>
+    // </>
     <div className="relative w-screen h-screen p-8 flex justify-center">
       <LandingBg />
       <div className="relative z- h-full text-white w-[90%]">
