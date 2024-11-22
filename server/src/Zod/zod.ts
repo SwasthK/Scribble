@@ -1,3 +1,4 @@
+import { PostReportType } from '@prisma/client';
 import { z } from 'zod'
 
 const allowedDomains = [
@@ -101,3 +102,20 @@ export const createUserNotificationsSchema = z.object({
 });
 
 export const markNotificationAsReadSchema = z.string().uuid({ message: "Invalid notification ID" });
+
+export const postReportSchema = z.object({
+    type: z.enum(
+        Object.values(PostReportType) as [string, ...string[]]
+        , {
+            required_error: "Report type is required",
+            invalid_type_error: "Invalid report type",
+            message: "Report type is required"
+        }),
+    reason: z.string(
+        {
+            invalid_type_error: "Invalid reason",
+            required_error: "Reason is required",
+            message: "Reason is required"
+        }
+    )
+});
