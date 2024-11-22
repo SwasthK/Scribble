@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { UseFormatDate } from "../../Hooks/Blogs/Format_Date";
 import { Avatar } from "./Blog_Card";
 import { useInView } from "react-intersection-observer";
@@ -29,7 +29,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, SendIcon } from "lucide-react";
 
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
@@ -45,6 +45,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 import { Textarea } from "../ui/textarea";
 import { ThreeDotsIcon } from "../../assets/svg/ThreeDotsIcon";
+import { Comment_Skeleton } from "../../Skeleton/Comment_Skeleton";
 
 const reportCategories = [
   {
@@ -110,25 +111,84 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
     savedBy,
   } = blogContent;
 
-  const { refetch, data, isLoading } = useGetPostByAuthorId(
-    blogContent.authorId || "",
-    slug
-  );
+  const {
+    refetch: fetchUserPosts,
+    data,
+    isLoading,
+  } = useGetPostByAuthorId(blogContent.authorId || "", slug);
 
   const { formattedDate } = UseFormatDate(createdAt);
 
+  const [comments, setComments] = useState<any[]>([]);
+  const [startIndex, setStartIndex] = useState(0);
+  const commentsPerPage = 3;
+  const [currentComments, setCurrentComments] = useState<any[]>([]);
+
+  useEffect(() => {
+    setCurrentComments(
+      comments.slice(startIndex, startIndex + commentsPerPage)
+    );
+  }, [comments, startIndex]);
+
+  const [sorting, setSorting] = useState("newest");
+
+  const sortedComments = useMemo(() => {
+    return comments.slice().sort((a, b) => {
+      if (sorting === "newest") {
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      }
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
+  }, [comments, sorting]);
+
+  useEffect(() => {
+    setCurrentComments(
+      sortedComments.slice(startIndex, startIndex + commentsPerPage)
+    );
+  }, [sortedComments, startIndex]);
+
+  const handleNext = () => {
+    if (startIndex + commentsPerPage < comments.length) {
+      setStartIndex(startIndex + commentsPerPage);
+    }
+  };
+  const handlePrevious = () => {
+    if (startIndex - commentsPerPage >= 0) {
+      setStartIndex(startIndex - commentsPerPage);
+    }
+  };
+
+  const fetchCommnets = async () => {
+    try {
+      const response = await axios.get(`comment/getNoReply/${id}`, {
+        headers: {
+          accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      setComments(response.data.data.comments);
+    } catch (error: any) {
+      toast.error(error.response?.data.message || "Something went wrong");
+    }
+  };
+
+  const fetchData = async () => {
+    await Promise.all([fetchUserPosts(), fetchCommnets()]);
+  };
+
   useEffect(() => {
     if (inView && currentUserId !== authorId) {
-      refetch();
+      fetchData();
     }
-  }, [inView, refetch]);
+  }, [inView]);
 
   const [loadImage, setLoadImage] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [saved, setSaved] = useState(savedBy.length > 0 ? true : false);
 
   const {
-    user: { id: currentUserId },
+    user: { id: currentUserId, avatarUrl: currentUserAvatarUrl },
   } = useRecoilValue(authAtom);
 
   const location = useLocation();
@@ -292,6 +352,37 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
     }
   };
 
+  const [commentContent, setCommentContent] = useState("");
+  const [sendComment, setSendComment] = useState(false);
+
+  const handleSendComment = async () => {
+    if (!commentContent || sendComment) {
+      toast.error("Please write a comment");
+      return;
+    }
+    try {
+      setSendComment(true);
+      const response = await axios.post(
+        `/comment/add`,
+        {
+          postId: id,
+          content: commentContent,
+        },
+        {
+          headers: {
+            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      setComments((prev) => [response.data.data.comment[0], ...prev]);
+      setCommentContent("");
+    } catch (error: any) {
+      toast.error(error.response?.data.message || "Something went wrong");
+    } finally {
+      setSendComment(false);
+    }
+  };
+
   return (
     <>
       <div className="flex justify-center items-center px-8  pt-8  sm:px-16">
@@ -396,7 +487,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                           </PopoverTrigger>
                           <PopoverContent className="w-[200px] p-0">
                             <Command className="bg-cdark-300 text-white border border-alphaborder">
-                              <CommandInput placeholder="Search Reasons..."/>
+                              <CommandInput placeholder="Search Reasons..." />
                               <CommandList>
                                 <CommandEmpty>No Results found.</CommandEmpty>
                                 <CommandGroup>
@@ -508,6 +599,87 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               </div>
             </div>
           )}
+          {isLoading ? (
+            <Comment_Skeleton />
+          ) : (
+            <div className="py-3">
+              <h1 className="text-base font-semibold mb-4">Comments</h1>
+
+              {currentComments.length === 0 && !isLoading ? (
+                <p className="text-sm text-gray-400 text-center">No comments available</p>
+              ) : (
+                <>
+                  <div className="mb-4">
+                    <select
+                      value={sorting}
+                      onChange={(e) => setSorting(e.target.value)}
+                      className="px-2 py-1 rounded-md text-sm font-semibold cursor-pointer"
+                    >
+                      <option value="newest">Newest</option>
+                      <option value="oldest">Oldest</option>
+                    </select>
+                  </div>
+                  <div className="space-y-7 pl-6">
+                    {currentComments.map((comment, index) => (
+                      <div key={index} className="flex items-start gap-4">
+                        <Avatar size={6} url={comment.author.avatarUrl || ""} />
+                        <div className="border px-3.5 py-2.5 rounded-md border-alphaborder shadow-sm bg-gray-800">
+                          <h4 className="font-semibold text-sm mb-1  text-blue-100">
+                            {comment.author?.username || "Anonymous"}
+                          </h4>
+                          <p className="text-sm">
+                            {comment.content || "No content available"}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-4 items-center mt-4 w-full px-14 justify-evenly">
+                    <button
+                      onClick={handlePrevious}
+                      className="px-4 border-2 py-1 rounded-md font-semibold bg-[#222630] disabled:cursor-not-allowed disabled:bg-gray-700 focus:border-[#596A95] border-[#2B3040]"
+                      disabled={startIndex === 0}
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={handleNext}
+                      className="px-4 border-2 py-1 rounded-md font-semibold bg-[#222630] disabled:cursor-not-allowed disabled:bg-gray-700 focus:border-[#596A95] border-[#2B3040]"
+                      disabled={startIndex + commentsPerPage >= comments.length}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </>
+              )}
+
+              <div className="flex gap-4 items-center mt-4">
+                <Avatar
+                  size={8}
+                  url={currentUserAvatarUrl}
+                  className="border"
+                />
+                <Textarea
+                  value={commentContent}
+                  onChange={(e) => setCommentContent(e.target.value)}
+                  disabled={sendComment ? true : false}
+                  placeholder="Write a comment..."
+                  className="py-2 border border-white font-semibold input-style"
+                  style={{ resize: "vertical", maxHeight: "100px" }}
+                />
+
+                <SendIcon
+                  onClick={handleSendComment}
+                  className={`${
+                    sendComment
+                      ? "pointer-events-none stroke-gray-400 cursor-not-allowed"
+                      : "pointer-events-auto stroke-white hover:stroke-gray-300 cursor-pointer"
+                  } transition-colors duration-300`}
+                />
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col gap-7">
             {currentUserId !== authorId ? (
@@ -516,11 +688,11 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                   <img
                     src={author.avatarUrl}
                     alt=""
-                    className="h-16 w-16 rounded-full border-none"
+                    className="sm:h-16 sm:w-16 w-10 h-10 rounded-full border-none"
                   />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-semibold">
+                  <h1 className="sm:text-2xl font-semibold text-xl">
                     Written by {author.username}
                   </h1>
                   <p className="py-2">53K Followers</p>

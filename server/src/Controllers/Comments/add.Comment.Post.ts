@@ -66,7 +66,17 @@ export async function addComments(c: Context) {
                     authorId,
                     postId,
                     parentId: parentId ?? null
-                }
+                },
+                select: {
+                    content: true,
+                    createdAt: true,
+                    author: {
+                        select: {
+                            username: true,
+                            avatarUrl: true
+                        }
+                    }
+                },
             })
         ]);
 

@@ -218,11 +218,13 @@ export const Avatar = memo(
     size,
     url,
     onClick,
+    className
   }: {
     name?: string;
     size: number;
     url?: string;
     onClick?: any;
+    className?: string;
   }) => {
     return (
       // <div
@@ -238,7 +240,7 @@ export const Avatar = memo(
       <>
         <img
           onClick={onClick}
-          className={`w-${size} border-black border rounded-full bg-white h-${size} flex justify-center items-center font-semibold cursor-pointer`}
+          className={`w-${size} ${className} border-black border rounded-full bg-white h-${size} flex justify-center items-center font-semibold cursor-pointer`}
           src={url}
           loading="lazy"
         />

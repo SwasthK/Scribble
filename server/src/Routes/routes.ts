@@ -62,7 +62,7 @@ import {
 //Import comment Route handlers
 import { removeComment } from '../Controllers/Comments/remove.Comment.Post'
 import { addComments } from '../Controllers/Comments/add.Comment.Post'
-import { getComments } from '../Controllers/Comments/get.Comment.Post'
+import { getComments, getCommentsWithoutReply } from '../Controllers/Comments/get.Comment.Post'
 
 //Import MiddlwWares
 import { authMiddleware } from '../Middleware/Auth'
@@ -140,6 +140,10 @@ api
     //Post Report Routes
     .post('/post/report/:postId', authMiddleware, findActiveUser, reportPost)
 
+    //Comment Routes
+    .post('/comment/add', authMiddleware, findActiveUser, addComments)
+    .get('/comment/getNoReply/:postId', authMiddleware, findActiveUser, getCommentsWithoutReply)
+
     // --------------------------------------------------------------------------
 
     .get('/profile/getFollowersDetails', authMiddleware, findActiveUser, getFollowersDetails)
@@ -182,7 +186,6 @@ api
 
 
     //Comment Routes
-    .post('/comment/add', authMiddleware, findActiveUser, addComments)
     .delete('/comment/remove', authMiddleware, findActiveUser, removeComment)
     .get('/comment/get/:postId', authMiddleware, findActiveUser, getComments)
 
