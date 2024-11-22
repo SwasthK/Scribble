@@ -23,6 +23,7 @@ import { Save } from "./Page/Save";
 import { Archived } from "./Page/Archived";
 import { followAtom } from "./atoms/followAtom";
 import { postsAtom } from "./atoms";
+import { Followers } from "./Page/Followers";
 
 function App() {
   const [user, setUser] = useRecoilState(authAtom);
@@ -123,6 +124,16 @@ function App() {
       element: (
         <ProtectedRoute>
           <Archived />
+        </ProtectedRoute>
+      ),
+      errorElement: <NotFound />,
+    },
+
+    {
+      path: "/user/followers",
+      element: (
+        <ProtectedRoute>
+          <Followers />
         </ProtectedRoute>
       ),
       errorElement: <NotFound />,

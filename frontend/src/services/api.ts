@@ -225,3 +225,51 @@ export const handleUpdateUserSocials = async (socials: any) => {
         }
     }
 }
+
+export const handleGetAllFollowers = async () => {
+    try {
+        const response = await axios.get<any>(
+            `/profile/getFollowersDetails`,
+            {
+                headers: {
+                    accessToken: `Bearer ${localStorage.getItem("accessToken")}`
+                }
+            }
+        );
+
+        if (response.data) {
+            return response.data.data;
+        }
+
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data.message || 'Unexpected error');
+        } else {
+            throw new Error('Something went wrong. Please try again later.');
+        }
+    }
+}
+
+export const handleGetAllFollowings = async () => {
+    try {
+        const response = await axios.get<any>(
+            `/profile/getFollowingsDetails`,
+            {
+                headers: {
+                    accessToken: `Bearer ${localStorage.getItem("accessToken")}`
+                }
+            }
+        );
+
+        if (response.data) {
+            return response.data.data;
+        }
+
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data.message || 'Unexpected error');
+        } else {
+            throw new Error('Something went wrong. Please try again later.');
+        }
+    }
+}
