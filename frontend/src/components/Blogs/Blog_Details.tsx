@@ -270,8 +270,26 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
       toast.error("Please add a detailed reason");
       return;
     }
-    setDialogOpen(false);
-    toast.success("Post reported successfully");
+    try {
+      toast.success("Post reported successfully");
+      setDialogOpen(false);
+      setMessage("");
+      setValue("");
+      await axios.post(
+        `/post/report/${id}`,
+        {
+          type: value,
+          reason: message,
+        },
+        {
+          headers: {
+            accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+    } catch (error: any) {
+      return;
+    }
   };
 
   return (
@@ -334,9 +352,11 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                   <div className="flex gap-8 items-center">
                     <div className="flex items-center gap-3">
                       <LikeIcon
-                        size={24}
+                        size={likeState.isLiked ? 26 : 24}
                         onClick={handleLikeCount}
-                        fill={likeState.isLiked ? "red" : "white"}
+                        fill={likeState.isLiked ? "red" : "none"}
+                        stroke={likeState.isLiked ? "" : "white"}
+                        strokeWidth={likeState.isLiked ? "" : "2"}
                       />
                       {likeState.count > 4 && <p>{likeState.count}</p>}
                     </div>
@@ -347,7 +367,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
 
                     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                       <DialogTrigger>
-                        <ThreeDotsIcon size={18}/>
+                        <ThreeDotsIcon size={18} />
                       </DialogTrigger>
                       <DialogContent className="bg-cdark-300 border border-alphaborder">
                         <DialogHeader>
@@ -376,7 +396,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                           </PopoverTrigger>
                           <PopoverContent className="w-[200px] p-0">
                             <Command className="bg-cdark-300 text-white border border-alphaborder">
-                              <CommandInput placeholder="Search Reasons..." />
+                              <CommandInput placeholder="Search Reasons..."/>
                               <CommandList>
                                 <CommandEmpty>No Results found.</CommandEmpty>
                                 <CommandGroup>
@@ -415,6 +435,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                             Detailed Reason
                           </p>
                           <Textarea
+                            value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             className="py-2 border border-alphaborder"
                             style={{ maxHeight: "100px", resize: "vertical" }}
