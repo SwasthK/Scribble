@@ -142,7 +142,7 @@ export const AppBar = () => {
             label="User"
           />
           <MenuItems icon={SavedIcon} label="Saved" url="/post/saved" />
-          <MenuItems icon={FollowersIcon} label="Followers" />
+          <MenuItems icon={FollowersIcon} label="Followers" url="/user/followers"/>
           <MenuItems icon={DraftIcon} url={"/post/draft"} label="Draft" />
           <MenuItems
             icon={ArchiveIcon}
