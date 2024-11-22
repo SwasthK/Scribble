@@ -1,6 +1,6 @@
 import { SvgIconType } from "../../Types/type";
 
-export const LikeIcon = ({ size, onClick, fill }: SvgIconType) => {
+export const LikeIcon = ({ size, onClick, fill,stroke,strokeWidth }: SvgIconType) => {
   return (
     <svg
       onClick={onClick}
@@ -9,6 +9,8 @@ export const LikeIcon = ({ size, onClick, fill }: SvgIconType) => {
       height={size || "24"}
       viewBox="0 0 24 24"
       fill={fill}
+      stroke={stroke}
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
       className="feather feather-heart cursor-pointer"
