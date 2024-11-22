@@ -76,6 +76,7 @@ import { DraftPostBodyParse, publishPostBodyParse, signupBodyParse, updateAvatar
 import { handleSavePost } from 'Controllers/Posts/Save/save.Post'
 import { getSavedPost } from 'Controllers/Posts/Save/getSavedPost'
 import { updateUserSocials } from 'Controllers/Socials/socials'
+import { reportPost } from 'Controllers/Report'
 
 const api = new Hono();
 
@@ -135,11 +136,14 @@ api
     //Follow Routes
     .post('/user/profile/:id/follow', authMiddleware, findActiveUser, FollowUser)
     .delete('/user/profile/:id/unfollow', authMiddleware, findActiveUser, UnFollowUser)
-    .get('/profile/getFollowersDetails', authMiddleware, findActiveUser, getFollowersDetails)
-    .get('/profile/getFollowingsDetails', authMiddleware, findActiveUser, getFollowingsDetails)
+
+    //Post Report Routes
+    .post('/post/report/:postId', authMiddleware, findActiveUser, reportPost)
 
     // --------------------------------------------------------------------------
 
+    .get('/profile/getFollowersDetails', authMiddleware, findActiveUser, getFollowersDetails)
+    .get('/profile/getFollowingsDetails', authMiddleware, findActiveUser, getFollowingsDetails)
 
     //Post Routes
     // .put('/post/updateDraftPost', authMiddleware, findActiveUser, updateDraftPost)
