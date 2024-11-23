@@ -117,6 +117,7 @@ api
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/getBy/authorId/:authorId', authMiddleware, findActiveUser, getPostByAuthorId)
     .get('/posts/getBy/slug/:postSlug', authMiddleware, findActiveUser, getPostBySlug)
+    .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
 
     // Save & Unsave Post
     .get("/posts/saved/getAll", authMiddleware, findActiveUser, getSavedPost)
@@ -155,7 +156,6 @@ api
 
     .get('/posts/getBy/title/:postTitle', authMiddleware, findActiveUser, getPostByTitle)
     .get('posts/published', authMiddleware, findActiveUser, getPublishedPost)
-    .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
 
     // .post('/posts/upsert', authMiddleware, findActiveUser, upSertDraftPost)
 
