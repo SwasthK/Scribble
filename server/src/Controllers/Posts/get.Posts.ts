@@ -483,19 +483,20 @@ export async function getUserPosts(c: Context) {
                 shortCaption: true,
                 coverImage: true,
                 createdAt: true,
+                authorId: true,
             }
         });
 
         return apiResponse(c, 200, {
             posts, currentPage: page, totalPages, totalPosts,
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                avatarUrl: user.avatarUrl,
-                bio: user.bio,
-                createdAt: user.createdAt
-            }
+            // user: {
+            //     id: user.id,
+            //     username: user.username,
+            //     email: user.email,
+            //     avatarUrl: user.avatarUrl,
+            //     bio: user.bio,
+            //     createdAt: user.createdAt
+            // }
         }, "Posts fetched successfully");
 
     } catch (error: any) {
