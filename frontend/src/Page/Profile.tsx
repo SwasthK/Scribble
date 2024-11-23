@@ -360,7 +360,7 @@ export const Profile = () => {
     <>
       <AppBar />
 
-      <div className="w-screen lg:px-24 pb-8 text-white">
+      <div className="w-screen lg:px-24 pb-10 text-white">
         <div className="relative px-8 py-8  flex border-b-[1px] border-[#ffffff3f] shadow-sm items-center gap-8 max-w-[60rem]">
           <Avatar
             url={userData.avatarUrl}
