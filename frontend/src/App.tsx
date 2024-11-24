@@ -24,6 +24,7 @@ import { Archived } from "./Page/Archived";
 import { followAtom } from "./atoms/followAtom";
 import { postsAtom } from "./atoms";
 import { Followers } from "./Page/Followers";
+import { ProfileView } from "./Page/ProfileView";
 
 function App() {
   const [user, setUser] = useRecoilState(authAtom);
@@ -134,6 +135,16 @@ function App() {
       element: (
         <ProtectedRoute>
           <Followers />
+        </ProtectedRoute>
+      ),
+      errorElement: <NotFound />,
+    },
+
+    {
+      path: "/view/profile/:username",
+      element: (
+        <ProtectedRoute>
+          <ProfileView />
         </ProtectedRoute>
       ),
       errorElement: <NotFound />,
