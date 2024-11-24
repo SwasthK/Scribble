@@ -2,6 +2,7 @@ import { Context } from "hono";
 import { apiError } from "../../utils/apiError";
 import { apiResponse } from "../../utils/apiResponse";
 import { PostStatus } from "@prisma/client";
+import { usernameSchema } from "Zod/zod";
 
 
 export async function getPostById(c: Context) {
@@ -129,6 +130,52 @@ export async function getPostByAuthorId(c: Context) {
         }
 
         return apiResponse(c, 200, post, "Post fetched successfully");
+
+    } catch (error: any) {
+        console.log("Get Post By UserId Error: ", error.message);
+        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+    }
+}
+
+export async function getPostByUsername(c: Context) {
+    //Used
+
+    try {
+        const currentUser = c.get("user");
+        const username = c.req.param('username');
+
+        const parseUsername = usernameSchema.safeParse(username);
+        if (!parseUsername.success) {
+            return apiError(c, 400, parseUsername.error.errors[0].message);
+        }
+
+        // if (currentUser.username === username) {
+        //     return apiError(c, 400, "You can't view your own posts");
+        // }
+
+        const prisma: any = c.get('prisma');
+
+        const user = await prisma.post.findMany({
+            where: {
+                author: { username },
+                status: PostStatus.PUBLISHED
+            },
+            select: {
+                coverImage: true,
+                title: true,
+                slug: true,
+                updatedAt: true,
+            },
+            orderBy: {
+                updatedAt: 'desc'
+            },
+        });
+
+        if (!user) { return apiError(c, 404, "User not found"); }
+
+        console.log(user);
+
+        return apiResponse(c, 200, user, "Post fetched successfully");
 
     } catch (error: any) {
         console.log("Get Post By UserId Error: ", error.message);
@@ -483,19 +530,20 @@ export async function getUserPosts(c: Context) {
                 shortCaption: true,
                 coverImage: true,
                 createdAt: true,
+                authorId: true,
             }
         });
 
         return apiResponse(c, 200, {
             posts, currentPage: page, totalPages, totalPosts,
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                avatarUrl: user.avatarUrl,
-                bio: user.bio,
-                createdAt: user.createdAt
-            }
+            // user: {
+            //     id: user.id,
+            //     username: user.username,
+            //     email: user.email,
+            //     avatarUrl: user.avatarUrl,
+            //     bio: user.bio,
+            //     createdAt: user.createdAt
+            // }
         }, "Posts fetched successfully");
 
     } catch (error: any) {

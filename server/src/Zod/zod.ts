@@ -27,7 +27,7 @@ const passwordSchema = z.string({
     .refine(value => /\d/.test(value), { message: 'Password must contain at least one number' })
     .refine(value => /[@$!%*?&]/.test(value), { message: 'Password must contain at least one special character' });
 
-const usernameSchema = z.string({
+export const usernameSchema = z.string({
     required_error: "Username is required",
     invalid_type_error: "Invalid username",
 })
@@ -39,7 +39,6 @@ const usernameSchema = z.string({
     .refine(value => /^[a-zA-Z_]+$/.test(value), {
         message: 'Username must only contain letters (a-z, A-Z) and underscores',
     });
-
 
 const bioSchema = z.string({
     required_error: "Bio is required",

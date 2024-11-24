@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { UseFormatDate } from "../../Hooks/Blogs/Format_Date";
-import { Avatar } from "./Blog_Card";
 import { useInView } from "react-intersection-observer";
 import { useGetPostByAuthorId } from "../../services/queries";
 import { Blog_Recommendation_Skeleton } from "../../Skeleton/Blog_Recommendation_Skeleton";
@@ -46,6 +45,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Textarea } from "../ui/textarea";
 import { ThreeDotsIcon } from "../../assets/svg/ThreeDotsIcon";
 import { Comment_Skeleton } from "../../Skeleton/Comment_Skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const reportCategories = [
   {
@@ -406,10 +406,16 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               } `}
             >
               <div className="flex gap-4 items-center justify-center">
-                <Avatar size={10} url={author.avatarUrl} />
+                {/* <Avatar size={10} url={} /> */}
+                <Avatar>
+                  <AvatarImage src={author.avatarUrl} />
+                  <AvatarFallback>{author.username.slice(0, 3)}</AvatarFallback>
+                </Avatar>
                 <div>
                   <div className="justify-between flex items-center mb-1">
-                    <p>{author.username}</p>
+                    <Link to={`/view/profile/${author.username}`}>
+                      {author.username}
+                    </Link>
 
                     {currentUserId !== authorId && (
                       <button
@@ -606,7 +612,9 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               <h1 className="text-base font-semibold mb-4">Comments</h1>
 
               {currentComments.length === 0 && !isLoading ? (
-                <p className="text-sm text-gray-400 text-center">No comments available</p>
+                <p className="text-sm text-gray-400 text-center">
+                  No comments available
+                </p>
               ) : (
                 <>
                   <div className="mb-4">
@@ -622,7 +630,13 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                   <div className="space-y-7 pl-6">
                     {currentComments.map((comment, index) => (
                       <div key={index} className="flex items-start gap-4">
-                        <Avatar size={6} url={comment.author.avatarUrl || ""} />
+                        <Avatar>
+                          <AvatarImage src={comment.author.avatarUrl} />
+                          <AvatarFallback>
+                            {comment.author.username.slice(0, 3)}
+                          </AvatarFallback>
+                        </Avatar>
+
                         <div className="border px-3.5 py-2.5 rounded-md border-alphaborder shadow-sm bg-gray-800">
                           <h4 className="font-semibold text-sm mb-1  text-blue-100">
                             {comment.author?.username || "Anonymous"}
@@ -655,11 +669,9 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               )}
 
               <div className="flex gap-4 items-center mt-4">
-                <Avatar
-                  size={8}
-                  url={currentUserAvatarUrl}
-                  className="border"
-                />
+                <Avatar>
+                  <AvatarImage src={currentUserAvatarUrl} />
+                </Avatar>
                 <Textarea
                   value={commentContent}
                   onChange={(e) => setCommentContent(e.target.value)}
@@ -804,7 +816,10 @@ export const Blog_Recommendation = ({
         </div>
         <div className="flex flex-col ">
           <div className="flex gap-4 items-center">
-            <Avatar size={6} url={author.avatarUrl} />
+            <Avatar>
+              <AvatarImage src={author.avatarUrl} />
+              <AvatarFallback>{author.username.slice(0, 3)}</AvatarFallback>
+            </Avatar>
             <p>{author.username}</p>
           </div>
           <p className="text-xl font-bold mt-5 mb-2">{title}</p>

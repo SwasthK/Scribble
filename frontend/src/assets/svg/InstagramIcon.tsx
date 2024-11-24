@@ -2,9 +2,9 @@ import { memo } from "react";
 import { SvgIconType } from "../../Types/type";
 import { Link } from "react-router-dom";
 
-export const InstagramIcon = memo(({ size, url }: SvgIconType) => {
+export const InstagramIcon = memo(({ size, url,target }: SvgIconType) => {
   return (
-    <Link to={url || ""}>
+    <Link to={url || ""} target={target || "_self"}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width={size || 24}

@@ -1,7 +1,7 @@
-import { Avatar, Blog_Card } from "../components/Blogs/Blog_Card";
+import { Blog_Card } from "../components/Blogs/Blog_Card";
 import { AppBar } from "../components/AppBar/AppBar";
 import { useInView } from "react-intersection-observer";
-
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Blogs_Skeleton } from "../Skeleton/Blogs_Skeleton";
 import { useEffect, memo } from "react";
 import { Link } from "react-router-dom";
@@ -127,7 +127,12 @@ const TopPicks = memo(({ blogs }: any) => {
                 className="flex flex-col gap-2 justify-center cursor-pointer"
               >
                 <div className="flex gap-4">
-                  <Avatar size={6} url={blog.author.avatarUrl} />
+                  <Avatar className="h-1">
+                    <AvatarImage src={blog.author.avatarUrl} />
+                    <AvatarFallback>
+                      {blog.author.username.slice(0, 3)}
+                    </AvatarFallback>
+                  </Avatar>
                   <h1 className="capitalize text-[0.850rem]">
                     {blog.author?.username || "Unknown Author"}
                   </h1>
@@ -243,7 +248,12 @@ const FollowRecommendation = memo(({ blogs }: any) => {
               className="flex gap-2 justify-between items-center cursor-pointer"
             >
               <div className="flex gap-4 items-center ">
-                <Avatar size={7} url={blog.author.avatarUrl} />
+                <Avatar>
+                  <AvatarImage src={blog.author.avatarUrl} />
+                  <AvatarFallback>
+                    {blog.author.username.slice(0, 3)}
+                  </AvatarFallback>
+                </Avatar>
                 <h1 className="capitalize text-lg">
                   {blog.author.username.length > 10
                     ? blog.author.username.substring(0, 10) + "..."

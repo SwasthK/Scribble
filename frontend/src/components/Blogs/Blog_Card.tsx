@@ -7,6 +7,7 @@ import axios from "axios";
 import { debounce } from "../../Page/NoveEditor";
 import { trimTitle } from "../../utils/trimTitle";
 import toast from "react-hot-toast";
+import { Avatar as ShadcnAvatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface Blog_CardProps {
   id: string;
@@ -117,21 +118,24 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
           className="text-white py-10 w-full border-b-[0.01rem] border-[#9ca3af2b] cursor-pointer flex items-center gap-6 md:gap-12 lg:gap-8"
         >
           <div className="w-[75%] sm:w-[73%] md:w-[70%] lg:w-[78%] xl:w-[70%]">
-            <Link
-              to={`/profile/@${author.username}`}
-              className="flex gap-2 items-center mb-3"
-            >
-              <div className="flex gap-2 items-center">
-                <Avatar url={author.avatarUrl} size={6} />
+            <div className="flex gap-2 items-center mb-3">
+              <Link
+                to={`/view/profile/${author.username}`}
+                className="flex gap-2 items-center"
+              >
+                <ShadcnAvatar className="h-6 w-6">
+                  <AvatarImage src={author.avatarUrl} />
+                  <AvatarFallback>{author.username.slice(0, 3)}</AvatarFallback>
+                </ShadcnAvatar>
                 <h1 className="capitalize text-[0.850rem]">
                   {author.username}
                 </h1>
-              </div>
+              </Link>
               <span className="font-bold ">&#183;</span>
-              <h1 className="text-xs sm:text-sm text-[#9CA3AF] capitalize">
+              <h1 className="text-xs sm:text-sm text-[#9CA3AF] capitalize cursor-auto">
                 {formattedDate}
               </h1>
-            </Link>
+            </div>
 
             <Link
               state={{
@@ -218,7 +222,7 @@ export const Avatar = memo(
     size,
     url,
     onClick,
-    className
+    className,
   }: {
     name?: string;
     size: number;

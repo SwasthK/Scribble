@@ -46,6 +46,7 @@ export type SvgIconType = {
     fill?: string,
     stroke?: string,
     strokeWidth?: string;
+    target?: string;
 }
 
 export interface updateUserProfileMetaData {

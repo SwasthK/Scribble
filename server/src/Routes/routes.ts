@@ -27,7 +27,8 @@ import {
     getPostBySlug,
     getPostByAuthorId,
     getDraftedPostShortned,
-    getDraftedPostFullContentById
+    getDraftedPostFullContentById,
+    getPostByUsername
 } from '../Controllers/Posts/get.Posts'
 import { deleteDraftBulk, deleteDraftPostById, deletePublishedPostById } from '../Controllers/Posts/delete.Post'
 
@@ -77,6 +78,7 @@ import { handleSavePost } from 'Controllers/Posts/Save/save.Post'
 import { getSavedPost } from 'Controllers/Posts/Save/getSavedPost'
 import { updateUserSocials } from 'Controllers/Socials/socials'
 import { reportPost } from 'Controllers/Report'
+import { getUserDetailsByUsername } from 'Controllers/User/user'
 
 const api = new Hono();
 
@@ -100,6 +102,9 @@ api
 
     // ---------------------------------------------------------------------
 
+    // User Details Routes
+    .get('/user/getBy/username/:username', authMiddleware, findActiveUser, getUserDetailsByUsername)
+
     // Draft Routes
     .get('/posts/drafts/shortened', authMiddleware, findActiveUser, getDraftedPostShortned)
     .get('/posts/drafts/fullContent/:postId', authMiddleware, findActiveUser, getDraftedPostFullContentById)
@@ -116,7 +121,9 @@ api
     // Post Manipulations
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/getBy/authorId/:authorId', authMiddleware, findActiveUser, getPostByAuthorId)
+    .get('/posts/getBy/username/:username', authMiddleware, findActiveUser, getPostByUsername)
     .get('/posts/getBy/slug/:postSlug', authMiddleware, findActiveUser, getPostBySlug)
+    .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
 
     // Save & Unsave Post
     .get("/posts/saved/getAll", authMiddleware, findActiveUser, getSavedPost)
@@ -155,7 +162,6 @@ api
 
     .get('/posts/getBy/title/:postTitle', authMiddleware, findActiveUser, getPostByTitle)
     .get('posts/published', authMiddleware, findActiveUser, getPublishedPost)
-    .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
 
     // .post('/posts/upsert', authMiddleware, findActiveUser, upSertDraftPost)
 

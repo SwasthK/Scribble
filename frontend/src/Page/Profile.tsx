@@ -50,6 +50,8 @@ export const Profile = () => {
 
   const pageCount = data ? Math.ceil(data.totalPosts / 6) : 6;
 
+  console.log(data);
+
   useEffect(() => {
     if (state?.section === pageSection.ABOUT) {
       setSection(pageSection.ABOUT);
@@ -60,7 +62,7 @@ export const Profile = () => {
     } else {
       setSection(pageSection.ABOUT);
     }
-    
+
     if (location.state) {
       navigate(location.pathname, { replace: true, state: null });
     }
@@ -358,7 +360,7 @@ export const Profile = () => {
     <>
       <AppBar />
 
-      <div className="w-screen lg:px-24 pb-8 text-white">
+      <div className="w-screen lg:px-24 pb-10 text-white">
         <div className="relative px-8 py-8  flex border-b-[1px] border-[#ffffff3f] shadow-sm items-center gap-8 max-w-[60rem]">
           <Avatar
             url={userData.avatarUrl}
@@ -498,8 +500,9 @@ export const Profile = () => {
                           <UserBlogs
                             onDeleteAndArchive={handleDeleteAndArchivePost}
                             key={blog.id}
+                            currentUserId={userData.id}
                             id={blog.id}
-                            userId={data?.user.id}
+                            authorId={blog.authorId}
                             title={blog.title}
                             shortCaption={blog.shortCaption}
                             url={blog.coverImage}
@@ -695,6 +698,8 @@ export const Profile = () => {
 
 export const UserBlogs = memo(
   ({
+    authorId,
+    currentUserId,
     id,
     title,
     shortCaption,
@@ -703,6 +708,8 @@ export const UserBlogs = memo(
     slug,
     onDeleteAndArchive,
   }: {
+    currentUserId?: number | string;
+    authorId?: number | string;
     id: string;
     userId?: number | string;
     title: string;
@@ -796,28 +803,30 @@ export const UserBlogs = memo(
            
           </div> */}
         </Link>
-        <div className="flex justify-end items-center w-full px-4 gap-6">
-          <button
-            onClick={() => handleDeleteAndArchive({ action: "delete" })}
-            className="p-1 rounded-full hover:bg-[#334155]"
-          >
-            <TrashIcon
-              className={"cursor-pointer"}
-              size={15}
-              color={"orange"}
-            />
-          </button>
-          <button
-            onClick={() => handleDeleteAndArchive({ action: "archive" })}
-            className="p-1 rounded-full hover:bg-[#334155]"
-          >
-            <ArchiveIcon
-              className={"cursor-pointer"}
-              size={15}
-              color={"white"}
-            />
-          </button>
-        </div>
+        {currentUserId === authorId && (
+          <div className="flex justify-end items-center w-full px-4 gap-6">
+            <button
+              onClick={() => handleDeleteAndArchive({ action: "delete" })}
+              className="p-1 rounded-full hover:bg-[#334155]"
+            >
+              <TrashIcon
+                className={"cursor-pointer"}
+                size={15}
+                color={"orange"}
+              />
+            </button>
+            <button
+              onClick={() => handleDeleteAndArchive({ action: "archive" })}
+              className="p-1 rounded-full hover:bg-[#334155]"
+            >
+              <ArchiveIcon
+                className={"cursor-pointer"}
+                size={15}
+                color={"white"}
+              />
+            </button>
+          </div>
+        )}
       </div>
     );
   }
