@@ -146,6 +146,7 @@ model Revision {
 
 model Category {
   id        String   @id @default(uuid())
+  head      String
   name      String   @unique
   slug      String   @unique
   posts     Post[]   @relation("PostCategories")
@@ -179,8 +180,6 @@ model Comment {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
-
-
 
 enum Role {
   USER
