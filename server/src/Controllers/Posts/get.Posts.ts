@@ -531,8 +531,11 @@ export async function getUserPosts(c: Context) {
                 coverImage: true,
                 createdAt: true,
                 authorId: true,
+                categories:true
             }
         });
+
+        console.log(posts);
 
         return apiResponse(c, 200, {
             posts, currentPage: page, totalPages, totalPosts,

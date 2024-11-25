@@ -78,14 +78,14 @@ body {
 }
 
 
-.gr {
+.card-gradient-1{
   background: #22c1c3;
   background: -webkit-linear-gradient(to right, #fdbb2d, #22c1c3);
   background: linear-gradient(to right, #fdbb2d, #22c1c3);
   transition: all 5s ease-in-out;
 }
 
-.gr:hover {
+.card-gradient-1:hover {
   background: #22c1c3;
   background: -webkit-linear-gradient(to right, #ebb237, #18a7aa);
   background: linear-gradient(to right, #f3b228, #04eff3);
@@ -96,7 +96,6 @@ body {
   background: linear-gradient(to top right, rgb(7 16 45), rgb(58 60 84));
   background: -webkit-linear-gradient(to top right, rgb(7 16 45), rgb(58 60 84));
 }
-
 
 
 .wrapper {

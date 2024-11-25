@@ -10,7 +10,7 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { GitHubIcon } from "../assets/svg/GitHubIcon";
 import { InstagramIcon } from "../assets/svg/InstagramIcon";
 import { TwitterIcon } from "../assets/svg/TwitterIcon";
-import { memo, useEffect, useState } from "react";
+import { memo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 
 import {
@@ -26,13 +26,8 @@ import { RefreshIcon } from "../assets/svg/RefreshIcon";
 export const ProfileView = () => {
   const { username } = useParams<{ username: string }>();
 
-  const [show, isshow] = useState(false);
-
   const { data, refetch, isLoading, error, isError, isRefetching } =
     useGetUserProfileDetailsAndPostsDetails(username || "");
-  useEffect(() => {
-    console.log("DATA : ", data);
-  }, [data]);
 
   return (
     <>

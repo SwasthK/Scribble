@@ -144,9 +144,9 @@ const DraftCard = ({
           : "Untitled"}
       </h5>
 
-      <p className="mb-3 font-normal text-gray-400 border bg-white">
+      <p className="mb-3 font-normal text-gray-400">
         <ReactTimeAgo
-         date={Date.now() - 3600 * 1000} 
+          date={new Date(date)}
           locale="en-US"
           timeStyle={"round-minute"}
           updateInterval={1000}

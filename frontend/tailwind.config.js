@@ -8,7 +8,7 @@ export default {
 	theme: {
 		extend: {
 			colors: {
-				alphaborder: '#272727',
+
 				cgray: '#d9c9c9',
 				cgreen: '#4BB543',
 				background: 'hsl(var(--background))',
@@ -51,6 +51,10 @@ export default {
 					'4': 'hsl(var(--chart-4))',
 					'5': 'hsl(var(--chart-5))'
 				}
+			},
+			borderColor: {
+				alphaborder: '#272727',
+				'b-dark-100': '#596A95'
 			},
 			backgroundColor: {
 				'cdark-100': '#161616',

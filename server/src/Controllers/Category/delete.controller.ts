@@ -57,3 +57,25 @@ export async function deleteCategory(c: Context) {
         return apiError(c, 500, "Internal Server Error");
     }
 }
+
+export async function deleteAllCategory(c: Context) {
+
+    try {
+        const user = c.get('user');
+        console.log(user);
+
+        if (user.role !== userRole.ADMIN) {
+            return apiError(c, 403, "Unauthorized - Only admins can delete categories");
+        }
+
+        const prisma: any = await c.get("prisma");
+        const deletedCategory = await prisma.category.deleteMany({
+
+        });
+
+        return apiResponse(c, 200, deletedCategory, "Category deleted successfully");
+    } catch (error: any) {
+        console.error("Category Delete Route: ", error.message);
+        return apiError(c, 500, "Internal Server Error");
+    }
+}

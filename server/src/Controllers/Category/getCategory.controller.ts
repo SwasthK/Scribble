@@ -53,13 +53,13 @@ export async function getCategory(c: Context) {
 export async function getAllCategory(c: Context) {
 
     try {
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get("prisma");
 
-        const category = await prisma.category.findMany({})
+        const category = await prisma.category.findMany({
+            select: { id: true, head: true, name: true }
+        })
 
-        if (!category) {
-            return apiError(c, 400, "Could'nt fetch categories")
-        }
+        if (!category) { return apiError(c, 400, "Could'nt fetch categories") }
 
         return apiResponse(c, 200, category, "Catgeories fetched successfully")
 
