@@ -36,7 +36,7 @@ import { deleteDraftBulk, deleteDraftPostById, deletePublishedPostById } from '.
 import { createCategory } from '../Controllers/Category/create.controller'
 import { getAllCategory, getCategory } from '../Controllers/Category/getCategory.controller'
 import { updateCategory } from '../Controllers/Category/update.controller'
-import { deleteCategory } from '../Controllers/Category/delete.controller'
+import { deleteAllCategory, deleteCategory } from '../Controllers/Category/delete.controller'
 
 //Import Tag Route handlers
 import { createTag } from '../Controllers/Tags/create.controller'
@@ -153,6 +153,14 @@ api
     .post('/comment/add', authMiddleware, findActiveUser, addComments)
     .get('/comment/getNoReply/:postId', authMiddleware, findActiveUser, getCommentsWithoutReply)
 
+    //Category Routes
+    .get('/category/getall', authMiddleware, findActiveUser, getAllCategory)
+    .post('/category/create', authMiddleware, findActiveUser, createCategory)
+    .put('/category/update', authMiddleware, findActiveUser, updateCategory)
+    .delete('/category/delete', authMiddleware, findActiveUser, deleteCategory)
+    .get('/category/get', authMiddleware, findActiveUser, getCategory)
+    .delete('/category/deleteAll', authMiddleware, findActiveUser, deleteAllCategory)
+
     // --------------------------------------------------------------------------
 
 
@@ -172,12 +180,6 @@ api
     .get('/notification/getUserNotifications', authMiddleware, findActiveUser, getUserNotifications)
     .put('/notification/markNotificationAsRead/:id', authMiddleware, findActiveUser, markNotificationAsRead)
 
-    //Category Routes
-    .post('/category/create', authMiddleware, findActiveUser, createCategory)
-    .put('/category/update', authMiddleware, findActiveUser, updateCategory)
-    .delete('/category/delete', authMiddleware, findActiveUser, deleteCategory)
-    .get('/category/getall', authMiddleware, findActiveUser, getAllCategory)
-    .get('/category/get', authMiddleware, findActiveUser, getCategory)
 
     //Tag Routes
     .post('/tag/create', authMiddleware, findActiveUser, createTag)
