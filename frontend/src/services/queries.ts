@@ -1,5 +1,5 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { getAllPosts, getAllUserArchivedPosts, getAllUserSavedPosts, getDraftPost, getDraftPostFullContentByPostId, getPostByAuthorId, getPostBySlug, getUserPosts, handleGetAllFollowers, handleGetAllFollowings, handleGetUserPostsDetailsByUsername, handleGetUserProfileDetailsByUsername } from "./api";
+import { getAllPosts, getAllUserArchivedPosts, getAllUserSavedPosts, getDraftPost, getDraftPostFullContentByPostId, getPostByAuthorId, getPostBySlug, getUserPosts, handleGetAllCategories, handleGetAllFollowers, handleGetAllFollowings, handleGetUserPostsDetailsByUsername, handleGetUserProfileDetailsByUsername } from "./api";
 
 export function useGetAllPosts() {
     return useInfiniteQuery(
@@ -120,6 +120,16 @@ export function useGetUserProfileDetailsAndPostsDetails(username: string) {
         },
         retry: false,
         staleTime: 0,
+        refetchOnWindowFocus: false,
+    })
+}
+
+export function useGetAllCategories() {
+    return useQuery({
+        queryKey: ["getAllCategories"],
+        queryFn: () => handleGetAllCategories(),
+        retry: false,
+        staleTime: Infinity,
         refetchOnWindowFocus: false,
     })
 }
