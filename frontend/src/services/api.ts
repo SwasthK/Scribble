@@ -144,6 +144,9 @@ export const getDraftPost = async () => {
 
 export const getDraftPostFullContentByPostId = async ({ postId }: { postId: string | null }) => {
     try {
+        if (!postId) {
+            throw new Error("Post Id is required");
+        }
         const response = await axios.get<any>(`/posts/drafts/fullContent/${postId || ''}`, {
             headers: {
                 accessToken: `Bearer ${localStorage.getItem("accessToken")}`
@@ -308,6 +311,31 @@ export const handleGetUserPostsDetailsByUsername = async ({ username }: { userna
         }
         const response = await axios.get<any>(
             `/posts/getBy/username/${username}`,
+            {
+                headers: {
+                    accessToken: `Bearer ${localStorage.getItem("accessToken")}`
+                }
+            }
+        );
+
+        if (response.data) {
+            return response.data.data;
+        }
+
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data.message || 'Unexpected error');
+        } else {
+            throw new Error('Something went wrong. Please try again later.');
+        }
+    }
+}
+
+export const handleGetAllCategories = async () => {
+    try {
+
+        const response = await axios.get<any>(
+            `/category/getall`,
             {
                 headers: {
                     accessToken: `Bearer ${localStorage.getItem("accessToken")}`
