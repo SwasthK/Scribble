@@ -5,18 +5,33 @@ import { apiError } from "../../utils/apiError";
 import { Role as userRole } from "@prisma/client";
 
 import z from "zod";
-import { dbConnect } from "../../Connection/db.connect";
 
-export const categoryNamesSchema = z.array(
-    z.string({
-        required_error: "Category name is required",
-        invalid_type_error: "Category name must be a string"
-    })
-        .min(4, { message: "Category name must be at least 4 characters long" })
-        .max(30, { message: "Category name must be at most 30 characters long" }),
-    { message: "Category is Required" }
-).nonempty({ message: "At least one category name is required" });
-
+export const categoryNamesSchema = z.object({
+    head: z.enum([
+        "technology",
+        "lifestyle",
+        "business",
+        "health & wellness",
+        "food & recipes",
+        "travel",
+        "education",
+        "personal development",
+        "finance",
+        "entertainment"
+    ], {
+        required_error: "Category head is required", invalid_type_error: "Category head must be a string",
+        message: "Category head is Required"
+    }),
+    categories: z.array(
+        z.string({
+            required_error: "Category name is required",
+            invalid_type_error: "Category name must be a string"
+        })
+            .min(4, { message: "Category name must be at least 4 characters long" })
+            .max(30, { message: "Category name must be at most 30 characters long" }),
+        { message: "Category is Required" }
+    ).nonempty({ message: "At least one category name is required" })
+})
 
 export async function createCategory(c: Context) {
 
@@ -27,32 +42,25 @@ export async function createCategory(c: Context) {
     }
 
     try {
-        const { categories } = await c.req.json();
 
-        if (!categories) {
-            return apiError(c, 400, "Categories are required")
-        }
+        const response = categoryNamesSchema.safeParse(await c.req.json());
 
-        const response = categoryNamesSchema.safeParse(categories);
-
-        if (!response.success) {
-            return apiError(c, 400, response.error.errors[0].message);
-        }
+        if (!response.success) { return apiError(c, 400, response.error.errors[0].message); }
 
         const results = [];
 
-        const prisma: any = await dbConnect(c)
+        const prisma: any = await c.get('prisma');
 
-        for (const name of categories) {
+        for (const name of response.data.categories) {
             const slug = createSlug(name, 25);
 
             const category = await prisma.category.upsert({
                 where: { slug },
-                update: { name, slug },
-                create: { name, slug }
+                update: { head: response.data.head, name, slug },
+                create: { head: response.data.head, name, slug }
             })
 
-            results.push({ id: category.id, name: category.name, slug: category.slug })
+            results.push({ head: category.head, id: category.id, name: category.name, slug: category.slug })
 
         }
 
