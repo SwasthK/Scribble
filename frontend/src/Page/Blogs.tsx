@@ -69,8 +69,8 @@ export const Blogs = () => {
               ))}
 
               <SideBarBanner
-                title="Noteworthy technology acquisitions 2021"
-                caption="Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order."
+                title="Understanding the Power of React"
+                caption=" React simplifies building user interfaces with its component-based approach. Learn how to create dynamic web applications effortlessly."
                 path=""
               />
               <TopicGrid />
@@ -115,42 +115,43 @@ const TopPicks = memo(({ blogs }: any) => {
   return (
     <>
       {Array.isArray(blogs) && blogs.length > 0 ? (
-        <div>
-          <h1 className="text-yellow-400 font-semibold text-lg mb-4">
+        <div className="pt-2">
+          <h1 className=" font-semibold text-base mb-4 ml-2">
             Top Picks
           </h1>
 
-          <div className="flex gap-6 flex-col">
+          <div className="flex gap-6 flex-col border px-4  py-3 rounded-xl   bg-cdark-200  border-b-dark-100">
             {blogs.slice(0, 3).map((blog: any, index: number) => (
-              <div
+              <Link
+                to={`/blog/${blog.slug}`}
                 key={index}
-                className="flex flex-col gap-2 justify-center cursor-pointer"
+                className="flex flex-col gap-2 justify-center cursor-pointer "
               >
-                <div className="flex gap-4">
-                  <Avatar className="h-1">
+                <div className="flex gap-4  w-fit pr-4">
+                  <Avatar className="h-5 w-5">
                     <AvatarImage src={blog.author.avatarUrl} />
                     <AvatarFallback>
-                      {blog.author.username.slice(0, 3)}
+                      {blog.author?.username.slice(0, 3)}
                     </AvatarFallback>
                   </Avatar>
-                  <h1 className="capitalize text-[0.850rem]">
+                  <h1 className="capitalize text-[0.850rem] text-neutral-100 font-medium">
                     {blog.author?.username || "Unknown Author"}
                   </h1>
                 </div>
-                <h1 className="font-bold text-lg text-wrap break-words lg:text-base xl:text-base">
+                <h1 className="font-bold text-lg text-wrap break-words lg:text-base xl:text-md">
                   {blog.title.length > 55
                     ? blog.title.substring(0, 45) + " ..."
                     : blog.title}
                 </h1>
-              </div>
+              </Link>
             ))}
           </div>
-
+          {/* 
           <div className="mt-3">
             <Link to={""} className="underline">
               See more
             </Link>
-          </div>
+          </div> */}
         </div>
       ) : null}
     </>
@@ -224,9 +225,9 @@ const SideBarBanner = memo(
       <>
         <Link
           to={path}
-          className="block max-w-sm p-8 rounded-lg shadow hover:bg-gray-100 gr"
+          className="block max-w-sm px-5 py-7 rounded-lg  hover:bg-gray-100  card-gradient-1"
         >
-          <h5 className="mb-5 text-2xl font-bold tracking-tight text-gray-900 ">
+          <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ">
             {title}
           </h5>
           <p className="font-normal text-gray-700 ">{caption}</p>
@@ -241,28 +242,30 @@ const FollowRecommendation = memo(({ blogs }: any) => {
     <>
       {Array.isArray(blogs) && blogs.length > 0 ? (
         <div className="space-y-8">
-          <h1 className="text-zinc-200 font-semibold text-lg">Who to follow</h1>
+          <h1 className="text-zinc-200  font-semibold text-base mb-4 ml-2">Who to follow</h1>
           {blogs.slice(0, 3).map((blog: any, index: number) => (
             <div
               key={index}
-              className="flex gap-2 justify-between items-center cursor-pointer"
+              className="flex gap-4 justify-between items-center cursor-pointer"
             >
-              <div className="flex gap-4 items-center ">
-                <Avatar>
+              <Link
+              to={`/view/profile/${blog.author.username}`}
+              className="flex gap-4 items-center rounded-xl border border-b-dark-100 w-full bg-cdark-200 px-3 py-1">
+                <Avatar className="h-7 w-7">
                   <AvatarImage src={blog.author.avatarUrl} />
                   <AvatarFallback>
                     {blog.author.username.slice(0, 3)}
                   </AvatarFallback>
                 </Avatar>
-                <h1 className="capitalize text-lg">
+                <h1 className="capitalize text-[0.9rem] ">
                   {blog.author.username.length > 10
                     ? blog.author.username.substring(0, 10) + "..."
                     : blog.author.username}
                 </h1>
-              </div>
+              </Link>
               <button
                 type="button"
-                className="px-4 py-1 text-black bg-white font-semibold rounded-md text-sm cursor-pointer"
+                className="px-5 py-2 text-black bg-white font-bold   rounded-xl  text-sm cursor-pointer"
               >
                 Follow
               </button>
