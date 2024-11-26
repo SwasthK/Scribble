@@ -25,6 +25,8 @@ import { followAtom } from "./atoms/followAtom";
 import { postsAtom } from "./atoms";
 import { Followers } from "./Page/Followers";
 import { ProfileView } from "./Page/ProfileView";
+import { Topic } from "./Page/Topic";
+import axios from "axios";
 
 function App() {
   const [user, setUser] = useRecoilState(authAtom);
@@ -151,6 +153,16 @@ function App() {
     },
 
     {
+      path: "/topic/:categoryName",
+      element: (
+        <ProtectedRoute>
+          <Topic />
+        </ProtectedRoute>
+      ),
+      errorElement: <NotFound />,
+    },
+
+    {
       path: "/noveledit",
       element: <NoveEditor />,
       errorElement: <NotFound />,
@@ -191,12 +203,30 @@ function App() {
       return;
     }
 
-    const {
-      accessToken,
-      user: userData,
-      following,
-      posts,
-    } = await refreshAccessToken(user.refreshToken);
+    // const {
+    //   accessToken,
+    //   user: userData,
+    //   following,
+    //   posts,
+    // } = await refreshAccessToken(user.refreshToken);
+
+    const newAccessTokenPromise = refreshAccessToken(user.refreshToken);
+
+    const [newAccessToken, userNames] = await Promise.all([
+      refreshAccessToken(user.refreshToken),
+      newAccessTokenPromise.then((token) => {
+        if (token) {
+          return axios.get(`/user/getAllUserNames`, {
+            headers: { accessToken: `Bearer ${token.accessToken}` },
+          }).then((res) => res.data.data); 
+        } else {
+          return []; 
+        }
+      }),
+    ]);
+
+    const { accessToken, user: userData, following, posts } = newAccessToken;
+    console.log(userNames);
 
     if (accessToken) {
       setUser((prev) => ({
