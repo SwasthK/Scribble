@@ -81,13 +81,15 @@ export async function publishPostBodyParse(c: Context, next: Next) {
         const body = formData.get('body') as string;
         const allowComments = formData.get('allowComments') === 'true';;
         const summary = formData.get('summary') as string;
+        const categories = formData.get('categories');
+        console.log("Categories Recieved : ", categories);
 
         const response = publishPostSchema.safeParse({ title, shortCaption, body, allowComments, summary });
 
         if (!response.success) {
             return apiError(c, 400, response.error.errors[0].message)
         }
-        c.set('publishData', { ...response.data, image });
+        c.set('publishData', { ...response.data, image, categories });
 
         return await next();
     } catch (error) {
