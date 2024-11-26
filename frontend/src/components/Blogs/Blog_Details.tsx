@@ -106,6 +106,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
     authorId,
     body,
     summary,
+    allowComments,
     _count: count,
     likes,
     savedBy,
@@ -610,61 +611,70 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
           ) : (
             <div className="py-3">
               <h1 className="text-base font-semibold mb-4">Comments</h1>
-
-              {currentComments.length === 0 && !isLoading ? (
+              {allowComments === false ? (
                 <p className="text-sm text-gray-400 text-center">
-                  No comments available
+                  Comments are disabled for this post
                 </p>
               ) : (
                 <>
-                  <div className="mb-4">
-                    <select
-                      value={sorting}
-                      onChange={(e) => setSorting(e.target.value)}
-                      className="px-2 py-1 rounded-md text-sm font-semibold cursor-pointer"
-                    >
-                      <option value="newest">Newest</option>
-                      <option value="oldest">Oldest</option>
-                    </select>
-                  </div>
-                  <div className="space-y-7 pl-6">
-                    {currentComments.map((comment, index) => (
-                      <div key={index} className="flex items-start gap-4">
-                        <Avatar>
-                          <AvatarImage src={comment.author.avatarUrl} />
-                          <AvatarFallback>
-                            {comment.author.username.slice(0, 3)}
-                          </AvatarFallback>
-                        </Avatar>
-
-                        <div className="border px-3.5 py-2.5 rounded-md border-alphaborder shadow-sm bg-gray-800">
-                          <h4 className="font-semibold text-sm mb-1  text-blue-100">
-                            {comment.author?.username || "Anonymous"}
-                          </h4>
-                          <p className="text-sm">
-                            {comment.content || "No content available"}
-                          </p>
-                        </div>
+                  {currentComments.length === 0 && !isLoading ? (
+                    <p className="text-sm text-gray-400 text-center">
+                      No comments available
+                    </p>
+                  ) : (
+                    <>
+                      <div className="mb-4">
+                        <select
+                          value={sorting}
+                          onChange={(e) => setSorting(e.target.value)}
+                          className="px-2 py-1 rounded-md text-sm font-semibold cursor-pointer"
+                        >
+                          <option value="newest">Newest</option>
+                          <option value="oldest">Oldest</option>
+                        </select>
                       </div>
-                    ))}
-                  </div>
+                      <div className="space-y-7 pl-6">
+                        {currentComments.map((comment, index) => (
+                          <div key={index} className="flex items-start gap-4">
+                            <Avatar>
+                              <AvatarImage src={comment.author.avatarUrl} />
+                              <AvatarFallback>
+                                {comment.author.username.slice(0, 3)}
+                              </AvatarFallback>
+                            </Avatar>
 
-                  <div className="flex gap-4 items-center mt-4 w-full px-14 justify-evenly">
-                    <button
-                      onClick={handlePrevious}
-                      className="px-4 border-2 py-1 rounded-md font-semibold bg-[#222630] disabled:cursor-not-allowed disabled:bg-gray-700 focus:border-[#596A95] border-[#2B3040]"
-                      disabled={startIndex === 0}
-                    >
-                      Previous
-                    </button>
-                    <button
-                      onClick={handleNext}
-                      className="px-4 border-2 py-1 rounded-md font-semibold bg-[#222630] disabled:cursor-not-allowed disabled:bg-gray-700 focus:border-[#596A95] border-[#2B3040]"
-                      disabled={startIndex + commentsPerPage >= comments.length}
-                    >
-                      Next
-                    </button>
-                  </div>
+                            <div className="border px-3.5 py-2.5 rounded-md border-alphaborder shadow-sm bg-gray-800">
+                              <h4 className="font-semibold text-sm mb-1  text-blue-100">
+                                {comment.author?.username || "Anonymous"}
+                              </h4>
+                              <p className="text-sm">
+                                {comment.content || "No content available"}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-4 items-center mt-4 w-full px-14 justify-evenly">
+                        <button
+                          onClick={handlePrevious}
+                          className="px-4 border-2 py-1 rounded-md font-semibold bg-[#222630] disabled:cursor-not-allowed disabled:bg-gray-700 focus:border-[#596A95] border-[#2B3040]"
+                          disabled={startIndex === 0}
+                        >
+                          Previous
+                        </button>
+                        <button
+                          onClick={handleNext}
+                          className="px-4 border-2 py-1 rounded-md font-semibold bg-[#222630] disabled:cursor-not-allowed disabled:bg-gray-700 focus:border-[#596A95] border-[#2B3040]"
+                          disabled={
+                            startIndex + commentsPerPage >= comments.length
+                          }
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
 
@@ -675,20 +685,21 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                 <Textarea
                   value={commentContent}
                   onChange={(e) => setCommentContent(e.target.value)}
-                  disabled={sendComment ? true : false}
+                  disabled={sendComment || !allowComments ? true : false}
                   placeholder="Write a comment..."
                   className="py-2 border border-white font-semibold input-style"
                   style={{ resize: "vertical", maxHeight: "100px" }}
                 />
-
-                <SendIcon
-                  onClick={handleSendComment}
-                  className={`${
-                    sendComment
-                      ? "pointer-events-none stroke-gray-400 cursor-not-allowed"
-                      : "pointer-events-auto stroke-white hover:stroke-gray-300 cursor-pointer"
-                  } transition-colors duration-300`}
-                />
+                {allowComments && (
+                  <SendIcon
+                    onClick={handleSendComment}
+                    className={`${
+                      sendComment
+                        ? "pointer-events-none stroke-gray-400 cursor-not-allowed"
+                        : "pointer-events-auto stroke-white hover:stroke-gray-300 cursor-pointer"
+                    } transition-colors duration-300`}
+                  />
+                )}
               </div>
             </div>
           )}

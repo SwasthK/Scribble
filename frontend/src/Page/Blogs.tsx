@@ -5,7 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Blogs_Skeleton } from "../Skeleton/Blogs_Skeleton";
 import { useEffect, memo } from "react";
 import { Link } from "react-router-dom";
-import { useGetAllPosts } from "../services/queries";
+import {
+  useGetAllCategoriesAndMostLikedPost,
+  useGetAllPosts,
+} from "../services/queries";
 
 export const Blogs = () => {
   const { ref, inView } = useInView();
@@ -17,15 +20,24 @@ export const Blogs = () => {
     isError,
     error,
     fetchNextPage,
+    isFetchedAfterMount,
     hasNextPage,
     isFetchingNextPage,
   } = postsQuery;
+
+  const categoryAndLikedpost = useGetAllCategoriesAndMostLikedPost();
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage]);
+
+  useEffect(() => {
+    if (isFetchedAfterMount) {
+      categoryAndLikedpost.refetch();
+    }
+  }, [isFetchedAfterMount]);
 
   return (
     <div className="bg-gradient-1 w-screen">
@@ -64,20 +76,18 @@ export const Blogs = () => {
 
           <div className="hidden  lg:flex lg:sticky top-0 lg:right-0 p-6  space-y-16 flex-col  h-screen overflow-y-scroll">
             <div className="w-72  xl:w-80 overflow-x-hidden flex flex-col gap-8 text-white font-semibold">
-              {data.pages?.map((page: any, pageIndex) => (
-                <TopPicks key={pageIndex} blogs={page.posts} />
-              ))}
+              <TopPicks mostLiked={categoryAndLikedpost} />
 
               <SideBarBanner
                 title="Understanding the Power of React"
                 caption=" React simplifies building user interfaces with its component-based approach. Learn how to create dynamic web applications effortlessly."
                 path=""
               />
-              <TopicGrid />
+              <TopicGrid categoryFetch={categoryAndLikedpost} />
 
-              {data.pages?.map((page: any, index) => (
-                <FollowRecommendation key={index} blogs={page.posts} />
-              ))}
+              {/* {data.pages?.map((page: any, index) => (
+              <FollowRecommendation key={index} blogs={page.posts} />
+            ))} */}
 
               <div className="bg-[#333331] text-white p-4 rounded-lg mt-3 text-sm">
                 <p>
@@ -111,64 +121,78 @@ export const Blogs = () => {
   );
 };
 
-const TopPicks = memo(({ blogs }: any) => {
+const TopPicks = memo(({ mostLiked }: { mostLiked: any }) => {
+  let data = mostLiked.data?.mostLikedPost?.mostLikedPosts;
+
   return (
     <>
-      {Array.isArray(blogs) && blogs.length > 0 ? (
-        <div className="pt-2">
-          <h1 className=" font-semibold text-base mb-4 ml-2">
-            Top Picks
-          </h1>
+      <div className="pt-2">
+        <h1 className=" font-semibold text-base mb-4 ml-2">Top Picks</h1>
 
-          <div className="flex gap-6 flex-col border px-4  py-3 rounded-xl   bg-cdark-200  border-b-dark-100">
-            {blogs.slice(0, 3).map((blog: any, index: number) => (
-              <Link
-                to={`/blog/${blog.slug}`}
-                key={index}
-                className="flex flex-col gap-2 justify-center cursor-pointer "
-              >
-                <div className="flex gap-4  w-fit pr-4">
-                  <Avatar className="h-5 w-5">
-                    <AvatarImage src={blog.author.avatarUrl} />
-                    <AvatarFallback>
-                      {blog.author?.username.slice(0, 3)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <h1 className="capitalize text-[0.850rem] text-neutral-100 font-medium">
-                    {blog.author?.username || "Unknown Author"}
-                  </h1>
+        <div
+          className={`flex gap-6 flex-col px-4  py-3 rounded-xl ${
+            !mostLiked.isLoading && !mostLiked.isError
+              ? "bg-cdark-200 border-b-dark-100 border"
+              : ""
+          }   `}
+        >
+          {mostLiked.isLoading ? (
+            <>
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index}>
+                  <div className=" gap-3 flex items-center">
+                    <div className="h-5 w-5 rounded-full skeleton-parent">
+                      <div className="h-5 w-5  skeleton-child"></div>
+                    </div>
+                    <div className="h-3 w-28 rounded-full skeleton-parent">
+                      <div className="h-3 w-28  skeleton-child"></div>
+                    </div>
+                  </div>
+                  <div className="skeleton-parent ml-8 w-44 rounded-md h-3 mt-1">
+                    <div className="skeleton-child w-44 rounded-md h-3"></div>
+                  </div>
                 </div>
-                <h1 className="font-bold text-lg text-wrap break-words lg:text-base xl:text-md">
-                  {blog.title.length > 55
-                    ? blog.title.substring(0, 45) + " ..."
-                    : blog.title}
-                </h1>
-              </Link>
-            ))}
-          </div>
-          {/* 
-          <div className="mt-3">
-            <Link to={""} className="underline">
-              See more
-            </Link>
-          </div> */}
+              ))}
+            </>
+          ) : mostLiked.isError ? (
+            <p className="text-sm text-gray-500 pl-4 font-normal">
+              Could'nt fetch the most liked posts
+            </p>
+          ) : (
+            <>
+              {data?.map((blog: any, index: number) => (
+                <Link
+                  to={`/blog/${blog.slug}`}
+                  key={index}
+                  className="flex flex-col gap-2 justify-center cursor-pointer "
+                >
+                  <div className="flex gap-4  w-fit pr-4">
+                    <Avatar className="h-5 w-5">
+                      <AvatarImage src={blog.author.avatarUrl} />
+                      <AvatarFallback>
+                        {blog.author?.username.slice(0, 3)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <h1 className="capitalize text-[0.850rem] text-neutral-100 font-medium">
+                      {blog.author?.username || "Unknown Author"}
+                    </h1>
+                  </div>
+                  <h1 className="font-bold text-lg text-wrap break-words lg:text-base xl:text-md">
+                    {blog.title.length > 55
+                      ? blog.title.substring(0, 45) + " ..."
+                      : blog.title}
+                  </h1>
+                </Link>
+              ))}
+            </>
+          )}
         </div>
-      ) : null}
+      </div>
     </>
   );
 });
 
-const TopicGrid = memo(() => {
-  const topics = [
-    "Web Development",
-    "Data Science",
-    "AI/ML",
-    "UI/UX",
-    "AWS",
-    "Flutter",
-    "Cybersecurity",
-  ];
-
+const TopicGrid = memo(({ categoryFetch }: { categoryFetch: any }) => {
   const colors = [
     "bg-blue-400",
     "bg-green-400",
@@ -182,30 +206,58 @@ const TopicGrid = memo(() => {
   const getRandomColor = () =>
     colors[Math.floor(Math.random() * colors.length)];
 
-  const renderRow = (rowTopics: any) => (
-    <div className="flex gap-2 justify-evenly">
-      {rowTopics.map((topic: any, index: number) => (
-        <Link
-          to={`/topic/${topic}`}
-          key={index}
-          className={`${getRandomColor()} text-white font-semibold text-[0.85rem] rounded-full px-2 py-2 flex justify-center items-center transition-all duration-300 hover:text-black cursor-pointer`}
-          style={{ width: topic.length > 5 ? "9rem" : "5rem" }}
-        >
-          <p>{topic}</p>
-        </Link>
-      ))}
-    </div>
-  );
+  // const renderRow = (rowTopics: any) => (
+  //   <div>
+  //     {rowTopics.map((topic: any, index: number) => (
+  //       <Link
+  //         to={`/topic/${topic}`}
+  //         key={index}
+  //         className={`${getRandomColor()} text-white font-semibold text-[0.85rem] rounded-full px-2 py-2 flex justify-center items-center transition-all duration-300 hover:text-black cursor-pointer`}
+  //         style={{ width: topic.length > 5 ? "9rem" : "5rem" }}
+  //       >
+  //         <p>{topic}</p>
+  //       </Link>
+  //     ))}
+  //   </div>
+  // );
 
   return (
     <div className="space-y-4">
-      <h1 className="text-zinc-200 font-semibold text-lg">
-        Recommended topics
-      </h1>
+      <h1 className=" font-semibold text-base mb-4 ml-2">Recommended Topics</h1>
       <div className="space-y-5">
-        {renderRow(topics.slice(0, 2))}
-        {renderRow(topics.slice(2, 5))}
-        {renderRow(topics.slice(5, 7))}
+        {categoryFetch.isLoading ? (
+          <div className="flex gap-2  ">
+            <div className="w-28 h-8  rounded-full skeleton-parent">
+              <div className="w-28 h-8  rounded-full skeleton-child"></div>
+            </div>
+            <div className=" flex-grow h-8 rounded-full skeleton-parent">
+              <div className="flex-grow h-8  rounded-full skeleton-child"></div>
+            </div>
+          </div>
+        ) : categoryFetch.error ? (
+          <p className="text-sm text-gray-500 pl-4 font-normal">
+            Could'nt fetch the topics
+          </p>
+        ) : (
+          <div
+            className={`grid grid-cols-2 gap-y-3 flex-col gap-3 ${
+              categoryFetch.data?.categories.length == 1
+                ? "justify-start"
+                : "justify-center"
+            }`}
+          >
+            {categoryFetch.data?.categories?.map((topic: any) => (
+              <Link
+                to={`/topic/${topic.name.toLowerCase().replace(/\s+/g, "-")}`}
+                key={topic.name}
+                className={`${getRandomColor()} capitalize text-gray-900 font-bold  text-[0.85rem] rounded-full px-2 py-2 flex justify-center items-center transition-all duration-300 hover:text-black cursor-pointer`}
+                style={{ width: topic.name.length > 5 ? "9rem" : "5rem" }}
+              >
+                <p>{topic.name}</p>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -237,42 +289,45 @@ const SideBarBanner = memo(
   }
 );
 
-const FollowRecommendation = memo(({ blogs }: any) => {
-  return (
-    <>
-      {Array.isArray(blogs) && blogs.length > 0 ? (
-        <div className="space-y-8">
-          <h1 className="text-zinc-200  font-semibold text-base mb-4 ml-2">Who to follow</h1>
-          {blogs.slice(0, 3).map((blog: any, index: number) => (
-            <div
-              key={index}
-              className="flex gap-4 justify-between items-center cursor-pointer"
-            >
-              <Link
-              to={`/view/profile/${blog.author.username}`}
-              className="flex gap-4 items-center rounded-xl border border-b-dark-100 w-full bg-cdark-200 px-3 py-1">
-                <Avatar className="h-7 w-7">
-                  <AvatarImage src={blog.author.avatarUrl} />
-                  <AvatarFallback>
-                    {blog.author.username.slice(0, 3)}
-                  </AvatarFallback>
-                </Avatar>
-                <h1 className="capitalize text-[0.9rem] ">
-                  {blog.author.username.length > 10
-                    ? blog.author.username.substring(0, 10) + "..."
-                    : blog.author.username}
-                </h1>
-              </Link>
-              <button
-                type="button"
-                className="px-5 py-2 text-black bg-white font-bold   rounded-xl  text-sm cursor-pointer"
-              >
-                Follow
-              </button>
-            </div>
-          ))}
-        </div>
-      ) : null}
-    </>
-  );
-});
+// const FollowRecommendation = memo(({ blogs }: any) => {
+//   return (
+//     <>
+//       {Array.isArray(blogs) && blogs.length > 0 ? (
+//         <div className="space-y-8">
+//           <h1 className="text-zinc-200  font-semibold text-base mb-4 ml-2">
+//             Who to follow
+//           </h1>
+//           {blogs.slice(0, 3).map((blog: any, index: number) => (
+//             <div
+//               key={index}
+//               className="flex gap-4 justify-between items-center cursor-pointer"
+//             >
+//               <Link
+//                 to={`/view/profile/${blog.author.username}`}
+//                 className="flex gap-4 items-center rounded-xl border border-b-dark-100 w-full bg-cdark-200 px-3 py-1"
+//               >
+//                 <Avatar className="h-7 w-7">
+//                   <AvatarImage src={blog.author.avatarUrl} />
+//                   <AvatarFallback>
+//                     {blog.author.username.slice(0, 3)}
+//                   </AvatarFallback>
+//                 </Avatar>
+//                 <h1 className="capitalize text-[0.9rem] ">
+//                   {blog.author.username.length > 10
+//                     ? blog.author.username.substring(0, 10) + "..."
+//                     : blog.author.username}
+//                 </h1>
+//               </Link>
+//               <button
+//                 type="button"
+//                 className="px-5 py-2 text-black bg-white font-bold   rounded-xl  text-sm cursor-pointer"
+//               >
+//                 Follow
+//               </button>
+//             </div>
+//           ))}
+//         </div>
+//       ) : null}
+//     </>
+//   );
+// });

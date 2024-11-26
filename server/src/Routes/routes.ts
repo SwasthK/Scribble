@@ -28,7 +28,9 @@ import {
     getPostByAuthorId,
     getDraftedPostShortned,
     getDraftedPostFullContentById,
-    getPostByUsername
+    getPostByUsername,
+    getMostLikedPosts,
+    getPostByCategory
 } from '../Controllers/Posts/get.Posts'
 import { deleteDraftBulk, deleteDraftPostById, deletePublishedPostById } from '../Controllers/Posts/delete.Post'
 
@@ -78,7 +80,7 @@ import { handleSavePost } from 'Controllers/Posts/Save/save.Post'
 import { getSavedPost } from 'Controllers/Posts/Save/getSavedPost'
 import { updateUserSocials } from 'Controllers/Socials/socials'
 import { reportPost } from 'Controllers/Report'
-import { getUserDetailsByUsername } from 'Controllers/User/user'
+import { getAllUsersNames, getUserDetailsByUsername } from 'Controllers/User/user'
 
 const api = new Hono();
 
@@ -104,6 +106,7 @@ api
 
     // User Details Routes
     .get('/user/getBy/username/:username', authMiddleware, findActiveUser, getUserDetailsByUsername)
+    .get('/user/getAllUserNames', authMiddleware, findActiveUser, getAllUsersNames)
 
     // Draft Routes
     .get('/posts/drafts/shortened', authMiddleware, findActiveUser, getDraftedPostShortned)
@@ -124,6 +127,8 @@ api
     .get('/posts/getBy/username/:username', authMiddleware, findActiveUser, getPostByUsername)
     .get('/posts/getBy/slug/:postSlug', authMiddleware, findActiveUser, getPostBySlug)
     .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
+    .get('/posts/mostliked', authMiddleware, findActiveUser, getMostLikedPosts)
+    .get('/posts/getBy/Category/:categoryName', authMiddleware, findActiveUser, getPostByCategory)
 
     // Save & Unsave Post
     .get("/posts/saved/getAll", authMiddleware, findActiveUser, getSavedPost)
@@ -155,11 +160,7 @@ api
 
     //Category Routes
     .get('/category/getall', authMiddleware, findActiveUser, getAllCategory)
-    .post('/category/create', authMiddleware, findActiveUser, createCategory)
-    .put('/category/update', authMiddleware, findActiveUser, updateCategory)
-    .delete('/category/delete', authMiddleware, findActiveUser, deleteCategory)
-    .get('/category/get', authMiddleware, findActiveUser, getCategory)
-    .delete('/category/deleteAll', authMiddleware, findActiveUser, deleteAllCategory)
+
 
     // --------------------------------------------------------------------------
 
@@ -189,8 +190,12 @@ api
     .get('/tag/get', authMiddleware, findActiveUser, getTag)
 
 
-
-
+    //Category Routes
+    .post('/category/create', authMiddleware, findActiveUser, createCategory)
+    .put('/category/update', authMiddleware, findActiveUser, updateCategory)
+    .delete('/category/delete', authMiddleware, findActiveUser, deleteCategory)
+    .get('/category/get', authMiddleware, findActiveUser, getCategory)
+    .delete('/category/deleteAll', authMiddleware, findActiveUser, deleteAllCategory)
 
 
     //Comment Routes

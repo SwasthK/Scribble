@@ -50,3 +50,28 @@ export async function getUserDetailsByUsername(c: Context) {
         return apiError(c, 500, "Internal Server Error", { code: "CE" });
     }
 }
+
+export async function getAllUsersNames(c: Context) {
+    //Used
+
+    try {
+        const prisma: any = c.get('prisma');
+
+        const user = await prisma.user.findMany({
+            select: {
+                username: true,
+                avatarUrl: true,
+            }
+        });
+
+        if (!user) { return apiError(c, 404, "Users Not Found"); }
+
+        console.log(user);
+
+        return apiResponse(c, 200, user, "users fetched successfully");
+
+    } catch (error: any) {
+        console.log("Get all Username Error: ", error.message);
+        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+    }
+}

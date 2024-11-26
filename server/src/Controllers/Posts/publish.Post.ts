@@ -8,7 +8,6 @@ import { createSlug } from "utils/createSlug";
 import { cloudinaryUploader, fileUploadMessage, generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers, mimeTypeSignup } from "Middleware/cloudinary";
 
 export const publishPostSchema = z.object({
-
     title: z.string()
         .min(6, { message: "Title must be atleast 6 Characters" })
         .max(25, { message: "Title must be atmost 25 Characters" }),
@@ -33,6 +32,8 @@ export async function updatePublishById(c: Context) {
         const postId = c.req.param('postId')
         const prisma = c.get('prisma');
         let cloudinaryHelpers = getCloudinaryHelpers(c);
+        const categoryIds = data.categories.split(",").map((id: string) => id.trim());
+        const categoryConnections = categoryIds.map((id: string) => ({ id }));
 
         if (!postId) { return apiError(c, 400, "Post ID required") }
 
@@ -61,7 +62,6 @@ export async function updatePublishById(c: Context) {
         const timestamp = Math.round((new Date).getTime() / 1000);
         let uniqueFilename = '';
         const cloudinaryFormData = new FormData();
-        console.log(data);
 
         if (data.image) {
             if (!Object.values(mimeTypeSignup).includes(data.image.type)) {
@@ -101,7 +101,11 @@ export async function updatePublishById(c: Context) {
                             shortCaption: data.shortCaption,
                             body: data.body,
                             summary: data?.summary,
-                            status: PostStatus.PUBLISHED
+                            allowComments: data.allowComments,
+                            status: PostStatus.PUBLISHED,
+                            categories: {
+                                connect: categoryConnections
+                            }
                         }
                     });
 
@@ -136,9 +140,18 @@ export async function updatePublishById(c: Context) {
                 shortCaption: data.shortCaption,
                 body: data.body,
                 summary: data?.summary,
+                allowComments: data.allowComments,
+                categories: {
+                    connect: categoryConnections
+                },
                 status: PostStatus.PUBLISHED
+            },
+            select: {
+                id: true,
             }
         });
+
+        console.log("Updated Post: ", updatedPost);
 
         return apiResponse(c, 200, updatedPost, "Post published successfully");
 
@@ -192,6 +205,10 @@ export async function createNewPublishPost(c: Context) {
 
         const cleanBody = data.body.replace(/(<br\s*\/?>\s*)+$/i, '');
 
+        const categoryIds = data.categories.split(",").map((id: string) => id.trim());
+
+        const categoryConnections = categoryIds.map((id: string) => ({ id }));
+
         const newPost = await prisma.post.create({
             data: {
                 coverImage: secure_url,
@@ -204,6 +221,9 @@ export async function createNewPublishPost(c: Context) {
                 allowComments: data.allowComments,
                 author: {
                     connect: { id: userId }
+                },
+                categories: {
+                    connect: categoryConnections
                 },
                 status: PostStatus.PUBLISHED,
             }

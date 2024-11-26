@@ -1,5 +1,5 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { getAllPosts, getAllUserArchivedPosts, getAllUserSavedPosts, getDraftPost, getDraftPostFullContentByPostId, getPostByAuthorId, getPostBySlug, getUserPosts, handleGetAllCategories, handleGetAllFollowers, handleGetAllFollowings, handleGetUserPostsDetailsByUsername, handleGetUserProfileDetailsByUsername } from "./api";
+import { getAllPosts, getAllUserArchivedPosts, getAllUserSavedPosts, getDraftPost, getDraftPostFullContentByPostId, getPostByAuthorId, getPostBySlug, getUserPosts, handleGetAllCategories, handleGetAllFollowers, handleGetAllFollowings, handleGetMostLikedPosts, handleGetPostsByCategoryName, handleGetUserPostsDetailsByUsername, handleGetUserProfileDetailsByUsername } from "./api";
 
 export function useGetAllPosts() {
     return useInfiniteQuery(
@@ -22,7 +22,7 @@ export function useGetAllPosts() {
 export function useGetUserPosts(currentPage: number) {
     return useQuery({
         queryKey: ["getUserPosts", currentPage],
-        queryFn: () => getUserPosts({ pageParam: currentPage }),
+        queryFn: async () => getUserPosts({ pageParam: currentPage }),
         retry: false,
         placeholderData: keepPreviousData,
         staleTime: Infinity,
@@ -124,12 +124,32 @@ export function useGetUserProfileDetailsAndPostsDetails(username: string) {
     })
 }
 
-export function useGetAllCategories() {
+export function useGetAllCategoriesAndMostLikedPost() {
     return useQuery({
-        queryKey: ["getAllCategories"],
-        queryFn: () => handleGetAllCategories(),
+        queryKey: ["allCategoriesAndMostLikedPost"],
+        queryFn: async () => {
+            const [categories, mostLikedPost] = await Promise.all([
+                handleGetAllCategories(),
+                handleGetMostLikedPosts(),
+            ]);
+            return { categories, mostLikedPost };
+        },
+        enabled: false,
         retry: false,
         staleTime: Infinity,
         refetchOnWindowFocus: false,
+        refetchOnMount: false,
+    })
+}
+
+export function useGetPostsByCategoryName(categoryName: string) {
+    return useQuery({
+        queryKey: ["postsByCategoryName", categoryName],
+        queryFn: () => handleGetPostsByCategoryName(categoryName),
+        enabled: Boolean(categoryName),
+        retry: false,
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
     })
 }
