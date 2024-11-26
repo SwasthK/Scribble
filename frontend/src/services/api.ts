@@ -355,3 +355,53 @@ export const handleGetAllCategories = async () => {
         }
     }
 }
+
+export const handleGetMostLikedPosts = async () => {
+    try {
+
+        const response = await axios.get<any>(
+            `/posts/mostliked`,
+            {
+                headers: {
+                    accessToken: `Bearer ${localStorage.getItem("accessToken")}`
+                }
+            }
+        );
+
+        if (response.data) {
+            return response.data.data;
+        }
+
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data.message || 'Unexpected error');
+        } else {
+            throw new Error('Something went wrong. Please try again later.');
+        }
+    }
+}
+
+export const handleGetPostsByCategoryName = async (categoryName: string) => {
+    try {
+
+        const response = await axios.get<any>(
+            `/posts/getBy/Category/${categoryName}`,
+            {
+                headers: {
+                    accessToken: `Bearer ${localStorage.getItem("accessToken")}`
+                }
+            }
+        );
+
+        if (response.data) {
+            return response.data.data;
+        }
+
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data.message || 'Unexpected error');
+        } else {
+            throw new Error('Something went wrong. Please try again later.');
+        }
+    }
+}
