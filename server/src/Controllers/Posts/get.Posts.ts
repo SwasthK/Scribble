@@ -3,6 +3,7 @@ import { apiError } from "../../utils/apiError";
 import { apiResponse } from "../../utils/apiResponse";
 import { PostStatus } from "@prisma/client";
 import { usernameSchema } from "Zod/zod";
+import { createSlug } from "utils/createSlug";
 
 
 export async function getPostById(c: Context) {
@@ -208,6 +209,8 @@ export async function getPostBySlug(c: Context) {
                 body: true,
                 summary: true,
                 authorId: true,
+                allowComments: true,
+                categories: true,
                 savedBy: {
                     where: { userId },
                     select: { postId: true }
@@ -459,6 +462,7 @@ export async function getAllPosts(c: Context) {
                     where: { userId: user.id },
                     select: { postId: true }
                 },
+                categories: true,
                 createdAt: true,
                 _count: {
                     select: {
@@ -531,7 +535,7 @@ export async function getUserPosts(c: Context) {
                 coverImage: true,
                 createdAt: true,
                 authorId: true,
-                categories:true
+                categories: true
             }
         });
 
@@ -551,6 +555,99 @@ export async function getUserPosts(c: Context) {
 
     } catch (error: any) {
         console.log("Get User Posts Error: ", error.message);
+        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+    }
+}
+
+export async function getMostLikedPosts(c: Context) {
+    //Used
+
+    const user = c.get("user");
+
+    let limit = 3;
+
+    try {
+        const prisma = c.get('prisma');
+
+        const mostLikedPosts = await prisma.post.findMany({
+            take: limit,
+            orderBy: [
+                { likes: { _count: 'desc' } },
+                { createdAt: 'desc' },
+            ],
+            where: {
+                status: PostStatus.PUBLISHED,
+                authorId: {
+                    not: user.id
+                }
+            },
+            select: {
+                slug: true,
+                title: true,
+                author: {
+                    select: {
+                        username: true,
+                        avatarUrl: true
+                    }
+                }
+            }
+        });
+
+        return apiResponse(c, 200, {
+            mostLikedPosts
+        }, "Posts fetched successfully");
+
+    } catch (error: any) {
+        console.log("Get Most Liked Posts Error: ", error.message);
+        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+    }
+}
+
+export async function getPostByCategory(c: Context) {
+
+    const categoryName = c.req.param('categoryName');
+
+    if (!categoryName || categoryName == "") { return apiError(c, 400, "Bad request"); }
+
+    const slug = createSlug(categoryName, 25);
+
+    try {
+        const prisma = c.get('prisma');
+
+        const post = await prisma.post.findMany({
+            where: {
+                categories: {
+                    some: {
+                        slug: {
+                            search: slug,
+                        },
+
+                    }
+                },
+            },
+            select: {
+                slug: true,
+                title: true,
+                author: {
+                    select: {
+                        username: true,
+                        avatarUrl: true
+                    }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        if (!post) {
+            return apiError(c, 404, "Post Not Found");
+        }
+
+        return apiResponse(c, 200, post, "Post fetched successfully");
+
+    } catch (error: any) {
+        console.log("Get Post By Category Error: ", error.message);
         return apiError(c, 500, "Internal Server Error", { code: "CE" });
     }
 }
