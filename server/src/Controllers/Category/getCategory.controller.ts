@@ -56,7 +56,7 @@ export async function getAllCategory(c: Context) {
         const prisma: any = await c.get("prisma");
 
         const category = await prisma.category.findMany({
-            select: { id: true, head: true, name: true }
+            select: { id: true, head: true, name: true,slug:true }
         })
 
         if (!category) { return apiError(c, 400, "Could'nt fetch categories") }
