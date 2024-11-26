@@ -20,7 +20,10 @@ import axios from "axios";
 import { Spinner } from "../components/Global/Spinner";
 import { useRecoilValue } from "recoil";
 import { authAtom } from "../atoms/auth.atoms";
-import { useGetDraftedPostFullContentByPostId } from "../services/queries";
+import {
+  useGetAllCategoriesAndMostLikedPost,
+  useGetDraftedPostFullContentByPostId,
+} from "../services/queries";
 import { Cancel } from "../assets/svg/Cancel";
 import { Blog_Handle_Skeleton } from "../Skeleton/Blog_Handle_Skeleton";
 import { CloudUploadIcon } from "../assets/svg/CloudUploadIcon";
@@ -119,7 +122,7 @@ export const HandlePost = () => {
       title: fullDraftData?.title || "",
       shortCaption: fullDraftData?.shortCaption || "",
       body: fullDraftData?.body || "",
-      allowComments: fullDraftData?.allowComments || true,
+      allowComments: fullDraftData?.allowComments,
       summary: fullDraftData?.summary || "",
     }));
     setImage(fullDraftData?.coverImage || "");
@@ -135,88 +138,89 @@ export const HandlePost = () => {
 
   const [open, setOpen] = useState(false);
 
-  const categories = [
-    {
-      id: "technology",
-      label: "Technology",
-      subcategories: [
-        { id: "software-development", label: "Software Development" },
-        { id: "gadgets", label: "Gadgets" },
-        { id: "ai-machine-learning", label: "AI & Machine Learning" },
-        { id: "cybersecurity", label: "Cybersecurity" },
-        { id: "startups", label: "Startups" },
-      ],
-    },
-    {
-      id: "lifestyle",
-      label: "Lifestyle",
-      subcategories: [
-        { id: "fitness", label: "Fitness" },
-        { id: "relationships", label: "Relationships" },
-        { id: "fashion", label: "Fashion" },
-        { id: "home-improvement", label: "Home Improvement" },
-      ],
-    },
-    {
-      id: "business",
-      label: "Business",
-      subcategories: [
-        { id: "entrepreneurship", label: "Entrepreneurship" },
-        { id: "marketing", label: "Marketing" },
-        { id: "ecommerce", label: "E-commerce" },
-        { id: "leadership", label: "Leadership" },
-      ],
-    },
-    {
-      id: "health-wellness",
-      label: "Health & Wellness",
-      subcategories: [],
-    },
-    {
-      id: "food-recipes",
-      label: "Food & Recipes",
-      subcategories: [
-        { id: "vegan-recipes", label: "Vegan Recipes" },
-        { id: "desserts", label: "Desserts" },
-        { id: "world-cuisine", label: "World Cuisine" },
-        { id: "quick-meals", label: "Quick Meals" },
-      ],
-    },
-    {
-      id: "travel",
-      label: "Travel",
-      subcategories: [
-        { id: "adventure", label: "Adventure" },
-        { id: "budget-travel", label: "Budget Travel" },
-        { id: "luxury-travel", label: "Luxury Travel" },
-        { id: "culture", label: "Culture" },
-      ],
-    },
-    {
-      id: "education",
-      label: "Education",
-      subcategories: [
-        { id: "study-tips", label: "Study Tips" },
-        { id: "career-advice", label: "Career Advice" },
-        { id: "online-learning", label: "Online Learning" },
-      ],
-    },
-    {
-      id: "personal-development",
-      label: "Personal Development",
-      subcategories: [],
-    },
-    {
-      id: "finance",
-      label: "Finance",
-      subcategories: [],
-    },
-    {
-      id: "entertainment",
-      label: "Entertainment",
-      subcategories: [],
-    },
-  ];
+  // const categories = [
+  //   {
+  //     id: "technology",
+  //     label: "Technology",
+  //     subcategories: [
+  //       { id: "software-development", label: "Software Development" },
+  //       { id: "gadgets", label: "Gadgets" },
+  //       { id: "ai-machine-learning", label: "AI & Machine Learning" },
+  //       { id: "cybersecurity", label: "Cybersecurity" },
+  //       { id: "startups", label: "Startups" },
+  //     ],
+  //   },
+  //   {
+  //     id: "lifestyle",
+  //     label: "Lifestyle",
+  //     subcategories: [
+  //       { id: "fitness", label: "Fitness" },
+  //       { id: "relationships", label: "Relationships" },
+  //       { id: "fashion", label: "Fashion" },
+  //       { id: "home-improvement", label: "Home Improvement" },
+  //     ],
+  //   },
+  //   {
+  //     id: "business",
+  //     label: "Business",
+  //     subcategories: [
+  //       { id: "entrepreneurship", label: "Entrepreneurship" },
+  //       { id: "marketing", label: "Marketing" },
+  //       { id: "ecommerce", label: "E-commerce" },
+  //       { id: "leadership", label: "Leadership" },
+  //     ],
+  //   },
+  //   {
+  //     id: "health-wellness",
+  //     label: "Health & Wellness",
+  //     subcategories: [],
+  //   },
+  //   {
+  //     id: "food-recipes",
+  //     label: "Food & Recipes",
+  //     subcategories: [
+  //       { id: "vegan-recipes", label: "Vegan Recipes" },
+  //       { id: "desserts", label: "Desserts" },
+  //       { id: "world-cuisine", label: "World Cuisine" },
+  //       { id: "quick-meals", label: "Quick Meals" },
+  //     ],
+  //   },
+  //   {
+  //     id: "travel",
+  //     label: "Travel",
+  //     subcategories: [
+  //       { id: "adventure", label: "Adventure" },
+  //       { id: "budget-travel", label: "Budget Travel" },
+  //       { id: "luxury-travel", label: "Luxury Travel" },
+  //       { id: "culture", label: "Culture" },
+  //     ],
+  //   },
+  //   {
+  //     id: "education",
+  //     label: "Education",
+  //     subcategories: [
+  //       { id: "study-tips", label: "Study Tips" },
+  //       { id: "career-advice", label: "Career Advice" },
+  //       { id: "online-learning", label: "Online Learning" },
+  //     ],
+  //   },
+  //   {
+  //     id: "personal-development",
+  //     label: "Personal Development",
+  //     subcategories: [],
+  //   },
+  //   {
+  //     id: "finance",
+  //     label: "Finance",
+  //     subcategories: [],
+  //   },
+  //   {
+  //     id: "entertainment",
+  //     label: "Entertainment",
+  //     subcategories: [],
+  //   },
+  // ];
+  const categoryAndLikedpost = useGetAllCategoriesAndMostLikedPost();
 
   const [checkedItems, setCheckedItems] = useState<string[]>([]);
 
@@ -228,29 +232,80 @@ export const HandlePost = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredItems = categories
-    .map((category) => {
-      const matchedSubcategories = category.subcategories.filter(
-        (subcategory) =>
-          subcategory.label.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+  function tranformCategoryDataToSubCategory(data: any) {
+    const groupedData: any = {};
 
-      if (
-        category.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        matchedSubcategories.length > 0
-      ) {
-        return {
-          ...category,
-          subcategories:
-            matchedSubcategories.length > 0
-              ? matchedSubcategories
-              : category.subcategories,
+    data.forEach((item: any) => {
+      const { head, id, name } = item;
+      if (!groupedData[head]) {
+        groupedData[head] = {
+          id: head,
+          label: capitalizeFirstLetter(head),
+          subcategories: [],
         };
       }
+      groupedData[head].subcategories.push({ id, label: name });
+    });
 
-      return null;
-    })
-    .filter(Boolean);
+    return Object.values(groupedData);
+  }
+
+  function capitalizeFirstLetter(string: string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  const [groupedData, setGroupedData] = useState<any>([]);
+
+  useEffect(() => {
+    if (
+      categoryAndLikedpost.data &&
+      !categoryAndLikedpost.isLoading &&
+      !categoryAndLikedpost.isError &&
+      categoryAndLikedpost.data?.categories.length > 0
+    ) {
+      setGroupedData(
+        tranformCategoryDataToSubCategory(categoryAndLikedpost.data.categories)
+      );
+    }
+  }, [categoryAndLikedpost.data]);
+
+  useEffect(() => {
+    if (categoryAndLikedpost.data?.categories.length > 0) {
+      return;
+    } else {
+      categoryAndLikedpost.refetch();
+    }
+  }, [categoryAndLikedpost.data]);
+
+  function filterGroupedData(data: any, searchQuery: string) {
+    if (!searchQuery) return data;
+
+    return data
+      .map((category: any) => {
+        const matchedSubcategories = category.subcategories.filter(
+          (subcategory: any) =>
+            subcategory.label.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+        if (
+          category.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          matchedSubcategories.length > 0
+        ) {
+          return {
+            ...category,
+            subcategories:
+              matchedSubcategories.length > 0
+                ? matchedSubcategories
+                : category.subcategories,
+          };
+        }
+
+        return null;
+      })
+      .filter(Boolean);
+  }
+
+  const filt = filterGroupedData(groupedData, searchQuery);
 
   const createNewDraftData = async () => {
     try {
@@ -323,6 +378,7 @@ export const HandlePost = () => {
       setPostId(newPostId);
       setPostURL(`/blog/${slug}`);
       setPublished(true);
+      setCheckedItems([]);
       toast.success("Your post is live now !");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Something went wrong");
@@ -351,6 +407,7 @@ export const HandlePost = () => {
       setFormData((prev) => ({ ...prev, coverImage: null }));
       setPostURL(`/blog/${slug}`);
       setPublished(true);
+      setCheckedItems([]);
       toast.success("Your post is live now !");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Something went wrong");
@@ -504,88 +561,105 @@ export const HandlePost = () => {
                   </>
                 ) : (
                   <>
-                    <Dialog open={open}>
+                    <Dialog open={open} onOpenChange={setOpen}>
                       <DialogContent className="border bg-cdark-300 border-alphaborder">
                         <DialogHeader>
-                          {/* <Category_Skeleton /> */}
                           <DialogTitle className="px-4 mb-4">
                             Choose a category for your post
                           </DialogTitle>
 
-                          <div className="mb-4  flex items-center gap-3  bg-[#121212]  px-2 rounded-md group focus-within:outline focus-within:outline-[0.3px] focus-within:outline-[#272727]">
-                            <Search />
-                            <input
-                              type="text"
-                              placeholder="Search categories..."
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              className="w-full p-2 border-none focus:outline-none"
-                            />
-                          </div>
-
-                          <ScrollArea className="h-[250px] w-full   p-4">
-                            <div className="space-y-4">
-                              {filteredItems.length > 0 ? (
-                                filteredItems.map((category: any) => (
-                                  <div key={category.id}>
-                                    <h3 className="text-base font-semibold text-gray-400 mb-2.5">
-                                      {category.label}
-                                    </h3>
-                                    <div className="pl-4 space-y-2">
-                                      {category.subcategories.length > 0 ? (
-                                        category.subcategories.map(
-                                          (subcategory: any) => (
-                                            <div
-                                              key={subcategory.id}
-                                              className="flex items-center space-x-6 py-1"
-                                            >
-                                              <Checkbox
-                                                id={subcategory.id}
-                                                onCheckedChange={(isChecked) =>
-                                                  handleCheck(
-                                                    subcategory.id,
-                                                    isChecked
-                                                  )
-                                                }
-                                              />
-                                              <label
-                                                htmlFor={subcategory.id}
-                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                              >
-                                                {subcategory.label}
-                                              </label>
-                                            </div>
-                                          )
-                                        )
-                                      ) : (
-                                        <p className="text-sm text-gray-500 pl-4">
-                                          No subcategories available
-                                        </p>
-                                      )}
-                                    </div>
-                                  </div>
-                                ))
-                              ) : (
-                                <p className="text-sm text-gray-500">
-                                  No matches found
-                                </p>
-                              )}
-                            </div>
-                          </ScrollArea>
-                          <Button
-                            className="border border-alphaborder"
-                            onClick={() => {
-                              if (checkedItems.length === 0) {
-                                toast.error("Please select a category");
-                                return;
-                              } else {
-                                setOpen(false);
-                                handlePublish();
-                              }
-                            }}
-                          >
-                            {checkedItems.length === 0 ? "Select" : "Publish"}
-                          </Button>
+                          {categoryAndLikedpost.isLoading ? (
+                            <Category_Skeleton />
+                          ) : categoryAndLikedpost.isError ? (
+                            <p className="text-sm text-gray-500 pl-4">
+                              Couldn't fetch categories , please try again later
+                            </p>
+                          ) : (
+                            <>
+                              <div className="mb-4  flex items-center gap-3  bg-[#121212]  px-2 rounded-md group focus-within:outline focus-within:outline-[0.3px] focus-within:outline-[#272727]">
+                                <Search />
+                                <input
+                                  type="text"
+                                  placeholder="Search categories..."
+                                  value={searchQuery}
+                                  onChange={(e) =>
+                                    setSearchQuery(e.target.value)
+                                  }
+                                  className="w-full p-2 border-none focus:outline-none"
+                                />
+                              </div>
+                              <ScrollArea className="h-[250px] w-full   p-4">
+                                <div className="space-y-4">
+                                  {filt.length > 0 ? (
+                                    filt.map((category: any) => (
+                                      <div key={category.id}>
+                                        <h3 className="text-base font-semibold text-gray-400 mb-2.5">
+                                          {category.label}
+                                        </h3>
+                                        <div className="pl-4 space-y-2">
+                                          {category.subcategories.length > 0 ? (
+                                            category.subcategories.map(
+                                              (subcategory: any) => (
+                                                <div
+                                                  key={subcategory.id}
+                                                  className="flex items-center space-x-6 py-1"
+                                                >
+                                                  <Checkbox
+                                                    checked={checkedItems.includes(
+                                                      subcategory.id
+                                                    )}
+                                                    id={subcategory.id}
+                                                    onCheckedChange={(
+                                                      isChecked
+                                                    ) =>
+                                                      handleCheck(
+                                                        subcategory.id,
+                                                        isChecked
+                                                      )
+                                                    }
+                                                  />
+                                                  <label
+                                                    htmlFor={subcategory.id}
+                                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                  >
+                                                    {subcategory.label}
+                                                  </label>
+                                                </div>
+                                              )
+                                            )
+                                          ) : (
+                                            <p className="text-sm text-gray-500 pl-4">
+                                              No subcategories available
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <p className="text-sm text-gray-500">
+                                      No matches found
+                                    </p>
+                                  )}
+                                </div>
+                              </ScrollArea>
+                              <Button
+                                className="border border-alphaborder"
+                                onClick={() => {
+                                  if (checkedItems.length === 0) {
+                                    toast.error("Please select a category");
+                                    return;
+                                  } else {
+                                    setOpen(false);
+                                    handlePublish();
+                                  }
+                                }}
+                              >
+                                {checkedItems.length === 0
+                                  ? "Select"
+                                  : "Publish"}
+                              </Button>
+                            </>
+                          )}
                         </DialogHeader>
                       </DialogContent>
                     </Dialog>
@@ -783,6 +857,10 @@ const ToggleComments = memo(({ formData, setFormData, setPublished }: any) => {
     }));
   };
 
+  useEffect(()=>{
+    console.log("DATA : ",formData.allowComments);
+  },[formData])
+
   return (
     <>
       <label
@@ -794,10 +872,10 @@ const ToggleComments = memo(({ formData, setFormData, setPublished }: any) => {
           name="comments"
           type="checkbox"
           className="sr-only peer"
-          checked={formData.allowComments ? true : false}
+          checked={formData.allowComments}
           onChange={handleToggle}
         />
-        <div className="relative w-8 h-4 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[0px] after:start-[0px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-60 peer-checked:bg-blue-600"></div>
+        <div className="relative w-8 h-4 bg-gray-500 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[0px] after:start-[0px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-60 peer-checked:bg-blue-600"></div>
         <span className="ms-3 text-sm font-medium text-cgray dark:text-gray-300">
           Allow Comments
         </span>
