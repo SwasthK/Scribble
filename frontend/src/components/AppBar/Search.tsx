@@ -13,15 +13,22 @@ import {
 import { Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import { postsAtom } from "../../atoms";
+import {  allUsersNames, postsAtom } from "../../atoms";
 import { authAtom } from "../../atoms/auth.atoms";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const SearchComponent = memo(() => {
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const posts = useRecoilValue(postsAtom);
   const { user } = useRecoilValue(authAtom);
-  console.log(user);
+  const userNames = useRecoilValue(allUsersNames);
+
+  const categoryData: any = queryClient.getQueryData([
+    "allCategoriesAndMostLikedPost",
+  ]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -40,16 +47,29 @@ export const SearchComponent = memo(() => {
   };
 
   const [filteredPosts, setFilteredPosts] = useState(posts.slice(0, 3));
+  const [filteredUsers, setFilteredUsers] = useState<any>(
+    userNames.slice(0, 3)
+  );
+  const [filteredCategories, setFilteredCategories] = useState<any>([]);
+
+  useEffect(() => {
+    setFilteredCategories(categoryData?.categories);
+  }, [categoryData]);
 
   const handleSearch = (query: string) => {
-    console.log(query);
     setSearchQuery(query);
     if (query) {
       setFilteredPosts(
         posts.filter((post) => post.toLowerCase().includes(query.toLowerCase()))
       );
+      setFilteredUsers(
+        userNames.filter((user: any) =>
+          user.username.toLowerCase().includes(query.toLowerCase())
+        )
+      );
     } else {
       setFilteredPosts(posts.slice(0, 3));
+      setFilteredUsers(userNames.slice(0, 3));
     }
   };
 
@@ -132,6 +152,34 @@ export const SearchComponent = memo(() => {
             <CommandSeparator />
 
             <CommandGroup
+              heading="Search authors by username"
+              className="mt-1.5 "
+            >
+              {filteredUsers.map((user: any) => (
+                <>
+                  <CommandItemLink
+                    onClick={handleSearchClick}
+                    url={`/view/profile/${user.username}`}
+                    className="px-5"
+                  >
+                    <div className="flex w-full gap-4">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={user.avatarUrl} />
+                        <AvatarFallback>
+                          {user.username.slice(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <h1>{user.username}</h1>
+                    </div>
+                  </CommandItemLink>
+                </>
+              ))}
+            </CommandGroup>
+
+            <CommandSeparator />
+
+            <CommandGroup
               heading="Search Posts by keywords"
               className="mt-1.5 "
             >
@@ -149,8 +197,32 @@ export const SearchComponent = memo(() => {
                 : null}
             </CommandGroup>
 
+            <CommandSeparator />
+
+            {filteredCategories?.length > 0 && (
+              <>
+                <CommandGroup
+                  heading="Search Posts by Category"
+                  className="mt-1.5 "
+                >
+                  {filteredCategories.map((category: any, index: number) => (
+                    <CommandItemLink
+                      onClick={handleSearchClick}
+                      url={`/topic/${category.name
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")}`}
+                      className="px-5"
+                      key={index}
+                    >
+                      {`# ${category.name}`}
+                    </CommandItemLink>
+                  ))}
+                </CommandGroup>
+              </>
+            )}
+
             <CommandGroup heading="Other">
-              <CommandItemLink url={'/post/saved'} className="px-5">
+              <CommandItemLink url={"/post/saved"} className="px-5">
                 Saved
               </CommandItemLink>
             </CommandGroup>
