@@ -49,3 +49,51 @@ export const Blogs_Skeleton = memo(() => {
     </div>
   );
 });
+
+export const Blogs_Fetching_Skeleton = memo(() => {
+  return (
+    <div className="text-white py-10 w-full border-b-[0.01rem] border-[#9ca3af2b] cursor-pointer flex items-center gap-6 md:gap-12 lg:gap-8 ">
+      <div className="w-[75%] sm:w-[73%] md:w-[70%] lg:w-[78%] xl:w-[70%]">
+        <div className="flex gap-2 items-center mb-3">
+          <div className="flex gap-2 items-center">
+            <div className="skeleton-parent rounded-full h-8 w-8 ">
+              <div className="h-8 w-8 skeleton-child mb-4"></div>
+            </div>
+
+            <div className="skeleton-parent rounded-full">
+              <div className="h-[.7rem] skeleton-child  w-32"></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <div className="skeleton-parent rounded-full md:max-w-[300px] mt-5 w-[180px]">
+            <div className="h-4 skeleton-child rounded-full md:max-w-[300px] w-[180px]"></div>
+          </div>
+
+          <div className="skeleton-parent rounded-full mt-4 md:w-[330px] w-[240px]">
+            <div className="h-3 skeleton-child  md:w-[330px] w-[240px]"></div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="skeleton-parent rounded-md">
+            <div className="h-4 w-4 skeleton-child rounded-full max-w-8"></div>
+          </div>
+
+          <div className="skeleton-parent rounded-md">
+            <div className="h-4 w-8 skeleton-child"></div>
+          </div>
+
+          <div className="skeleton-parent rounded-full">
+            <div className="h-4 w-16 skeleton-child"></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-lg h-20 sm:h-24 md:h-28 lg:h-32 w-[25%] md:w-[12em] sm:max-w-[20%] lg:max-w-[100%] skeleton-parent animate-pulse">
+        <div className="h-20 sm:h-24 md:h-28 lg:h-32  w-full skeleton-child"></div>
+      </div>
+    </div>
+  );
+});
