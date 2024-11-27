@@ -22,7 +22,7 @@ import { Draft } from "./Page/Draft";
 import { Save } from "./Page/Save";
 import { Archived } from "./Page/Archived";
 import { followAtom } from "./atoms/followAtom";
-import { postsAtom } from "./atoms";
+import { allUsersNames, postsAtom } from "./atoms";
 import { Followers } from "./Page/Followers";
 import { ProfileView } from "./Page/ProfileView";
 import { Topic } from "./Page/Topic";
@@ -32,6 +32,7 @@ function App() {
   const [user, setUser] = useRecoilState(authAtom);
   const setFollowing = useSetRecoilState(followAtom);
   const setPostsAtom = useSetRecoilState(postsAtom);
+  const setAllUsersNames = useSetRecoilState(allUsersNames);
 
   const router = createBrowserRouter([
     {
@@ -216,17 +217,18 @@ function App() {
       refreshAccessToken(user.refreshToken),
       newAccessTokenPromise.then((token) => {
         if (token) {
-          return axios.get(`/user/getAllUserNames`, {
-            headers: { accessToken: `Bearer ${token.accessToken}` },
-          }).then((res) => res.data.data); 
+          return axios
+            .get(`/user/getAllUserNames`, {
+              headers: { accessToken: `Bearer ${token.accessToken}` },
+            })
+            .then((res) => res.data.data);
         } else {
-          return []; 
+          return [];
         }
       }),
     ]);
 
     const { accessToken, user: userData, following, posts } = newAccessToken;
-    console.log(userNames);
 
     if (accessToken) {
       setUser((prev) => ({
@@ -240,6 +242,7 @@ function App() {
       }));
       setFollowing((prev: any) => ({ ...prev, following }));
       setPostsAtom(posts);
+      setAllUsersNames(userNames);
       return;
     } else {
       resetAuthAtom();

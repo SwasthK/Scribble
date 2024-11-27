@@ -9,3 +9,8 @@ export const allCategoryAtom = atom<string[]>({
     key: 'allCategoryAtom',
     default: []
 })
+
+export const allUsersNames = atom<string[]>({
+    key: 'allUsersNames',
+    default: []
+})

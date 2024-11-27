@@ -2,13 +2,18 @@ import { Blog_Card } from "../components/Blogs/Blog_Card";
 import { AppBar } from "../components/AppBar/AppBar";
 import { useInView } from "react-intersection-observer";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Blogs_Skeleton } from "../Skeleton/Blogs_Skeleton";
+import {
+  Blogs_Fetching_Skeleton,
+  Blogs_Skeleton,
+} from "../Skeleton/Blogs_Skeleton";
 import { useEffect, memo } from "react";
 import { Link } from "react-router-dom";
 import {
   useGetAllCategoriesAndMostLikedPost,
   useGetAllPosts,
 } from "../services/queries";
+
+import { ScrollArea } from "../components/ui/scroll-area";
 
 export const Blogs = () => {
   const { ref, inView } = useInView();
@@ -72,6 +77,13 @@ export const Blogs = () => {
               ))
             )}
             {hasNextPage && !isFetchingNextPage && <div ref={ref}></div>}
+            {isFetchingNextPage && (
+              <>
+                <Blogs_Fetching_Skeleton />
+                <Blogs_Fetching_Skeleton />
+                <Blogs_Fetching_Skeleton />
+              </>
+            )}
           </div>
 
           <div className="hidden  lg:flex lg:sticky top-0 lg:right-0 p-6  space-y-16 flex-col  h-screen overflow-y-scroll">
@@ -110,13 +122,13 @@ export const Blogs = () => {
           </div>
         </div>
       )}
-      {isFetchingNextPage && (
+      {/* {isFetchingNextPage && (
         <div className="h-screen w-3/4 pt-20">
           <Blogs_Skeleton />
           <Blogs_Skeleton />
           <Blogs_Skeleton />
         </div>
-      )}
+      )} */}
     </div>
   );
 };
@@ -206,20 +218,9 @@ const TopicGrid = memo(({ categoryFetch }: { categoryFetch: any }) => {
   const getRandomColor = () =>
     colors[Math.floor(Math.random() * colors.length)];
 
-  // const renderRow = (rowTopics: any) => (
-  //   <div>
-  //     {rowTopics.map((topic: any, index: number) => (
-  //       <Link
-  //         to={`/topic/${topic}`}
-  //         key={index}
-  //         className={`${getRandomColor()} text-white font-semibold text-[0.85rem] rounded-full px-2 py-2 flex justify-center items-center transition-all duration-300 hover:text-black cursor-pointer`}
-  //         style={{ width: topic.length > 5 ? "9rem" : "5rem" }}
-  //       >
-  //         <p>{topic}</p>
-  //       </Link>
-  //     ))}
-  //   </div>
-  // );
+  const getRandomCategories = (categories: any[], count: number) => {
+    return [...categories].sort(()  => Math.random() - 0.5).slice(0, count);
+  };
 
   return (
     <div className="space-y-4">
@@ -242,20 +243,24 @@ const TopicGrid = memo(({ categoryFetch }: { categoryFetch: any }) => {
           <div
             className={`grid grid-cols-2 gap-y-3 flex-col gap-3 ${
               categoryFetch.data?.categories.length == 1
-                ? "justify-start"
+                ? "justify-center"
                 : "justify-center"
             }`}
           >
-            {categoryFetch.data?.categories?.map((topic: any) => (
-              <Link
-                to={`/topic/${topic.name.toLowerCase().replace(/\s+/g, "-")}`}
-                key={topic.name}
-                className={`${getRandomColor()} capitalize text-gray-900 font-bold  text-[0.85rem] rounded-full px-2 py-2 flex justify-center items-center transition-all duration-300 hover:text-black cursor-pointer`}
-                style={{ width: topic.name.length > 5 ? "9rem" : "5rem" }}
-              >
-                <p>{topic.name}</p>
-              </Link>
-            ))}
+            {categoryFetch.data?.categories &&
+              getRandomCategories(categoryFetch.data.categories, 6).map(
+                (topic: any) => (
+                  <Link
+                    to={`/topic/${topic.name
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")}`}
+                    key={topic.name}
+                    className={`${getRandomColor()} text-center capitalize text-gray-900 font-bold text-[0.85rem] rounded-full px-2 py-2 flex justify-center items-center transition-all duration-300 hover:text-black cursor-pointer`}
+                  >
+                    <p>{topic.name}</p>
+                  </Link>
+                )
+              )}
           </div>
         )}
       </div>

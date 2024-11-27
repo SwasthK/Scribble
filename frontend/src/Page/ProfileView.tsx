@@ -80,8 +80,12 @@ export const ProfileView = () => {
                     About
                   </span>
 
-                  <h1 className="input-style">
-                    {data?.userProfileDetails.bio}
+                  <h1
+                    className={`input-style ${
+                      !data?.userProfileDetails.bio ? "text-center" : ""
+                    }`}
+                  >
+                    {data?.userProfileDetails.bio || "Bio Not Added"}
                   </h1>
                 </div>
                 <div className="py-2 flex flex-col gap-3  max-w-[400px]">
@@ -177,14 +181,17 @@ const PostCards = memo(
     return (
       <Link
         to={`/blog/${slug}`}
-        className="flex gap-4 sm:h-20 overflow-hidden py-1 "
+        className="flex gap-4 sm:h-20 overflow-hidden py-1"
       >
-        <img
-          src={coverImage}
-          alt=""
-          className="h-full rounded-md w-36 object-center object-cover  hidden sm:block"
-        />
-        <div className="flex input-style border  flex-col gap-1 w-full overflow-hidden">
+        <div className="w-36 h-full ">
+          <img
+            src={coverImage}
+            alt=""
+            className="h-full rounded-md w-36 object-center object-cover  hidden sm:block"
+          />
+        </div>
+
+        <div className="flex input-style border  flex-col gap-1 w-full overflow-hidden flex-grow">
           <h1 className="">
             {title.length > 30 ? `${title.slice(0, 30)}...` : title}
           </h1>
