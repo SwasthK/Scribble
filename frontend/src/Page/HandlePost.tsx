@@ -593,7 +593,7 @@ export const HandlePost = () => {
                                   {filt.length > 0 ? (
                                     filt.map((category: any) => (
                                       <div key={category.id}>
-                                        <h3 className="text-base font-semibold text-gray-400 mb-2.5">
+                                        <h3 className="text-base font-semibold text-gray-400 mb-2.5 capitalize">
                                           {category.label}
                                         </h3>
                                         <div className="pl-4 space-y-2">
@@ -620,7 +620,7 @@ export const HandlePost = () => {
                                                   />
                                                   <label
                                                     htmlFor={subcategory.id}
-                                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                    className="text-sm font-medium capitalize leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                                   >
                                                     {subcategory.label}
                                                   </label>
