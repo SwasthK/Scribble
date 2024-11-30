@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+font-face {
+  font-family: 'Scribble-1';
+  src: url('/fonts/scribble-1.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Scribble-2';
+  src: url('/fonts/scribble-2.woff2') format('woff2');
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -14,6 +26,7 @@ body {
   height: 100%;
   background-color: #212121;
   color: white;
+  font-family: 'Scribble-1', sans-serif;
 }
 
 ::-webkit-scrollbar {
@@ -78,7 +91,7 @@ body {
 }
 
 
-.card-gradient-1{
+.card-gradient-1 {
   background: #22c1c3;
   background: -webkit-linear-gradient(to right, #fdbb2d, #22c1c3);
   background: linear-gradient(to right, #fdbb2d, #22c1c3);
