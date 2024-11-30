@@ -7,6 +7,10 @@ export default {
 	],
 	theme: {
 		extend: {
+			fontFamily: {
+				scribble1: ['Scribble-1', 'sans-serif'],
+				scribble2: ['Scribble-2', 'sans-serif'],
+			},
 			colors: {
 
 				cgray: '#d9c9c9',
