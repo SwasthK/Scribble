@@ -19,30 +19,52 @@ const Home = () => {
 
       {/* Scrollable Content */}
       <div className="relative z-10 h-full w-full overflow-y-scroll">
-        <div className="w-[90%] mx-auto text-white pt-8">
+        <div className="w-[90%] mx-auto text-white ">
+          <div className="h-screen flex justify-center items-center  flex-col gap-16">
+            <div className="relative">
+              <h1 className="mb-2 text-7xl sm:text-9xl font-scribble2 sm:mb-9">
+                Scribble .
+              </h1>
+              <h3 className="text rotate-[-3deg] absolute bottom-[-1.2rem] right-[-1rem] sm:absolute sm:bottom-0 sm:right-0  font-scribble2 sm:text-xl">
+                Unleash Your Voice, Share Your Story !
+              </h3>
+            </div>
+            <div className=" flex gap-5 sm:gap-12 w-full justify-center">
+              <button className="px-6 py-2 sm:px-10 sm:py-5 rounded-full border text-black bg-white font-extralight">
+                Register
+              </button>
+              {/* <div className="flex flex-col"> */}
+              <button className="font-scribble2 px-6 py-2 sm:px-10 sm:py-5 rounded-full border text-white bg-cdark-300">
+                Continue without Registering &#8594;
+              </button>
+              {/* <h1></h1> */}
+              {/* </div> */}
+            </div>
+          </div>
+
           {/* First Section */}
           <div className="flex items-center gap-8 flex-col lg:flex-row lg:gap-24 py-8 justify-center">
-            <img src="https://cdn.wccftech.com/wp-content/uploads/2023/07/Cyberpunk-2077-Project-AI.jpg" className="h-60  w-full max-w-[30rem] object-cover object-center rounded-lg"></img>
-            <div className="max-w-[30rem] flex flex-col gap-5">
-              <h1 className="text-2xl md:text-3xl font-semibold">
-                Google for India 2023: Partnering India's success in a new
-                digital paradigm
+            <img
+              src="/Block-animation.gif"
+              className="border border-alphaborder w-[30rem] object-contain rounded-lg"
+            ></img>
+            <div className="max-w-[30rem] flex flex-col gap-10">
+              <h1 className="text-3xl md:text-5xl font-semibold">
+                Rich Text Editing Made Easy
               </h1>
-              <p className="md:text-lg">
-                With India looking at a billion connected people in the near
-                future, the country's digital journey is underpinned by the
-                large strides it has taken in a short timespan by
+              <p className="md:text-lg text-neutral-400">
+              Craft beautiful content effortlessly with our intuitive BlockNote editor.
               </p>
             </div>
           </div>
 
           {/* Second Section */}
-          <div className="w-full bg-cdark-100 sm:px-16 sm:py-16 p-16 rounded-xl">
+          <div className="w-full bg-[#0C0C0C] sm:px-16 sm:py-16 p-16 rounded-xl">
             <div className=" flex gap-4 flex-col w-full">
               <p className="font-semibold w-[100%]  md:w-[30rem]">
                 Runway | Tools for human imagination.
               </p>
-              <p className="sm:text-3xl text-2xl font-semibold w-[100%]  md:w-[30rem] lg:w-[35rem]">
+              <p className="font-scribble1 text-[#585F69  ] font-[100] sm:text-4xl text-2xl w-[100%]  md:w-[30rem] lg:w-[35rem]">
                 We are pioneering general-purpose multimodal simulators of the
                 world.
               </p>
@@ -52,10 +74,16 @@ const Home = () => {
             </div>
 
             <div className=" grid lg:grid-cols-3 gap-12 sm:gap-14 md:gap-20 lg:gap-10 grid-cols-1 place-items-center mt-8 ">
-    
               {Array.from({ length: 3 }).map((_, idx) => (
-                <div key={idx} className="flex gap-2 flex-col items-center  w-full max-w-96">
-                  <img src="https://cdn.wccftech.com/wp-content/uploads/2023/07/Cyberpunk-2077-Project-AI.jpg" alt="" className="xl:h-60 mb-4  w-full rounded-xl object-cover object-center" />
+                <div
+                  key={idx}
+                  className="flex gap-2 flex-col items-center  w-full max-w-96"
+                >
+                  <img
+                    src="https://cdn.wccftech.com/wp-content/uploads/2023/07/Cyberpunk-2077-Project-AI.jpg"
+                    alt=""
+                    className="xl:h-60 mb-4  w-full rounded-xl object-cover object-center"
+                  />
                   <h1 className="font-semibold text-[1.1rem]  w-full  ">
                     Lorem, ipsum dolor sit amet consectetur
                   </h1>
@@ -66,6 +94,8 @@ const Home = () => {
                 </div>
               ))}
             </div>
+
+            <div className="h-48 w-96 bg-[#252525]"></div>
           </div>
         </div>
       </div>
