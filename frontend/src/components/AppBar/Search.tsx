@@ -84,7 +84,7 @@ export const SearchComponent = memo(() => {
     <>
       <button
         onClick={handleSearchClick}
-        className="flex gap-8 justify-between items-center p-2 sm:rounded-md sm:px-4 rounded-full  bg-slate-800 sm:bg-transparent  sm:border sm:border-[#ffffff54]"
+        className="flex gap-8 justify-between items-center p-2 sm:rounded-full sm:px-8 rounded-full border"
       >
         <Search size={18} />
         <p className="hidden sm:block text-sm font-semibold bg-[#2E2E2E] px-2 rounded-md ">
@@ -103,7 +103,7 @@ export const SearchComponent = memo(() => {
             <CommandEmpty>No results found.</CommandEmpty>
 
             <CommandGroup heading="Commands">
-              <div className="flex gap-4 px-2 w-full items-center justify-center mb-1.5">
+              <div className="flex gap-4 px-2 w-full items-center justify-center mb-1.5 ">
                 <CommandItem className="w-full flex justify-center">
                   <Link
                     to={"/post/handle"}
