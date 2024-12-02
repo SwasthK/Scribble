@@ -1,14 +1,8 @@
 import { memo } from "react";
-
-interface RefreshIconProps {
-  onClick: any;
-  size?: number;
-  disabled?: boolean;
-  className?: string;
-}
+import { SvgIconType } from "../../Types/type";
 
 export const RefreshIcon = memo(
-  ({ onClick, size, disabled, className }: RefreshIconProps) => {
+  ({ onClick, size, disabled, className }: SvgIconType) => {
     return (
       <>
         <button onClick={onClick} disabled={disabled}>
