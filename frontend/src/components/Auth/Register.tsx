@@ -15,6 +15,7 @@ import { Cancel } from "../../assets/svg/Cancel";
 import { Upload } from "../../assets/svg/Upload";
 import { Next } from "../../assets/svg/Next";
 import { Eye } from "../../assets/svg/Eye";
+import { Spinner } from "../Global/Spinner";
 
 export const Register = () => {
   const [formData, setFormData] = useState({
@@ -177,7 +178,9 @@ export const Register = () => {
     <div className="w-[70%] max-w-[350px]">
       {step === 1 ? (
         <div className="flex flex-col gap-4 items-center mb-10">
-          <h1 className="text-4xl font-medium">Create an account</h1>
+          <h1 className="text-3xl md:text-4xl font-medium font-scribble2">
+            Create an account
+          </h1>
           <h3 className="text-cgray italic">Join the Circle of Knowledge !</h3>
         </div>
       ) : (
@@ -191,44 +194,49 @@ export const Register = () => {
       )}
 
       <form onSubmit={handleSubmit}>
-        {errors.submit && <p>{errors.submit}</p>}
+        {errors.submit && (
+          <p className=" font-giest font-light text-sm text-giest-100 mb-2 error">
+            {errors.submit}
+          </p>
+        )}
+
         {step === 1 && (
           <div className="flex flex-col gap-6">
             <div className="flex gap-3 flex-col">
               <p className="font-semibold"> Profile Picture (optional):</p>
-              <div className="flex  items-center justify-between gap-8 h-[3.4rem]">
-                <img
-                  src={
-                    formData.file
-                      ? URL.createObjectURL(formData.file)
-                      : import.meta.env.VITE_SIGNUP_PROFILE_ICON || ""
-                  }
-                  className=" border-none h-full rounded-full w-[3.4rem] border  object-cover object-center hover:object-top transition-all duration-300"
-                ></img>
-
-                <div className="h-full w-full flex items-center pr-6 outline-none rounded-lg  font-medium ">
-                  <div className="flex gap-8 justify-center items-center h-full">
+              <div className="flex  items-center justify-between gap-8 h-[3rem]">
+                <div className="h-full w-full flex items-center pr-6 outline-none rounded-lg  font-medium gap-4">
+                  {formData.file && (
+                    <>
+                      <img
+                        src={URL.createObjectURL(formData.file)}
+                        className="w-[3rem] h-[3rem] rounded-md  object-cover object-center "
+                      ></img>
+                    </>
+                  )}
+                  <div className="flex gap-8 justify-center items-center h-full ">
                     <label
                       className={`
-                        p-4 rounded-full font-medium  
-                        bg-custom-gradient-1 cursor-pointer hover:bg-custom-gradient-2
+                       h-full px-3  rounded-md font-medium bg-cgray-100 border border-b-dark-200 cursor-pointer flex justify-center items-center
                      `}
                       htmlFor="file"
                     >
                       {formData.file ? (
                         <>
                           <div className="flex items-center justify-between text-base w-14 overflow-hidden">
-                            <span>
+                            <h1>
                               {`${formData.file.name.slice(
                                 0,
-                                3
+                                1
                               )}.${formData.file.name.split(".").pop()}` || ""}
-                            </span>
+                            </h1>
                           </div>
                         </>
                       ) : (
                         <>
-                          <Upload></Upload>
+                          <h1 className="font-giest font-semibold text-sm">
+                            Upload
+                          </h1>
                         </>
                       )}
                     </label>
@@ -263,13 +271,19 @@ export const Register = () => {
               </div>
 
               {errors.file ? (
-                <p className="error">{errors.file}</p>
+                <p className=" font-giest font-light text-sm error">
+                  {errors.file}
+                </p>
               ) : (
                 <>
                   {formData.file ? (
-                    <p className="text-cgreen">Wow, that's looking great!</p>
+                    <p className=" font-giest font-light text-sm text-cgreen">
+                      Wow, that's looking great!
+                    </p>
                   ) : (
-                    <p className="text-cgray">You can add it later as well.</p>
+                    <p className=" font-giest font-light text-sm text-giest-100">
+                      You can add it later as well.
+                    </p>
                   )}
                 </>
               )}
@@ -290,9 +304,13 @@ export const Register = () => {
                 disabled={loading}
               />
               {errors.username ? (
-                <p className="error">{errors.username}</p>
+                <p className=" font-giest font-light text-sm error">
+                  {errors.username}
+                </p>
               ) : (
-                <p className="text-cgray">Your public username here.</p>
+                <p className=" font-giest font-light text-sm text-giest-100">
+                  Your public username here.
+                </p>
               )}
             </div>
 
@@ -313,21 +331,25 @@ export const Register = () => {
               />
 
               {errors.email ? (
-                <p className="error">{errors.email}</p>
+                <p className=" font-giest font-light text-sm error">
+                  {errors.email}
+                </p>
               ) : (
-                <p className="text-cgray">Your email address</p>
+                <p className=" font-giest font-light text-sm text-giest-100">
+                  Your email address
+                </p>
               )}
             </div>
 
             <div className="flex justify-between items-center">
-              <LinkToLogin path="/login" text={"If account already exists ."} />
+              <LinkToLogin path="/login" text={"If account already exists"} />
               <button
-                className="bg-custom-gradient-1 cursor-pointer hover:bg-custom-gradient-2 p-3 rounded-full disabled:cursor-not-allowed"
+                className=" p-3 rounded-full disabled:cursor-not-allowed bg-cgray-100 border border-b-dark-200"
                 type="button"
                 onClick={nextStep}
                 disabled={!formData.username || loading || !formData.email}
               >
-                <Next />
+                <Next size={20} />
                 <div className=""></div>
               </button>
             </div>
@@ -356,14 +378,18 @@ export const Register = () => {
                 disabled={loading}
               />
               {errors.password ? (
-                <p className="error">{errors.password}</p>
+                <p className=" font-giest font-light text-sm text-giest-100 error">
+                  {errors.password}
+                </p>
               ) : (
-                <p className="text-cgray">Your password here.</p>
+                <p className=" font-giest font-light text-sm text-giest-100">
+                  Your password here.
+                </p>
               )}
             </div>
-            <div className="flex justify-between pt-8">
+            <div className="flex justify-between pt-8 font-semibold">
               <button
-                className="bg-custom-gradient-1 cursor-pointer hover:bg-custom-gradient-2 rounded-lg py-3 px-4"
+                className="bg-custom-gradient-1 cursor-pointer hover:bg-custom-gradient-2 rounded-lg py-2 px-5"
                 type="button"
                 onClick={prevStep}
                 disabled={loading}
@@ -373,44 +399,24 @@ export const Register = () => {
 
               {loading ? (
                 <>
-                  <div
-                    className="flex justify-center items-center w-24 py-3 px-4"
-                    role="status"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      className="w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-blue-100"
-                      viewBox="0 0 100 101"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                        fill="currentColor"
-                      />
-                      <path
-                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                        fill="currentFill"
-                      />
-                    </svg>
-                  </div>
+                  <Spinner size={5} />
                 </>
               ) : (
                 <button
-                  type="submit" 
+                  type="submit"
                   className={`${
                     loading
                       ? ""
                       : "bg-custom-gradient-1 cursor-pointer hover:bg-custom-gradient-2"
-                  } rounded-lg py-3 px-4 disabled:cursor-not-allowed font-semibold w-24`}
+                  } rounded-lg py-2 px-5 disabled:cursor-not-allowed  w-24`}
                   disabled={!!(loading && errors["password"])}
                 >
                   Register
                 </button>
               )}
             </div>
-            <div className="mt-4">
-              <LinkToLogin path="/login" text={"If account already exists ."} />
+            <div className="mt-8">
+              <LinkToLogin path="/login" text={"If account already exists"} />
             </div>
           </div>
         )}

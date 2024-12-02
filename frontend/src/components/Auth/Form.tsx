@@ -1,7 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { InputBoxProps } from "../../Types/type";
 import { Link, useNavigate } from "react-router-dom";
-import { BACKEND_URL } from "../../config";
 import { ClientSignupSchema } from "@swasthik/medium-common-types";
 import { ClientSigninSchema } from "@swasthik/medium-common-types";
 import axios from "axios";
@@ -32,7 +31,7 @@ const Form: React.FC<FormProps> = ({ FormType }) => {
   const sendRequest = async () => {
     try {
       const response = await axios.post(
-        `${BACKEND_URL}/api/v1/${FormType === "signup" ? "signup" : "signin"}`,
+        `/${FormType === "signup" ? "signup" : "signin"}`,
         postInputs
       );
       if (response.data) {
@@ -126,8 +125,6 @@ const Form: React.FC<FormProps> = ({ FormType }) => {
 };
 
 export default Form;
-
-
 
 const InputBox = ({ label, type, placeholder, onChange }: InputBoxProps) => {
   const [hide, sethide] = useState("password");
