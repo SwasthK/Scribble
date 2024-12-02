@@ -7,7 +7,11 @@ import axios from "axios";
 import { debounce } from "../../Page/NoveEditor";
 import { trimTitle } from "../../utils/trimTitle";
 import toast from "react-hot-toast";
-import { Avatar as ShadcnAvatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import {
+  Avatar as ShadcnAvatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../ui/avatar";
 
 interface Blog_CardProps {
   id: string;
@@ -127,12 +131,12 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
                   <AvatarImage src={author.avatarUrl} />
                   <AvatarFallback>{author.username.slice(0, 3)}</AvatarFallback>
                 </ShadcnAvatar>
-                <h1 className="capitalize text-[0.850rem]">
+                <h1 className="capitalize text-[0.850rem] font-semibold ">
                   {author.username}
                 </h1>
               </Link>
               <span className="font-bold ">&#183;</span>
-              <h1 className="text-xs sm:text-sm text-[#9CA3AF] capitalize cursor-auto">
+              <h1 className="text-xs sm:text-sm text-giest-100 capitalize cursor-auto font-light">
                 {formattedDate}
               </h1>
             </div>
@@ -144,10 +148,10 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
               to={`/blog/${slug}`}
             >
               <div className="mb-6">
-                <h1 className="font-bold text-xl text-wrap break-words sm:text-xl md:text-2xl ">
+                <h1 className="font-giest font-extrabold text-xl text-wrap break-words sm:text-xl md:text-2xl ">
                   {trimTitle(title, 55)}
                 </h1>
-                <p className="text-[#9CA3AF] mt-2 break-words line-clamp-3 sm:text-base">
+                <p className="text-giest-100 mt-2 break-words line-clamp-3 sm:text-base font-normal">
                   {shortCaption}
                 </p>
               </div>
@@ -163,7 +167,7 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
                     {tag}
                   </div>
                 ))} */}
-                <h1 className="text-[#fff]">{`${Math.ceil(
+                <h1 className="text-giest-200">{`${Math.ceil(
                   title.length / 500
                 )} min read`}</h1>
               </div>
@@ -195,9 +199,9 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
           )}
 
           {imgHasError ? (
-            <div className="px-2 flex justify-center items-center rounded-lg h-20 sm:h-24 md:h-28 lg:h-32 w-[25%] md:w-[12em] bg-gray-200 sm:max-w-[20%] lg:max-w-[100%]">
-              <span className="text-red-500 font-semibold text-sm text-center sm:text-base">
-                Failed to Load the Image
+            <div className="px-4 flex justify-center items-center rounded-lg h-20 sm:h-24 md:h-28 lg:h-32 w-[25%] md:w-[12em] bg-cdark-100  sm:max-w-[20%] lg:max-w-[100%]">
+              <span className="font-scribble2 text-[0.85rem] text-c">
+               ERROR
               </span>
             </div>
           ) : (
