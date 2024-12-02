@@ -3,7 +3,7 @@ import { Login } from "../components/Auth/Login";
 
 export const Signin = () => {
   return (
-    <div className="flex h-screen bg-cdark-100">
+    <div className="flex h-screen bg-cdark-100 ">
       <div className="lg:block hidden sm:w-[60%] relative ">
         <RightBar
           title="Write what should not <br />

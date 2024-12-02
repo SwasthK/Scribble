@@ -58,8 +58,8 @@ export const Draft = () => {
       <AppBar />
       <div className="w-screen lg:px-24 pb-8 text-white">
         <div className="px-8 py-8  flex flex-col  border-[#ffffff3f] shadow-sm items-start gap-8 max-w-[60rem]">
-          <p className="text-2xl italic">
-            You're just a few steps away from {""}
+          <p className="text-base sm:text-lg bg-cgray-100 border border-b-dark-200 px-4 rounded-md">
+            You're just a few step away from {""}
             <span className="text-sky-400 font-semibold">
               getting noticed !
             </span>
@@ -77,7 +77,7 @@ export const Draft = () => {
           {drafts && drafts.length === 0 && (
             <div>
               <p className="text-base">
-                You have not drafted any post yet.{" "}
+                You have not drafted any post yet .{" "}
                 <Link
                   to={"/post/handle"}
                   className="underline underline-offset-2 text-sky-500"

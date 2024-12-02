@@ -87,7 +87,7 @@ export const Blogs = () => {
           </div>
 
           <div className="hidden  lg:flex lg:sticky top-0 lg:right-0 p-6  space-y-16 flex-col  h-screen overflow-y-scroll">
-            <div className="w-72  xl:w-80 overflow-x-hidden flex flex-col gap-8 text-white font-semibold">
+            <div className="w-72  xl:w-80 overflow-x-hidden flex flex-col gap-[1.8rem] text-white font-semibold">
               <TopPicks mostLiked={categoryAndLikedpost} />
 
               <SideBarBanner
@@ -101,19 +101,19 @@ export const Blogs = () => {
               <FollowRecommendation key={index} blogs={page.posts} />
             ))} */}
 
-              <div className="bg-[#333331] text-white p-4 rounded-lg mt-3 text-sm">
+              <div className="bg-[#333331] text-white p-4 rounded-lg mt-3 text-sm font-giest font-normal">
                 <p>
                   This is a blog application where you can read and share
                   articles on various topics.
                 </p>
-                <p className="mt-2">
-                  Made with ❤️ by
+                <p className="mt-5">
+                  Built by
                   <Link
                     to={"https://github.com/swasthK"}
                     target="_blank"
-                    className="ml-2 font-semibold text-cyan-400"
+                    className="ml-1 font-semibold text-cyan-200 hover:underline"
                   >
-                    Swasthik
+                  Swasthik
                   </Link>
                   .
                 </p>
@@ -139,10 +139,12 @@ const TopPicks = memo(({ mostLiked }: { mostLiked: any }) => {
   return (
     <>
       <div className="pt-2">
-        <h1 className=" font-semibold text-base mb-4 ml-2">Top Picks</h1>
+        <h1 className=" font-bold  mb-4 ml-2 font-giest text-giest-200">
+          Top Picks
+        </h1>
 
         <div
-          className={`flex gap-6 flex-col px-4  py-3 rounded-xl ${
+          className={`flex gap-6 flex-col px-4  py-4 rounded-xl ${
             !mostLiked.isLoading && !mostLiked.isError
               ? "bg-cdark-200 border-b-dark-100 border"
               : ""
@@ -167,7 +169,7 @@ const TopPicks = memo(({ mostLiked }: { mostLiked: any }) => {
               ))}
             </>
           ) : mostLiked.isError ? (
-            <p className="text-sm text-gray-500 pl-4 font-normal">
+            <p className="text-sm text-giest-300 pl-4 font-normal">
               Could'nt fetch the most liked posts
             </p>
           ) : (
@@ -185,11 +187,11 @@ const TopPicks = memo(({ mostLiked }: { mostLiked: any }) => {
                         {blog.author?.username.slice(0, 3)}
                       </AvatarFallback>
                     </Avatar>
-                    <h1 className="capitalize text-[0.850rem] text-neutral-100 font-medium">
+                    <h1 className="capitalize text-[0.850rem] text-giest-200 font-semibold">
                       {blog.author?.username || "Unknown Author"}
                     </h1>
                   </div>
-                  <h1 className="font-bold text-lg text-wrap break-words lg:text-base xl:text-md">
+                  <h1 className="font-light text-lg text-wrap break-words lg:text-base xl:text-md">
                     {blog.title.length > 55
                       ? blog.title.substring(0, 45) + " ..."
                       : blog.title}
@@ -206,12 +208,13 @@ const TopPicks = memo(({ mostLiked }: { mostLiked: any }) => {
 
 const TopicGrid = memo(({ categoryFetch }: { categoryFetch: any }) => {
   const colors = [
-    "bg-blue-400",
+    "bg-gradient-to-r from-cyan-500 to-blue-500",
+    "bg-gradient-to-r from-[#EC6F66] to-[#F3A183]",
+    "bg-gradient-to-r from-white to-[#49a09d]",
     "bg-green-400",
     "bg-yellow-400",
-    "bg-red-400",
+    "bg-red-100",
     "bg-purple-400",
-    "bg-pink-400",
     "bg-indigo-400",
   ];
 
@@ -219,12 +222,14 @@ const TopicGrid = memo(({ categoryFetch }: { categoryFetch: any }) => {
     colors[Math.floor(Math.random() * colors.length)];
 
   const getRandomCategories = (categories: any[], count: number) => {
-    return [...categories].sort(()  => Math.random() - 0.5).slice(0, count);
+    return [...categories].sort(() => Math.random() - 0.5).slice(0, count);
   };
 
   return (
     <div className="space-y-4">
-      <h1 className=" font-semibold text-base mb-4 ml-2">Recommended Topics</h1>
+      <h1 className=" font-semibold font-giest text-giest-200 mb-4 ml-2">
+        Recommended Topics
+      </h1>
       <div className="space-y-5">
         {categoryFetch.isLoading ? (
           <div className="flex gap-2  ">
@@ -255,7 +260,7 @@ const TopicGrid = memo(({ categoryFetch }: { categoryFetch: any }) => {
                       .toLowerCase()
                       .replace(/\s+/g, "-")}`}
                     key={topic.name}
-                    className={`${getRandomColor()} text-center capitalize text-gray-900 font-bold text-[0.85rem] rounded-full px-2 py-2 flex justify-center items-center transition-all duration-300 hover:text-black cursor-pointer`}
+                    className={`${getRandomColor()} font-scribble2 text-center capitalize text-gray-900 font-bold text-[0.85rem] rounded-full px-2 py-2 flex justify-center items-center transition-all duration-300 hover:text-black cursor-pointer`}
                   >
                     <p>{topic.name}</p>
                   </Link>
@@ -282,12 +287,12 @@ const SideBarBanner = memo(
       <>
         <Link
           to={path}
-          className="block max-w-sm px-5 py-7 rounded-lg  hover:bg-gray-100  card-gradient-1"
+          className="block max-w-sm px-5 py-7 rounded-lg  hover:bg-gray-100  card-gradient-1 "
         >
-          <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 ">
+          <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">
             {title}
           </h5>
-          <p className="font-normal text-gray-700 ">{caption}</p>
+          <p className="font-normal text-gray-900 ">{caption}</p>
         </Link>
       </>
     );

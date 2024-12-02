@@ -427,10 +427,10 @@ export const Profile = () => {
               <p className="w-16 h-4 skeleton-parent rounded-md">
                 <p className="w-16 h-4 skeleton-child"></p>
               </p>
-            ) : data?.totalPosts != 0 ? (
+            ) : data?.totalPosts !== 0 ? (
               <h6 className="h-4 text-sm">{data?.totalPosts} Posts</h6>
             ) : (
-              <h6 className="h-4 text-sm">No Posts</h6>
+              <h6 className="h-4 text-sm text-giest-100">No Posts</h6>
             )}
           </div>
         </div>
@@ -524,15 +524,15 @@ export const Profile = () => {
                   <button
                     disabled={currentPage === 1}
                     onClick={handlePrevClick}
-                    className="bg-[#1d58aa] disabled:cursor-not-allowed font-semibold cursor-pointer px-8 py-3 rounded-lg disabled:bg-[#fb8e8e] disabled:text-black"
+                    className="bg-[#1d58aa] disabled:cursor-not-allowed font-semibold cursor-pointer px-8 py-2 rounded-lg disabled:bg-[#fb8e8e] disabled:text-black"
                   >
                     Previous
                   </button>
-                  <h1 className="text-md font-semibold">
+                  <h1 className="text-md font- text-giest-100 font-light">
                     Page - {currentPage}
                   </h1>
                   <button
-                    className="bg-[#1d58aa] disabled:cursor-not-allowed font-semibold cursor-pointer px-8 py-3 rounded-lg disabled:bg-[#fb8e8e] disabled:text-black"
+                    className="bg-[#1d58aa] disabled:cursor-not-allowed font-semibold cursor-pointer px-8 py-2 rounded-lg disabled:bg-[#fb8e8e] disabled:text-black"
                     disabled={currentPage === pageCount || isFetching}
                     onClick={handleNextClick}
                   >
@@ -561,9 +561,11 @@ export const Profile = () => {
                     disabled={isPending}
                   />
                   {errors.username ? (
-                    <p className="error">{errors.username}</p>
+                    <p className="error bg-cgray-100 px-2 py-[0.1rem] text-sm rounded-md">
+                      {errors.username}
+                    </p>
                   ) : (
-                    <p className="text-cgray italic">
+                    <p className="text-giest-100 font-light text-sm font-giest">
                       Your public username here.
                     </p>
                   )}
@@ -586,9 +588,13 @@ export const Profile = () => {
                   />
 
                   {errors.email ? (
-                    <p className="error">{errors.email}</p>
+                    <p className="error bg-cgray-100 px-2 py-[0.1rem] text-sm rounded-md">
+                      {errors.email}
+                    </p>
                   ) : (
-                    <p className="text-cgray italic">Your email address</p>
+                    <p className="text-giest-100 font-light text-sm font-giest">
+                      Your email address
+                    </p>
                   )}
                 </div>
 
@@ -610,9 +616,11 @@ export const Profile = () => {
                   ></textarea>
 
                   {errors.bio ? (
-                    <p className="error">{errors.bio}</p>
+                    <p className="error bg-cgray-100 px-2 py-[0.1rem] text-sm rounded-md">
+                      {errors.bio}
+                    </p>
                   ) : (
-                    <p className="text-cgray italic">
+                    <p className="text-giest-100 font-light text-sm font-giest">
                       Anything that describes you
                     </p>
                   )}
@@ -626,7 +634,7 @@ export const Profile = () => {
                       <button
                         disabled={isPending || !isFormChanged()}
                         type="submit"
-                        className="bg-[#1d58aa]  disabled:text-black disabled:cursor-not-allowed font-semibold cursor-pointer px-8 py-3 rounded-lg"
+                        className="bg-[#1d58aa] disabled:bg-[#8babce] hover:bg-[#406ca9] transition-colors duration-100 disabled:text-black disabled:cursor-not-allowed font-semibold cursor-pointer px-8 py-3 rounded-lg"
                         onClick={() => {
                           if (
                             !errors.username &&
@@ -680,7 +688,7 @@ export const Profile = () => {
                     <button
                       disabled={socialUpdatePending}
                       type="submit"
-                      className="bg-[#1d58aa]   disabled:cursor-not-allowed font-semibold cursor-pointer px-8 py-3 rounded-lg"
+                      className="bg-[#1d58aa] disabled:bg-[#8babce] hover:bg-[#406ca9] transition-colors duration-100 disabled:text-black disabled:cursor-not-allowed font-semibold cursor-pointer px-8 py-3 rounded-lg"
                       onClick={() => handleSocialsUpdate(socials)}
                     >
                       {socialUpdatePending ? "Updating..." : "Update"}
@@ -765,10 +773,10 @@ export const UserBlogs = memo(
           )}
 
           {hasError ? (
-            <div className=" w-[64rem] h-[8rem] rounded-2xl rounded-b-none bg-red-200 flex justify-center items-center">
-              <span className="text-red-500 font-semibold">
+            <div className="h-[8rem] rounded-2xl rounded-b-none bg-cdark-100 flex justify-center items-center">
+              <h1 className="text-sm text-giest-100 font-light">
                 Failed to Load the Image
-              </span>
+              </h1>
             </div>
           ) : (
             <div className="overflow-hidden">
@@ -788,9 +796,9 @@ export const UserBlogs = memo(
             <h1 className="text-[1.1rem] font-semibold ">
               {title.length > 25 ? title.substring(0, 50) + " ..." : title}
             </h1>
-            <h6 className="text-sm text-cgray font-semibold">
-              {shortCaption.length > 50
-                ? shortCaption.substring(0, 50) + " ..."
+            <h6 className="text-sm text-giest-100  font-giest">
+              {shortCaption.length > 30
+                ? shortCaption.substring(0, 30) + " ..."
                 : shortCaption}
             </h6>
             <div className="text-xs flex justify-between items-start w-full">
@@ -798,10 +806,6 @@ export const UserBlogs = memo(
               <p className="text-green-500">Published</p>
             </div>
           </div>
-
-          {/* <div className="absolute top-[-16px] right-[-10px] h-8 w-8 rounded-full bg-red-500 flex justify-center items-center">
-           
-          </div> */}
         </Link>
         {currentUserId === authorId && (
           <div className="flex justify-end items-center w-full px-4 gap-6">
@@ -845,7 +849,7 @@ export const SectionBar = memo(
     return (
       <h6
         onClick={() => setSection(label)}
-        className={`text-gray-80 cursor-pointer px-5 py-2 rounded-full capitalize
+        className={`text-gray-80 cursor-pointer px-5 py-2 rounded-full capitalize font-scribble2 tracking-wide
         ${
           section === label ? "font-bold bg-blue-300 text-black" : "text-cgray "
         }

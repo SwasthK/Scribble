@@ -38,13 +38,17 @@ export const Archived = () => {
       <AppBar />
       <div className="flex justify-center items-center w-screen sm:px-8 flex-col gap-4 pt-6">
         <div className=" flex justify-between gap-16 items-center sticky top-0  rounded-md">
-          <div className="flex justify-center gap-3 items-center px-4 py-2 bg-black rounded-md">
+          <div className="flex justify-center gap-3 items-center px-6 py-1 bg-cgray-100 border border-b-dark-200 rounded-md">
             <h1 className="font-semibold">Archived Posts</h1>
-            <ArchiveIcon size={20} />
+            <ArchiveIcon size={18} />
           </div>
           {!isLoading && !isError && (
-            <div className="p-[0.7rem] bg-black flex justify-center items-center rounded-md">
-              <RefreshIcon onClick={hadleReftechArchivedPosts} size={18} />
+            <div
+              onClick={hadleReftechArchivedPosts}
+              className="px-6 py-1 gap-2 cursor-pointer bg-cgray-100 border border-b-dark-200 flex justify-center items-center rounded-md"
+            >
+              <h1> Refresh</h1>
+              <RefreshIcon size={18} />
             </div>
           )}
         </div>
@@ -62,7 +66,7 @@ export const Archived = () => {
         {isRefetching && (
           <div className="relative skeleton-parent flex justify-center items-center rounded-md">
             <h1 className="px-2 py-1 skeleton-child rounded-md h-9 w-[20rem]"></h1>
-            <h1 className="absolute font-semibold">
+            <h1 className="absolute text-giest-100 font-light">
               Plase wait while we are fetching data
             </h1>
           </div>

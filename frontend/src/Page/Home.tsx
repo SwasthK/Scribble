@@ -1,6 +1,6 @@
 // import React from 'react';
 // import { AppBar } from "../components/AppBar/AppBar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { LandingBg } from "../components/Home/LandingBg";
 import { GitHubIcon } from "../assets/svg/GitHubIcon";
 import { TwitterIcon } from "../assets/svg/TwitterIcon";
@@ -9,6 +9,7 @@ import { Mail } from "lucide-react";
 // import { Outlet } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
   return (
     // <>
     //   <AppBar />
@@ -24,10 +25,10 @@ const Home = () => {
 
       {/* Scrollable Content */}
       <div className="relative z-10 h-full w-full overflow-y-scroll">
-        <div className="w-[90%] mx-auto text-white ">
+        <div className="w-[100%] text-white ">
           <div className="h-screen flex justify-center items-center  flex-col gap-10  relative">
             <div className="relative">
-              <h1 className="mb-2 text-7xl sm:text-9xl font-scribble2 sm:mb-9">
+              <h1 className="mb-2 text-7xl sm:text-9xl font-scribble2 sm:mb-9 font-bold">
                 Scribble .
               </h1>
               <h3 className="text rotate-[-3deg] absolute bottom-[-1.2rem] right-[-1rem] sm:absolute sm:bottom-0 sm:right-0  font-scribble2 sm:text-xl">
@@ -38,21 +39,21 @@ const Home = () => {
               Write, connect, and inspire with our modern blogging platform
             </h1>
 
-            <div className="flex gap-5 sm:gap-12 w-full justify-center mt-4">
-              <button className="px-6 py-2 sm:px-10 sm:py-5 rounded-full border text-black bg-white font-extralight">
+            <div className="flex gap-5 sm:gap-12 w-full justify-center mt-4 font-scribble2">
+              <button
+                onClick={() => navigate("/login")}
+                className="px-4 py-3.5 sm:px-10 sm:py-5 rounded-full border text-black bg-white "
+              >
                 Register
               </button>
-              {/* <div className="flex flex-col"> */}
               <button className="font-scribble2 px-6 py-2 sm:px-10 sm:py-5 rounded-full border text-white bg-cdark-300">
                 Continue without Registering &#8594;
               </button>
-              {/* <h1></h1> */}
-              {/* </div> */}
             </div>
           </div>
 
           <div
-            className="rounded-xl sm:py-16 py-4 flex flex-col gap-10 border lg:px-16"
+            className="rounded-t-xl sm:py-16 py-4 flex flex-col gap-10  md:px-16 sm:mx-10 lg:mx-20 mx-0"
             style={{
               background: "linear-gradient(to bottom, #051E2E, #000)",
             }}
@@ -60,7 +61,7 @@ const Home = () => {
             <div className="flex items-center gap-12 flex-col lg:flex-row lg:gap-24 py-8 justify-center">
               <img
                 src="/Block-animation.gif"
-                className="border border-alphaborder w-[25rem] sm:w-[30rem] object-contain rounded-lg"
+                className="border border-alphaborder w-[24rem] sm:w-[30rem] object-contain rounded-lg"
               ></img>
               <div className="max-w-[30rem] flex flex-col gap-4 sm:gap-10 font-scribble2 -tracking-wide">
                 <h1 className="text-3xl md:text-5xl font-semibold">
@@ -82,7 +83,7 @@ const Home = () => {
             <div className="flex items-center gap-12 flex-col lg:flex-row-reverse lg:gap-24 py-8 justify-center">
               <img
                 src="/Block-animation.gif"
-                className="border border-alphaborder w-[25rem] sm:w-[30rem]  object-contain rounded-lg"
+                className="border border-alphaborder w-[24rem] sm:w-[30rem]  object-contain rounded-lg"
               ></img>
               <div className="max-w-[30rem] flex flex-col gap-4 sm:gap-10 font-scribble2 -tracking-wide">
                 <h1 className="text-3xl md:text-5xl font-semibold ">
@@ -105,7 +106,7 @@ const Home = () => {
           </div>
 
           {/* Second Section */}
-          <div className="w-full bg-[#0C0C0C] sm:py-16 sm:pt-20 pb-12 pt-20 flex flex-col gap-10 lg:px-16 sm:px-16    rounded-tr-xl rounded-tl-xl font-scribble2">
+          <div className=" bg-[#0C0C0C] sm:py-16 sm:pt-20 pb-12 pt-20 flex flex-col gap-10 lg:px-16 sm:px-16  md:px-16 sm:mx-10 lg:mx-20 mx-0   rounded-b-xl font-scribble2">
             <div className=" flex gap-4 flex-col w-full  px-8 sm:px-0">
               <p className="font-semibold w-[100%] md:w-[30rem] text-sm text-[#95959D]">
                 Runway | Tools for human imagination.
@@ -129,7 +130,7 @@ const Home = () => {
                 <h1 className="font-semibold text-[1.1rem]  w-full  ">
                   Draft, Archive, Publish
                 </h1>
-                <h6 className="text-sm text-gray-400  w-full  ">
+                <h6 className="text-sm text-giest-100 font-light font-giest w-full  ">
                   "Manage your posts your way — work in progress, organize
                   archived ideas, or share with the world.
                 </h6>
@@ -144,7 +145,7 @@ const Home = () => {
                 <h1 className="font-semibold text-[1.1rem]  w-full  ">
                   Engage & Connect
                 </h1>
-                <h6 className="text-sm text-gray-400  w-full  ">
+                <h6 className="text-sm text-giest-100 font-light font-giest w-full  ">
                   "Follow creators, comment on posts, and build meaningful
                   connections."
                 </h6>
@@ -159,7 +160,7 @@ const Home = () => {
                 <h1 className="font-semibold text-[1.1rem]  w-full  ">
                   Like, Save & Report
                 </h1>
-                <h6 className="text-sm text-gray-400  w-full  ">
+                <h6 className="text-sm text--400  w-full text-giest-100 font-light font-giest">
                   "Engage with posts you love, save them for later, or report
                   inappropriate content."
                 </h6>
@@ -179,18 +180,18 @@ const Home = () => {
               <img
                 src="/Block-animation.gif"
                 alt="Profile example 1"
-                className="w-60 h-60  rounded-md object-contain"
+                className="w-96 h-60  rounded-md object-cover"
               />
               <img
                 src="/Block-animation.gif"
                 alt="Profile example 2"
-                className="w-60 h-60  rounded-md object-contain"
+                className="w-96 h-60  rounded-md object-cover"
               />
             </div>
           </div>
 
-          <div className="h-screen sm:px-8 sm:py-24 px-5 py-8  flex flex-col justify-center items-center font-scribble2">
-            <div className="sm:text-center pb-8">
+          <div className=" sm:px-8 md:py-60 sm:py-48 px-3 py-36 flex flex-col justify-center items-center font-scribble2">
+            <div className="sm:text-center pb-8 px-4">
               <h1 className="text-6xl font-bold">
                 Ready to Start Your Blogging Journey?
               </h1>
@@ -199,20 +200,17 @@ const Home = () => {
                 communities.
               </p>
             </div>
-            <div className=" flex gap-5 sm:gap-12 w-full justify-center mt-4">
-              <Link to="/register"
-
-              className="px-6 py-2 sm:px-10 sm:py-5 rounded-full border text-black bg-white font-extralight">
+            <div className=" flex gap-5 sm:gap-12 w-full justify-center mt-4 font-scribble2">
+              <button
+                onClick={() => navigate("/login")}
+                className="px-4 py-3.5 sm:px-10 sm:py-5 rounded-full border text-black bg-white "
+              >
                 Register
-              </Link>
-              {/* <div className="flex flex-col"> */}
-              <Link to="/register" className="font-scribble2 px-6 py-2 sm:px-10 sm:py-5 rounded-full border text-white bg-cdark-300">
+              </button>
+              <button className="font-scribble2 px-6 py-2 sm:px-10 sm:py-5 rounded-full border text-white bg-cdark-300">
                 Continue without Registering &#8594;
-              </Link >
-              {/* <h1></h1> */}
-              {/* </div> */}
+              </button>
             </div>
-
           </div>
         </div>
         <div className="w-screen font-scribble1 py-12 md:px-10 lg:px-36 text-sm flex justify-between items-center bg-[#09090B] flex-col md:flex-row gap-8 md:gap-0">

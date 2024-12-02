@@ -17,8 +17,8 @@ export const Save = () => {
       <div className="flex justify-center items-center flex-row w-screen sm:p-4">
         <div className="flex items-center justify-between gap-4 py-6 sm:py-4  w-[50rem] px-8 bg-[#2F2F2F] sm:rounded-lg">
           <div className="flex items-center gap-4">
-            <h1 className="md:text-lg font-semibold">Saved Posts</h1>
-            <GridIcon size={28} />
+            <h1 className="md:text-base font-semibold">Saved Posts</h1>
+            <GridIcon size={22} />
           </div>
           <div className="flex items-center">
             <RefreshIcon onClick={refetch} size={20} />
