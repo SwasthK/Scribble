@@ -84,22 +84,22 @@ export const SearchComponent = memo(() => {
     <>
       <button
         onClick={handleSearchClick}
-        className="flex gap-8 justify-between items-center p-2 sm:rounded-full sm:px-8 rounded-full border"
+        className="flex gap-5 justify-between items-center p-2 sm:rounded-full sm:px-8 rounded-full border border-b-dark-200 bg-[#383434]"
       >
         <Search size={18} />
-        <p className="hidden sm:block text-sm font-semibold bg-[#2E2E2E] px-2 rounded-md ">
+        <p className="hidden sm:block text-sm font-semibold px-3 rounded-md ">
           Ctrl + K
         </p>
       </button>
 
       <Command>
-        <CommandDialog open={open} onOpenChange={setOpen}>
-          <CommandInput
+        <CommandDialog open={open} onOpenChange={setOpen} >
+          <CommandInput 
             placeholder="Search posts, profile, write..."
             value={searchQuery}
             onValueChange={(e: string) => handleSearch(e)}
           />
-          <CommandList>
+          <CommandList >
             <CommandEmpty>No results found.</CommandEmpty>
 
             <CommandGroup heading="Commands">

@@ -136,18 +136,17 @@ export const AppBar = () => {
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
 
-            <Link to={`/profile/@${currentUser.username}`} className="px-4 pr-20 py-[0.6rem]">
+            <Link
+              to={`/profile/@${currentUser.username}`}
+              className="px-4 pr-20 py-[0.6rem]"
+            >
               {currentUser.username}{" "}
               <span className="text-cgreen ml-3">&#x2022; Active</span>
             </Link>
           </>
         </div>
         <div className="menu flex flex-col gap-2 text-base">
-          <MenuItems
-            icon={EditIcon}
-            label="Write"
-            url={"/post/handle"}
-          />
+          <MenuItems icon={EditIcon} label="Write" url={"/post/handle"} />
           <hr className="opacity-30 mt-2 mb-1" />
           <MenuItems
             icon={UserIcon}
@@ -168,7 +167,7 @@ export const AppBar = () => {
           />
 
           {currentUser.email && (
-            <h1 className="mt-4 text-cgray menuItems">{currentUser.email}</h1>
+            <h1 className="mt-4 text-cgray menuItems font-light">{currentUser.email}</h1>
           )}
 
           <MenuItems

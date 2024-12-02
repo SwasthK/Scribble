@@ -515,8 +515,8 @@ export const HandlePost = () => {
         </>
       ) : (
         <>
-          <div className="flex justify-center items-center px-8 py-8 sm:px-16">
-            <div className="fixed top-24 w-[95%]  max-w-[800px] flex items-center justify-between px-16 bg-slate-800 rounded-full">
+          <div className="flex justify-center items-center px-8 py-8 sm:px-16 font-giest">
+            <div className="fixed top-24 w-[95%]  max-w-[800px] flex items-center justify-between px-4 sm:px-8">
               <div className="flex gap-3 items-center  py-3">
                 <button
                   onClick={handleDraft}
@@ -525,7 +525,7 @@ export const HandlePost = () => {
                     loadPublish
                       ? "disabled:bg-[#8babce] "
                       : "disabled:bg-transparent"
-                  } bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold w-[5.5rem]`}
+                  }  bg-cgray-100  py-[0.3rem] rounded-lg font-semibold border px-2 border-b-dark-200`}
                 >
                   <div className="flex justify-center items-center gap-2">
                     {!loadDraft ? (
@@ -533,7 +533,12 @@ export const HandlePost = () => {
                         <SaveFileIcon
                           color={loadDraft ? "currentColor" : "currentColor"}
                         />
-                        <p>Draft</p>
+                        <p>
+                          Draft{" "}
+                          <span className="text-[0.8rem] text-giest-300 pl-1.5">
+                            Ctrl + D
+                          </span>
+                        </p>
                       </>
                     ) : (
                       <>
@@ -547,8 +552,8 @@ export const HandlePost = () => {
               <div className="flex gap-3 items-center ">
                 {published ? (
                   <>
-                    <p className="font-semibold">
-                      Live at <span className="text-cgreen ml-2">&#x2022;</span>
+                    <p className="font-normal font-giest text-sm md:text-base">
+                      This Page is live on <span className="text-cgreen ml-2">&#x2022;</span>
                     </p>
 
                     <Link to={postURL}>
@@ -671,7 +676,7 @@ export const HandlePost = () => {
                           : handlePublish();
                       }}
                       disabled={loadPublish || loadDraft ? true : false}
-                      className={`cursor-pointer h-[2.2rem] disabled:cursor-not-allowed bg-[#007bff] px-3 py-[0.3rem] rounded-lg font-semibold 
+                      className={`cursor-pointer h-[2.2rem] disabled:cursor-not-allowed bg-[#007bff] hover:bg-[#1f6857] px-3 py-[0.3rem] rounded-lg font-semibold transition-colors duration-100
                      ${
                        loadDraft
                          ? "disabled:bg-[#8babce] "
@@ -702,19 +707,19 @@ export const HandlePost = () => {
                 )}
               </div>
             </div>
-            <div className="w-[95%] flex flex-col gap-8 max-w-[800px] h-3/4 fixed overflow-y-scroll top-44 pb-24 px-4 sm:px-8 ">
-              <div className="rounded-lg py-5 px-8 flex  gap-8 flex-col-reverse md:flex-row bg-[#262932] md:items-center">
+            <div className="w-[95%] flex flex-col gap-8 max-w-[800px] h-3/4 fixed overflow-y-scroll top-40 pb-24 px-4 sm:px-8 ">
+              <div className="rounded-lg py-5 px-8 flex  gap-8 flex-col-reverse md:flex-row bg-[#262932 md:items-center">
                 <div className="flex flex-col gap-6 items-start ">
                   <div className="flex gap-3 flex-col w-full sm:w-96">
                     <label
                       htmlFor="title"
-                      className="text-cgray ml-2 font-semibold"
+                      className="ml-2 font-semibold"
                     >
                       Main title
                     </label>
 
                     <input
-                      className="input-style italic  text-xl"
+                      className="input-style text-xl font-scribble2 font-semibold"
                       type="text"
                       id="title"
                       name="title"
@@ -728,13 +733,13 @@ export const HandlePost = () => {
                   <div className="flex gap-3 flex-col w-full sm:w-96">
                     <label
                       htmlFor="shortCaption"
-                      className="text-cgray font-semibold ml-2"
+                      className="font-semibold ml-2"
                     >
                       Short description
                     </label>
 
                     <input
-                      className="input-style  text-base italic"
+                      className="input-style  text-base font-scribble2 font-semibold"
                       type="text"
                       id="shortCaption"
                       name="shortCaption"
@@ -753,7 +758,7 @@ export const HandlePost = () => {
 
                 <div className="w-full sm:max-w-96 rounded-lg flex justify-center flex-col gap-3">
                   <div className="flex justify-between pr-1 items-center">
-                    <p className="text-cgray font-semibold ml-2">Cover Image</p>
+                    <p className="font-semibold ml-2">Cover Image</p>
                     {image && (
                       <Cancel
                         className={"cursor-pointer"}
@@ -774,25 +779,25 @@ export const HandlePost = () => {
                       htmlFor="coverImage"
                       className={`overflow-hidden flex flex-col w-full ${
                         !image
-                          ? "border-2 hover:bg-gray-800 bg-gray-700 border-gray-600 hover:border-gray-500"
+                          ? "border-2 hover:bg-gray-800 bg-[#232e3e] border-gray-600 hover:border-gray-500"
                           : "border-none"
-                      } border-dashed rounded-lg cursor-pointer `}
+                      } border-dashed rounded-lg cursor-pointer transition-colors duration-100`}
                     >
                       {image ? (
-                        <div className="flex flex-col items-center justify-center pb-1 h-[8.5rem] ">
+                        <div className="flex flex-col items-center justify-center pb-1.5 h-[8.5rem] ">
                           <img
                             src={image}
                             alt="Preview"
                             className="w-full h-[7rem] object-cover mb-1 rounded-lg"
                           />
-                          <p className="text-sm text-gray-400">Change image</p>
+                          <p className="text-sm text-gray-400 bg-cgray-100 px-2 border border-b-dark-200 rounded-md">Change image</p>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <CloudUploadIcon />
                           <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
                             <span className="font-semibold">
-                              Click to upload
+                              Click here
                             </span>{" "}
                             or drag and drop
                           </p>
@@ -820,7 +825,6 @@ export const HandlePost = () => {
               <BlockNoteView
                 editor={editor}
                 editable={true}
-                // data-changing-font-demo
                 data-theming-css-variables-demo
                 formattingToolbar={true}
                 onChange={handleBodyChange}
@@ -837,7 +841,7 @@ export const HandlePost = () => {
                   maxLength={200}
                   minLength={10}
                   onChange={handleInputChange}
-                  className="min-h-16 max-h-28 border input-style italic"
+                  className="min-h-16 max-h-28 border input-style font-scribble2"
                 ></input>
               </div>
             </div>
@@ -857,9 +861,9 @@ const ToggleComments = memo(({ formData, setFormData, setPublished }: any) => {
     }));
   };
 
-  useEffect(()=>{
-    console.log("DATA : ",formData.allowComments);
-  },[formData])
+  useEffect(() => {
+    console.log("DATA : ", formData.allowComments);
+  }, [formData]);
 
   return (
     <>

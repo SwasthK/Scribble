@@ -47,6 +47,7 @@ export type SvgIconType = {
     stroke?: string,
     strokeWidth?: string;
     target?: string;
+    disabled?: boolean;
 }
 
 export interface updateUserProfileMetaData {

@@ -54,8 +54,8 @@ export const Followers = () => {
             onClick={() => setActiveSection(pageSection.Followers)}
             className={`${
               activeSection === pageSection.Followers
-                ? "underline text-yellow-300"
-                : ""
+                ? ""
+                : "text-giest-100 font-light"
             } text-md font-bold cursor-pointer`}
           >
             Followers
@@ -64,8 +64,8 @@ export const Followers = () => {
             onClick={() => setActiveSection(pageSection.Followings)}
             className={`${
               activeSection === pageSection.Followings
-                ? "underline text-yellow-300"
-                : ""
+                ? ""
+                : "text-giest-100 font-light"
             } text-md font-bold cursor-pointer `}
           >
             Following
@@ -97,7 +97,7 @@ export const Followers = () => {
               <div className="w-full flex gap-2 items-center">
                 <label
                   htmlFor="sort-selector"
-                  className="text-sm font-semibold"
+                  className="text-sm text-giest-100 font-medium"
                 >
                   Sort by :
                 </label>
@@ -194,7 +194,7 @@ const UserCards = memo(
           <AvatarFallback>{username.slice(0, 2)}</AvatarFallback>
         </Avatar>
 
-        <h1 className="font-semibold">{username || ""}</h1>
+        <h1 className="font-medium">{username || "Anonymous"}</h1>
       </Link>
     );
   }

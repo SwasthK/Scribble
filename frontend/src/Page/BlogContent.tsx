@@ -7,8 +7,7 @@ import { useGetPostBySlug } from "../services/queries";
 export const BlogContent = () => {
   const navigate = useNavigate();
   const { slug } = useParams();
-  const { data, isError, error, isLoading } =
-    useGetPostBySlug(slug);
+  const { data, isError, error, isLoading } = useGetPostBySlug(slug);
 
   return (
     <div>
@@ -17,11 +16,13 @@ export const BlogContent = () => {
       {isLoading ? (
         <Blog_Content_Skeleton />
       ) : isError ? (
-        <div className="h-screen w-screen flex flex-col justify-center items-center gap-8">
-          <h1 className="text-3xl font-semibold">{error.message}</h1>
+        <div className="h-screen w-screen flex flex-col justify-center items-center gap-7 bg-cdark-100">
+          <h1 className="text-lg font-semibold font-scribble2 tracking-wide ">
+            {error.message}
+          </h1>
           <button
             onClick={() => navigate("/blogs")}
-            className="px-10 py-3 border border-white hover:bg-slate-800 rounded-md font-semibold"
+            className="px-8 py-1.5  hover:bg-[#f1e8e8] hover:text-black rounded-full font-scribble2 font-bold bg-white text-black"
           >
             Explore
           </button>
