@@ -8,13 +8,20 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				scribble1: ['Scribble-1', 'sans-serif'],
 				scribble2: ['Scribble-2', 'sans-serif'],
+				giest: ['Geist Variable', 'sans-serif']
+			},
+			textColor: {
+				'giest-100': '#A1A1A1',
+				'giest-200': '#EDEDED',
+				'giest-300': '#6b7280',
+				'giest-400': '#95959D'
 			},
 			colors: {
-
 				cgray: '#d9c9c9',
 				cgreen: '#4BB543',
+				'cgray-100': '#252525',
+
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				card: {
@@ -58,7 +65,8 @@ export default {
 			},
 			borderColor: {
 				alphaborder: '#272727',
-				'b-dark-100': '#596A95'
+				'b-dark-100': '#596A95',
+				'b-dark-200': '#413d3d'
 			},
 			backgroundColor: {
 				'cdark-100': '#161616',
