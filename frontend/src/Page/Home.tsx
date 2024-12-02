@@ -1,5 +1,3 @@
-// import React from 'react';
-// import { AppBar } from "../components/AppBar/AppBar";
 import { Link, useNavigate } from "react-router-dom";
 import { LandingBg } from "../components/Home/LandingBg";
 import { GitHubIcon } from "../assets/svg/GitHubIcon";
