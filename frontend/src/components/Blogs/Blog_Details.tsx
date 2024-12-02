@@ -189,7 +189,11 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
   const [saved, setSaved] = useState(savedBy.length > 0 ? true : false);
 
   const {
-    user: { id: currentUserId, avatarUrl: currentUserAvatarUrl },
+    user: {
+      id: currentUserId,
+      avatarUrl: currentUserAvatarUrl,
+      username: currentUserUsername,
+    },
   } = useRecoilValue(authAtom);
 
   const location = useLocation();
@@ -386,17 +390,17 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
 
   return (
     <>
-      <div className="flex justify-center items-center px-8  pt-8  sm:px-16">
+      <div className="flex justify-center items-center px-8  pt-8  sm:px-16 font-scribble2">
         <div className="w-full flex flex-col gap-8 max-w-[700px]">
           <div className="min-h-96 max-w-3/4 ">
             <h1
               style={{ wordBreak: "break-word", lineHeight: "1.3" }}
-              className="text-5xl sm:text-4xl md:text-5xl font-bold"
+              className="text-4xl md:text-5xl font-bold tracking-wide"
             >
               {title}
             </h1>
             <p
-              className="pt-4 text-lg lg:text-xl"
+              className="pt-2 text-lg lg:text-xl font-giest text-giest-100 "
               style={{ wordBreak: "break-word", lineHeight: "1.9" }}
             >
               {shortCaption}
@@ -407,13 +411,12 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               } `}
             >
               <div className="flex gap-4 items-center justify-center">
-                {/* <Avatar size={10} url={} /> */}
                 <Avatar>
                   <AvatarImage src={author.avatarUrl} />
                   <AvatarFallback>{author.username.slice(0, 3)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="justify-between flex items-center mb-1">
+                  <div className="justify-between flex items-center mb-1 ">
                     <Link to={`/view/profile/${author.username}`}>
                       {author.username}
                     </Link>
@@ -423,13 +426,15 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                         onClick={handleFollowRequest}
                         className={`${
                           isFollowing ? " bg-[#162C35]" : "bg-[#0D82DF]"
-                        }  text-white font-semibold px-2 rounded-md text-sm py-[0.10rem]`}
+                        }  text-white font-semibold px-2 rounded-md text-sm py-[0.10rem] font-giest`}
                       >
                         {isFollowing ? "Following" : "Follow"}
                       </button>
                     )}
                   </div>
-                  <p>4 min read · {formattedDate}</p>
+                  <p className="font-giest font text-giest-100 text-sm">
+                    4 min read · {formattedDate}
+                  </p>
                 </div>
               </div>
               {currentUserId === authorId ? (
@@ -561,9 +566,9 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                 <div className="animate-pulse aspect-video bg-gray-200 rounded-xl"></div>
               )}
               {imageError ? (
-                <div className="aspect-video bg-gray-800 rounded-xl flex justify-center items-center">
+                <div className="aspect-video bg-cdark-100 rounded-xl flex justify-center items-center">
                   <h1 className="text-white font-semibold text-lg">
-                    Failed to load the image...!
+                    Failed to load an image !
                   </h1>
                 </div>
               ) : (
@@ -599,27 +604,27 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
       >
         <div className="w-full flex flex-col gap-8 max-w-[700px]">
           {summary && (
-            <div className="z-10 flex flex-col gap-4">
-              <h1 className="italic font-semibold">Summary</h1>
-              <div className="bg-[#7663630e] p-6 text-lg">
-                <h1 className="text-white">{summary}</h1>
+            <div className="z-10 flex flex-col gap-4 font-giest">
+              <h1 className="text-base font-semibold">Summary</h1>
+              <div className="bg-[#7663630e] p-6 text-sm md:text-base lg:text-lg">
+                <h1 className="  text-giest-100">{summary}</h1>
               </div>
             </div>
           )}
           {isLoading ? (
             <Comment_Skeleton />
           ) : (
-            <div className="py-3">
+            <div className="py-3 z-10">
               <h1 className="text-base font-semibold mb-4">Comments</h1>
               {allowComments === false ? (
-                <p className="text-sm text-gray-400 text-center">
+                <p className="text-sm text-gray-400 text-center pb-4">
                   Comments are disabled for this post
                 </p>
               ) : (
                 <>
                   {currentComments.length === 0 && !isLoading ? (
-                    <p className="text-sm text-gray-400 text-center">
-                      No comments available
+                    <p className="text-sm text-gray-400 text-center pb-4">
+                      Be the first one to comment on this post
                     </p>
                   ) : (
                     <>
@@ -681,13 +686,17 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               <div className="flex gap-4 items-center mt-4">
                 <Avatar>
                   <AvatarImage src={currentUserAvatarUrl} />
+                  <AvatarFallback>
+                    {currentUserUsername.slice(0, 3)}
+                  </AvatarFallback>
                 </Avatar>
+
                 <Textarea
                   value={commentContent}
                   onChange={(e) => setCommentContent(e.target.value)}
                   disabled={sendComment || !allowComments ? true : false}
                   placeholder="Write a comment..."
-                  className="py-2 border border-white font-semibold input-style"
+                  className="py-2 border border-white font-bold input-style"
                   style={{ resize: "vertical", maxHeight: "100px" }}
                 />
                 {allowComments && (
@@ -707,18 +716,21 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
           <div className="flex flex-col gap-7">
             {currentUserId !== authorId ? (
               <>
-                <div className="z-10">
-                  <img
-                    src={author.avatarUrl}
-                    alt=""
-                    className="sm:h-16 sm:w-16 w-10 h-10 rounded-full border-none"
-                  />
-                </div>
+                <Avatar className="sm:h-16 sm:w-16 w-10 h-10 rounded-full border-none">
+                  <AvatarImage src={author.avatarUrl} />
+                  <AvatarFallback>{author.username.slice(0, 3)}</AvatarFallback>
+                </Avatar>
                 <div>
                   <h1 className="sm:text-2xl font-semibold text-xl">
-                    Written by {author.username}
+                    Written by{" "}
+                    <Link
+                      className="hover:underline text-cyan-300"
+                      to={`/view/profile/${author.username}`}
+                    >
+                      {author.username}
+                    </Link>
                   </h1>
-                  <p className="py-2">53K Followers</p>
+                  <p className="pt-2 text-giest-100">Socials</p>
                 </div>
                 <div className="flex items-center gap-5">
                   <GitHubIcon size={20} />
@@ -732,11 +744,11 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
                   <Link
                     state={{ profile: false }}
                     to={`/profile/@${author.username}`}
-                    className="text-lg font-semibold text-blue-600 hover:underline"
+                    className="text-lg font-semibold text-white hover:underline"
                   >
-                    <p>{`More posts from you - @ ${author.username}`}</p>
+                    <p>{`More posts from you - @${author.username}`}</p>
                   </Link>
-                  <blockquote className="text-sm italic text-gray-600 mb-2">
+                  <blockquote className="text-sm italic text-giest-100 mb-2 mt-4">
                     "Writing is the painting of the voice." – Voltaire
                   </blockquote>
                 </div>
@@ -749,8 +761,8 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               {isLoading && <Blog_Recommendation_Skeleton />}
               {data?.length > 0 && (
                 <>
-                  <h1 className="text-lg font-semibold">
-                    More from {author.username}
+                  <h1 className="text-base font-semibold mt-7">
+                  Recommended Posts
                   </h1>
                   <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
                     {data.map((item: any, index: number) => (
@@ -827,14 +839,14 @@ export const Blog_Recommendation = ({
         </div>
         <div className="flex flex-col ">
           <div className="flex gap-4 items-center">
-            <Avatar>
+            <Avatar className="h-7 w-7">
               <AvatarImage src={author.avatarUrl} />
               <AvatarFallback>{author.username.slice(0, 3)}</AvatarFallback>
             </Avatar>
-            <p>{author.username}</p>
+            <p className="text-sm md:text-[0.9rem]">{author.username}</p>
           </div>
-          <p className="text-xl font-bold mt-5 mb-2">{title}</p>
-          <p>{shortCaption}</p>
+          <p className="text-xl font-bold mt-2 mb-1">{title}</p>
+          <p className="text-giest-100">{shortCaption}</p>
         </div>
       </Link>
     </>
