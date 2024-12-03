@@ -5,7 +5,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "../components/ui/tabs";
-import { AppBar } from "../components/AppBar/AppBar";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { GitHubIcon } from "../assets/svg/GitHubIcon";
 import { InstagramIcon } from "../assets/svg/InstagramIcon";
@@ -23,7 +22,7 @@ import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
 import { RefreshIcon } from "../assets/svg/RefreshIcon";
 
-export const ProfileView = () => {
+const ProfileView = () => {
   const { username } = useParams<{ username: string }>();
 
   const { data, refetch, isLoading, error, isError, isRefetching } =
@@ -31,7 +30,6 @@ export const ProfileView = () => {
 
   return (
     <>
-      <AppBar></AppBar>
       <div className="flex justify-center  py-20  items-center">
         <Tabs
           defaultValue="profile"
@@ -165,6 +163,8 @@ export const ProfileView = () => {
     </>
   );
 };
+
+export default ProfileView;
 
 const PostCards = memo(
   ({

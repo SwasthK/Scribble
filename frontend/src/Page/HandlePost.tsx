@@ -1,6 +1,5 @@
 import { memo, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AppBar } from "../components/AppBar/AppBar";
 import { GlobeIcon } from "../assets/svg/GlobeIcon";
 import { Link } from "react-router-dom";
 import { SaveFileIcon } from "../assets/svg/SaveFileIcon";
@@ -40,7 +39,7 @@ import { Button } from "../components/ui/button";
 import { Search } from "lucide-react";
 import { Category_Skeleton } from "../Skeleton/Category_Skeleton";
 
-export const HandlePost = () => {
+const HandlePost = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { state } = location;
@@ -508,7 +507,6 @@ export const HandlePost = () => {
 
   return (
     <>
-      <AppBar />
       {isLoading ? (
         <>
           <Blog_Handle_Skeleton />
@@ -553,7 +551,8 @@ export const HandlePost = () => {
                 {published ? (
                   <>
                     <p className="font-normal font-giest text-sm md:text-base">
-                      This Page is live on <span className="text-cgreen ml-2">&#x2022;</span>
+                      This Page is live on{" "}
+                      <span className="text-cgreen ml-2">&#x2022;</span>
                     </p>
 
                     <Link to={postURL}>
@@ -711,10 +710,7 @@ export const HandlePost = () => {
               <div className="rounded-lg py-5 px-8 flex  gap-8 flex-col-reverse md:flex-row bg-[#262932 md:items-center">
                 <div className="flex flex-col gap-6 items-start ">
                   <div className="flex gap-3 flex-col w-full sm:w-96">
-                    <label
-                      htmlFor="title"
-                      className="ml-2 font-semibold"
-                    >
+                    <label htmlFor="title" className="ml-2 font-semibold">
                       Main title
                     </label>
 
@@ -790,16 +786,16 @@ export const HandlePost = () => {
                             alt="Preview"
                             className="w-full h-[7rem] object-cover mb-1 rounded-lg"
                           />
-                          <p className="text-sm text-gray-400 bg-cgray-100 px-2 border border-b-dark-200 rounded-md">Change image</p>
+                          <p className="text-sm text-gray-400 bg-cgray-100 px-2 border border-b-dark-200 rounded-md">
+                            Change image
+                          </p>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <CloudUploadIcon />
                           <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                            <span className="font-semibold">
-                              Click here
-                            </span>{" "}
-                            or drag and drop
+                            <span className="font-semibold">Click here</span> or
+                            drag and drop
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
                             JPEG, PNG, WEBP ( MAX. 2mb )
@@ -851,6 +847,8 @@ export const HandlePost = () => {
     </>
   );
 };
+
+export default HandlePost;
 
 const ToggleComments = memo(({ formData, setFormData, setPublished }: any) => {
   const handleToggle = () => {

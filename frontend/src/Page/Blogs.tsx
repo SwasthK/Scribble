@@ -1,24 +1,22 @@
-import { Blog_Card } from "../components/Blogs/Blog_Card";
-import { AppBar } from "../components/AppBar/AppBar";
+import { useEffect, memo } from "react";
+import { Link } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
+
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { Blog_Card } from "../components/Blogs/Blog_Card";
 import {
   Blogs_Fetching_Skeleton,
   Blogs_Skeleton,
 } from "../Skeleton/Blogs_Skeleton";
-import { useEffect, memo } from "react";
-import { Link } from "react-router-dom";
+
 import {
   useGetAllCategoriesAndMostLikedPost,
   useGetAllPosts,
 } from "../services/queries";
 
-import { ScrollArea } from "../components/ui/scroll-area";
-
-export const Blogs = () => {
+const Blogs = () => {
   const { ref, inView } = useInView();
 
-  const postsQuery = useGetAllPosts();
   const {
     data,
     isPending,
@@ -28,8 +26,7 @@ export const Blogs = () => {
     isFetchedAfterMount,
     hasNextPage,
     isFetchingNextPage,
-  } = postsQuery;
-
+  } = useGetAllPosts();
   const categoryAndLikedpost = useGetAllCategoriesAndMostLikedPost();
 
   useEffect(() => {
@@ -46,8 +43,6 @@ export const Blogs = () => {
 
   return (
     <div className="bg-gradient-1 w-screen">
-      <AppBar />
-
       {isPending ? (
         <div className="h-screen absolute top-0 w-3/4 pt-20">
           {Array.from({ length: 6 }).map((_, index) => (
@@ -97,10 +92,6 @@ export const Blogs = () => {
               />
               <TopicGrid categoryFetch={categoryAndLikedpost} />
 
-              {/* {data.pages?.map((page: any, index) => (
-              <FollowRecommendation key={index} blogs={page.posts} />
-            ))} */}
-
               <div className="bg-[#333331] text-white p-4 rounded-lg mt-3 text-sm font-giest font-normal">
                 <p>
                   This is a blog application where you can read and share
@@ -113,7 +104,7 @@ export const Blogs = () => {
                     target="_blank"
                     className="ml-1 font-semibold text-cyan-200 hover:underline"
                   >
-                  Swasthik
+                    Swasthik
                   </Link>
                   .
                 </p>
@@ -122,13 +113,6 @@ export const Blogs = () => {
           </div>
         </div>
       )}
-      {/* {isFetchingNextPage && (
-        <div className="h-screen w-3/4 pt-20">
-          <Blogs_Skeleton />
-          <Blogs_Skeleton />
-          <Blogs_Skeleton />
-        </div>
-      )} */}
     </div>
   );
 };
@@ -299,45 +283,4 @@ const SideBarBanner = memo(
   }
 );
 
-// const FollowRecommendation = memo(({ blogs }: any) => {
-//   return (
-//     <>
-//       {Array.isArray(blogs) && blogs.length > 0 ? (
-//         <div className="space-y-8">
-//           <h1 className="text-zinc-200  font-semibold text-base mb-4 ml-2">
-//             Who to follow
-//           </h1>
-//           {blogs.slice(0, 3).map((blog: any, index: number) => (
-//             <div
-//               key={index}
-//               className="flex gap-4 justify-between items-center cursor-pointer"
-//             >
-//               <Link
-//                 to={`/view/profile/${blog.author.username}`}
-//                 className="flex gap-4 items-center rounded-xl border border-b-dark-100 w-full bg-cdark-200 px-3 py-1"
-//               >
-//                 <Avatar className="h-7 w-7">
-//                   <AvatarImage src={blog.author.avatarUrl} />
-//                   <AvatarFallback>
-//                     {blog.author.username.slice(0, 3)}
-//                   </AvatarFallback>
-//                 </Avatar>
-//                 <h1 className="capitalize text-[0.9rem] ">
-//                   {blog.author.username.length > 10
-//                     ? blog.author.username.substring(0, 10) + "..."
-//                     : blog.author.username}
-//                 </h1>
-//               </Link>
-//               <button
-//                 type="button"
-//                 className="px-5 py-2 text-black bg-white font-bold   rounded-xl  text-sm cursor-pointer"
-//               >
-//                 Follow
-//               </button>
-//             </div>
-//           ))}
-//         </div>
-//       ) : null}
-//     </>
-//   );
-// });
+export default Blogs;
