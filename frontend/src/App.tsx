@@ -8,6 +8,9 @@ import { allUsersNames, postsAtom } from "./atoms";
 import axios from "axios";
 import { Loader } from "./Skeleton/Loader";
 import SuspendedComponent from "./Layout/SuspensedComponent";
+import "@blocknote/core/fonts/inter.css";
+import "@blocknote/core/style.css";
+import "@blocknote/mantine/style.css";
 
 // Layout Imports
 import { LayoutProtected } from "./Layout/LayoutProtected";

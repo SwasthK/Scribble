@@ -762,7 +762,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
               {data?.length > 0 && (
                 <>
                   <h1 className="text-base font-semibold mt-7">
-                  Recommended Posts
+                    Recommended Posts
                   </h1>
                   <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">
                     {data.map((item: any, index: number) => (
@@ -811,7 +811,7 @@ export const Blog_Details = ({ blogContent }: { blogContent: any }) => {
   );
 };
 
-export const Blog_Recommendation = ({
+const Blog_Recommendation = ({
   title,
   coverImage,
   shortCaption,
