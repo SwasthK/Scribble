@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useState } from "react";
 // import { useParams, useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { Avatar } from "../components/Blogs/Blog_Card";
+import { Avatar } from "./Blogs/blogcard";
 import { UseFormatDate } from "../Hooks/Blogs/Format_Date";
 import { authAtom } from "../atoms/auth.atoms";
 import { useGetUserPosts } from "../services/queries";

@@ -11,7 +11,7 @@ import {
   Avatar as ShadcnAvatar,
   AvatarFallback,
   AvatarImage,
-} from "../ui/avatar";
+} from "../../components/ui/avatar";
 
 interface Blog_CardProps {
   id: string;

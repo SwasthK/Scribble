@@ -17,24 +17,24 @@ import { LayoutProtected } from "./Layout/LayoutProtected";
 import { LayoutUnProtected } from "./Layout/LayoutUnProtected";
 
 // Public Layout Imports
-const Home = lazy(() => import("./Page/Home"));
-const Signup = lazy(() => import("./Page/Signup"));
-const Signin = lazy(() => import("./Page/Signin"));
+const Home = lazy(() => import("./Pages/Home"));
+const Signup = lazy(() => import("./Pages/Signup"));
+const Signin = lazy(() => import("./Pages/Signin"));
 
 // Private Layout Imports
-const Blogs = lazy(() => import("./Page/Blogs"));
-const Profile = lazy(() => import("./Page/Profile"));
-const BlogContent = lazy(() => import("./Page/BlogContent"));
-const Draft = lazy(() => import("./Page/Draft"));
-const HandlePost = lazy(() => import("./Page/HandlePost"));
-const Save = lazy(() => import("./Page/Save"));
-const Archived = lazy(() => import("./Page/Archived"));
-const Followers = lazy(() => import("./Page/Followers"));
-const ProfileView = lazy(() => import("./Page/ProfileView"));
-const Topic = lazy(() => import("./Page/Topic"));
+const Blogs = lazy(() => import("./Pages/Blogs/index"));
+const Profile = lazy(() => import("./Pages/Profile"));
+const BlogContent = lazy(() => import("./Pages/BlogContent"));
+const Draft = lazy(() => import("./Pages/Draft"));
+const HandlePost = lazy(() => import("./Pages/HandlePost"));
+const Save = lazy(() => import("./Pages/Save"));
+const Archived = lazy(() => import("./Pages/Archived"));
+const Followers = lazy(() => import("./Pages/Followers"));
+const ProfileView = lazy(() => import("./Pages/ProfileView"));
+const Topic = lazy(() => import("./Pages/Topic"));
 
 // Catch-All Route Imports
-const NotFound = lazy(() => import("./Page/NotFound"));
+const NotFound = lazy(() => import("./Pages/NotFound"));
 
 function App() {
   function updateState(
