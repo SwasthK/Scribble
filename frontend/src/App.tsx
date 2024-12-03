@@ -28,7 +28,7 @@ const BlogContent = lazy(() => import("./Pages/BlogContent"));
 const Draft = lazy(() => import("./Pages/Draft"));
 const HandlePost = lazy(() => import("./Pages/HandlePost"));
 const Save = lazy(() => import("./Pages/Save"));
-const Archived = lazy(() => import("./Pages/Archived"));
+const Archived = lazy(() => import("./Pages/Archived/index"));
 const Followers = lazy(() => import("./Pages/Followers"));
 const ProfileView = lazy(() => import("./Pages/ProfileView"));
 const Topic = lazy(() => import("./Pages/Topic"));

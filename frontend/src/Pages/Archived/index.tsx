@@ -1,19 +1,19 @@
-import { memo, useEffect, useState } from "react";
-import { ArchiveIcon } from "../assets/svg/ArchiveIcon";
-import { UnArchiveIcon } from "../assets/svg/UnArchiveIcon";
-import { useGetAlluserArchivedPosts } from "../services/queries";
-import { trimTitle } from "../utils/trimTitle";
-import { RefreshIcon } from "../assets/svg/RefreshIcon";
-import { Archived_Post_Skeleton } from "../Skeleton/Archived_Post_Skeleton";
-import toast from "react-hot-toast";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import { lazy, Suspense, useEffect, useState } from "react";
+
+import { ArchiveIcon } from "../../assets/svg/ArchiveIcon";
+import { RefreshIcon } from "../../assets/svg/RefreshIcon";
+
+import { useGetAlluserArchivedPosts } from "../../services/queries";
+
+import { Archived_Post_Skeleton } from "./skeleton";
+
+const ArchivedCard = lazy(() => import("./archivedcard"));
 
 const Archived = () => {
+  const [posts, setPosts] = useState<any>([]);
+
   const { data, isLoading, isError, error, refetch, isRefetching } =
     useGetAlluserArchivedPosts();
-
-  const [posts, setPosts] = useState<any>([]);
 
   useEffect(() => {
     if (data) {
@@ -45,7 +45,7 @@ const Archived = () => {
               onClick={hadleReftechArchivedPosts}
               className="px-6 py-1 gap-2 cursor-pointer bg-cgray-100 border border-b-dark-200 flex justify-center items-center rounded-md"
             >
-              <h1> Refresh</h1>
+              <h1>Refresh</h1>
               <RefreshIcon size={18} />
             </div>
           )}
@@ -75,20 +75,17 @@ const Archived = () => {
             <h1>{error?.message || "No posts found"}</h1>
           </div>
         ) : (
-          <div
-            className={`max-w-[100rem]  p-2 gap-16 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 `}
+          <Suspense
+            fallback={
+              <>
+                {Array.from({ length: 9 }).map((_, index) => (
+                  <Archived_Post_Skeleton key={index} />
+                ))}
+              </>
+            }
           >
-            {posts?.map((post: any) => (
-              <ArchivedCard
-                key={post.id}
-                id={post.id}
-                slug={post.slug}
-                coverImage={post.coverImage}
-                title={post.title}
-                onUnArchive={handleUnArchive}
-              />
-            ))}
-          </div>
+            <ArchivedCard posts={posts} onUnArchive={handleUnArchive} />
+          </Suspense>
         )}
       </div>
     </>
@@ -96,53 +93,3 @@ const Archived = () => {
 };
 
 export default Archived;
-
-const ArchivedCard = memo(
-  ({
-    id,
-    slug,
-    coverImage,
-    title,
-    onUnArchive,
-  }: {
-    id: string;
-    slug: string;
-    coverImage: string;
-    title: string;
-    onUnArchive: (id: string) => void;
-  }) => {
-    const handleOnUnArchive = async () => {
-      onUnArchive(id);
-      try {
-        axios.post(
-          `/post/unarchive/${id}`,
-          {},
-          {
-            headers: {
-              accessToken: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-      } catch (error) {
-        toast.error("Failed to UnArchive the post");
-      }
-    };
-
-    return (
-      <>
-        <div className="w-full flex gap-4 justify-start items-center rounded-md pr-2 bg-[#27272A]">
-          <img
-            src={coverImage || ""}
-            className="h-16 w-16 bg-gray-300 rounded-l-md object-cover"
-          ></img>
-          <div className="flex justify-between items-center gap-2">
-            <Link to={`/blog/${slug}`} className="min-w-52 font-semibold">
-              <h1> {trimTitle(title, 30)}</h1>
-            </Link>
-            <UnArchiveIcon size={26} onclick={handleOnUnArchive} />
-          </div>
-        </div>
-      </>
-    );
-  }
-);
