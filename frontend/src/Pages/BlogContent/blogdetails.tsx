@@ -17,14 +17,15 @@ import { followAtom } from "../../atoms/followAtom";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../../components/ui/avatar";
 
 import { EditIcon } from "../../assets/svg/EditIcon";
 import { BookMarkIcon } from "../../assets/svg/BookMarkIcon";
 import { LikeIcon } from "../../assets/svg/LikeIcon";
-
-
-
 
 const ReportPost = lazy(() => import("../../Pages/BlogContent/reportpost"));
 const Comment = lazy(() => import("../../Pages/BlogContent/comment"));

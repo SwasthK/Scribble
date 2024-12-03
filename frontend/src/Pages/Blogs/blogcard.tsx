@@ -12,6 +12,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "../../components/ui/avatar";
+import { minCaluclate } from "../../utils/minCaluclate";
 
 interface Blog_CardProps {
   id: string;
@@ -159,17 +160,9 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
 
             <div className="flex items-center gap-8 cursor-auto">
               <div className="gap-3 items-center text-sm hidden sm:flex">
-                {/* {tags.map((tag) => (
-                  <div
-                    key={tag}
-                    className="font-semibold text-xs p-1 px-2.5 rounded-md bg-sky-500 text-center justify-center items-center flex"
-                  >
-                    {tag}
-                  </div>
-                ))} */}
-                <h1 className="text-giest-200">{`${Math.ceil(
-                  title.length / 500
-                )} min read`}</h1>
+                <h1 className="text-giest-200">
+                  {minCaluclate(title)} min read
+                </h1>
               </div>
               <div className="flex gap-8 items-center">
                 <div className="flex items-center gap-2 cursor-pointer">
