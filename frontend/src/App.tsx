@@ -31,7 +31,7 @@ const Save = lazy(() => import("./Pages/Save"));
 const Archived = lazy(() => import("./Pages/Archived/index"));
 const Followers = lazy(() => import("./Pages/Followers"));
 const ProfileView = lazy(() => import("./Pages/ProfileView"));
-const Topic = lazy(() => import("./Pages/Topic"));
+const Topic = lazy(() => import("./Pages/Topic/index"));
 
 // Catch-All Route Imports
 const NotFound = lazy(() => import("./Pages/NotFound"));
