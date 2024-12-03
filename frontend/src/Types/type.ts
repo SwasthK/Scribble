@@ -1,32 +1,3 @@
-import { ChangeEvent } from "react";
-
-export interface MenuItemType {
-    icon?: any
-    path?: string;
-    className?: string;
-    label?: string;
-}
-
-export interface InputBoxProps {
-    label: string;
-    type?: string;
-    placeholder: string;
-    onChange: (
-        e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
-    ) => void;
-}
-
-export interface FormProps {
-    FormType: string;
-}
-
-export interface RightBarType {
-    title: string;
-    author: string;
-    shortNote?: string;
-    url?: string
-}
-
 export enum mimeTypeSignup {
     JPEG = 'image/jpeg',
     PNG = 'image/png',
