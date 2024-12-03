@@ -12,7 +12,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { authAtom } from "../../atoms/auth.atoms";
 import { Cancel } from "../../assets/svg/Cancel";
-import { Upload } from "../../assets/svg/Upload";
 import { Next } from "../../assets/svg/Next";
 import { Eye } from "../../assets/svg/Eye";
 import { Spinner } from "../Global/Spinner";
