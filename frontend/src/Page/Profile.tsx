@@ -695,7 +695,7 @@ const Profile = () => {
 
 export default Profile;
 
-export const UserBlogs = memo(
+const UserBlogs = memo(
   ({
     authorId,
     currentUserId,
@@ -827,7 +827,7 @@ export const UserBlogs = memo(
   }
 );
 
-export const SectionBar = memo(
+const SectionBar = memo(
   ({
     label,
     section,
