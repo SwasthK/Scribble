@@ -1,8 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Blog_Content_Skeleton } from "./skeleton";
-
-import { Blog_Details } from "./blogdetails";
 import { useGetPostBySlug } from "../../services/queries";
+
+import { Blog_Content_Skeleton } from "./skeleton";
+import { Blog_Details } from "./blogdetails";
 
 const BlogContent = () => {
   const navigate = useNavigate();

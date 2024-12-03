@@ -32,7 +32,7 @@ const DraftCard = memo(
 
             <p className="mb-3 font-normal text-gray-400">
               <ReactTimeAgo
-                date={new Date(post.date)}
+                date={new Date(post.updatedAt)}
                 locale="en-US"
                 timeStyle={"round-minute"}
                 updateInterval={1000}

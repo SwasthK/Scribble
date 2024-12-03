@@ -24,8 +24,8 @@ const Signin = lazy(() => import("./Pages/Signin"));
 // Private Layout Imports
 const Blogs = lazy(() => import("./Pages/Blogs/index"));
 const Profile = lazy(() => import("./Pages/Profile"));
-const BlogContent = lazy(() => import("./Pages/BlogContent"));
-const Draft = lazy(() => import("./Pages/Draft"));
+const BlogContent = lazy(() => import("./Pages/BlogContent/index"));
+const Draft = lazy(() => import("./Pages/Draft/index"));
 const HandlePost = lazy(() => import("./Pages/HandlePost"));
 const Save = lazy(() => import("./Pages/Save"));
 const Archived = lazy(() => import("./Pages/Archived/index"));
