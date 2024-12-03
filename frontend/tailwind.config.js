@@ -8,8 +8,8 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				scribble2: ['Scribble-2', 'sans-serif'],
-				giest: ['Geist Variable', 'sans-serif']
+				giest: ['var(--font-primary)', 'sans-serif'],
+				scribble2: ['var(--font-secondary)', 'sans-serif']
 			},
 			textColor: {
 				'giest-100': '#A1A1A1',
