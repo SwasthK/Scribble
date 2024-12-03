@@ -1,7 +1,7 @@
 import { RightBar } from "../components/Auth/RightBar";
 import { Login } from "../components/Auth/Login";
 
-export const Signin = () => {
+const Signin = () => {
   return (
     <div className="flex h-screen bg-cdark-100 ">
       <div className="lg:block hidden sm:w-[60%] relative ">
@@ -19,3 +19,5 @@ export const Signin = () => {
     </div>
   );
 };
+
+export default Signin;

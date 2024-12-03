@@ -2,7 +2,6 @@ import axios from "axios";
 
 import { useRecoilState } from "recoil";
 import { userState } from "../../atoms/userAtom";
-import { BACKEND_URL } from "../../config";
 import { useResetUserState } from "../../atoms/userAtom";
 import { useState } from "react";
 
@@ -19,8 +18,7 @@ const useFetchData = () => {
     }
 
     try {
-     
-      const response = await axios.get(`${BACKEND_URL}/api/v1/verifyUser`, {
+      const response = await axios.get(`/verifyUser`, {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },

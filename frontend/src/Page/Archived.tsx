@@ -1,7 +1,6 @@
 import { memo, useEffect, useState } from "react";
 import { ArchiveIcon } from "../assets/svg/ArchiveIcon";
 import { UnArchiveIcon } from "../assets/svg/UnArchiveIcon";
-import { AppBar } from "../components/AppBar/AppBar";
 import { useGetAlluserArchivedPosts } from "../services/queries";
 import { trimTitle } from "../utils/trimTitle";
 import { RefreshIcon } from "../assets/svg/RefreshIcon";
@@ -10,7 +9,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-export const Archived = () => {
+const Archived = () => {
   const { data, isLoading, isError, error, refetch, isRefetching } =
     useGetAlluserArchivedPosts();
 
@@ -35,7 +34,6 @@ export const Archived = () => {
 
   return (
     <>
-      <AppBar />
       <div className="flex justify-center items-center w-screen sm:px-8 flex-col gap-4 pt-6">
         <div className=" flex justify-between gap-16 items-center sticky top-0  rounded-md">
           <div className="flex justify-center gap-3 items-center px-6 py-1 bg-cgray-100 border border-b-dark-200 rounded-md">
@@ -96,6 +94,8 @@ export const Archived = () => {
     </>
   );
 };
+
+export default Archived;
 
 const ArchivedCard = memo(
   ({

@@ -1,5 +1,4 @@
 import { memo, useEffect, useMemo, useState } from "react";
-import { AppBar } from "../components/AppBar/AppBar";
 import { Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FollowerCard_Skeleton } from "../Skeleton/FollowerCard_Skeleton";
@@ -11,7 +10,7 @@ enum pageSection {
   Followings = "Followings",
 }
 
-export const Followers = () => {
+const Followers = () => {
   const [activeSection, setActiveSection] = useState(pageSection.Followers);
   const [followers, setFollowers] = useState([]);
   const [followings, setFollowings] = useState([]);
@@ -47,7 +46,6 @@ export const Followers = () => {
 
   return (
     <>
-      <AppBar />
       <div className="flex justify-center flex-col items-center gap-6 mt-10 py-4">
         <div className="flex gap-6">
           <h1
@@ -181,6 +179,8 @@ export const Followers = () => {
     </>
   );
 };
+
+export default Followers;
 
 const UserCards = memo(
   ({ username, avatarUrl }: { username: string; avatarUrl: string }) => {

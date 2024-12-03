@@ -1,7 +1,7 @@
 import { Register } from "../components/Auth/Register";
 import { RightBar } from "../components/Auth/RightBar";
 
-export const Signup = () => {
+const Signup = () => {
   return (
     <div className="flex h-screen bg-cdark-100">
       <div className="lg:block hidden sm:w-[60%] relative ">
@@ -19,3 +19,5 @@ export const Signup = () => {
     </div>
   );
 };
+
+export default Signup;

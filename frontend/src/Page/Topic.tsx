@@ -1,11 +1,10 @@
 import { Link, useParams } from "react-router-dom";
-import { AppBar } from "../components/AppBar/AppBar";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { useGetPostsByCategoryName } from "../services/queries";
 import { useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 
-export const Topic = () => {
+ const Topic = () => {
   const { categoryName } = useParams();
 
   const { data, isLoading, isError } = useGetPostsByCategoryName(
@@ -18,7 +17,6 @@ export const Topic = () => {
 
   return (
     <>
-      <AppBar></AppBar>
       <div className="grid lg:grid-cols-5 xl:gap-4 lg:gap-8 md:gap-12 gap-8 justify-center items-center xl:p-20 lg:h-screen p-6 pt-16 grid-cols-1">
         <div className=" col-span-2 lg:h-[500px] h-fit   flex justify-center items-center">
           <h1 className="lg:pb-12 xl:text-3xl lg:text-2xl text-xl">
@@ -101,3 +99,5 @@ export const Topic = () => {
     </>
   );
 };
+
+export default Topic;

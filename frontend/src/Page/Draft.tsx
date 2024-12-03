@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { AppBar } from "../components/AppBar/AppBar";
 import { useGetDraftedPost } from "../services/queries";
 import { Link } from "react-router-dom";
 import { RightArrow } from "../assets/svg/RightArrow";
@@ -10,7 +9,7 @@ import axios from "axios";
 import { statusType } from "../Types/type";
 import { RefreshIcon } from "../assets/svg/RefreshIcon";
 
-export const Draft = () => {
+const Draft = () => {
   const postsQuery = useGetDraftedPost();
   const { data, isFetching, isError, error, refetch } = postsQuery;
   const [drafts, setDrafts] = useState([]);
@@ -55,7 +54,6 @@ export const Draft = () => {
 
   return (
     <>
-      <AppBar />
       <div className="w-screen lg:px-24 pb-8 text-white">
         <div className="px-8 py-8  flex flex-col  border-[#ffffff3f] shadow-sm items-start gap-8 max-w-[60rem]">
           <p className="text-base sm:text-lg bg-cgray-100 border border-b-dark-200 px-4 rounded-md">
@@ -120,6 +118,8 @@ export const Draft = () => {
     </>
   );
 };
+
+export default Draft;
 
 const DraftCard = ({
   title,

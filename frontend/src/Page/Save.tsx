@@ -1,19 +1,16 @@
 import { memo } from "react";
-import { AppBar } from "../components/AppBar/AppBar";
 import { GridIcon } from "../assets/svg/GridIcon";
 import { useGetAllUserSavedPosts } from "../services/queries";
 import { Link } from "react-router-dom";
 import { RefreshIcon } from "../assets/svg/RefreshIcon";
 import { Saved_Post_Skeleton } from "../Skeleton/Saved_Post_Skeleton";
 
-export const Save = () => {
+const Save = () => {
   const { data, isLoading, isError, refetch, isRefetching, error } =
     useGetAllUserSavedPosts();
 
   return (
     <>
-      <AppBar />
-
       <div className="flex justify-center items-center flex-row w-screen sm:p-4">
         <div className="flex items-center justify-between gap-4 py-6 sm:py-4  w-[50rem] px-8 bg-[#2F2F2F] sm:rounded-lg">
           <div className="flex items-center gap-4">
@@ -61,6 +58,8 @@ export const Save = () => {
     </>
   );
 };
+
+export default Save;
 
 const SaveCard = memo(
   ({ coverImage, slug }: { coverImage: string | undefined; slug: string }) => {

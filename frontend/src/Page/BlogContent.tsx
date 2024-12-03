@@ -1,18 +1,15 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Blog_Details } from "../components/Blogs/Blog_Details";
 import { Blog_Content_Skeleton } from "../Skeleton/Blog_Content_Skeleton";
-import { AppBar } from "../components/AppBar/AppBar";
 import { useGetPostBySlug } from "../services/queries";
 
-export const BlogContent = () => {
+const BlogContent = () => {
   const navigate = useNavigate();
   const { slug } = useParams();
   const { data, isError, error, isLoading } = useGetPostBySlug(slug);
 
   return (
     <div>
-      <AppBar />
-
       {isLoading ? (
         <Blog_Content_Skeleton />
       ) : isError ? (
@@ -39,3 +36,5 @@ export const BlogContent = () => {
     </div>
   );
 };
+
+export default BlogContent;

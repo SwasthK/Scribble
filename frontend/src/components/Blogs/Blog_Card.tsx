@@ -4,7 +4,7 @@ import { LikeIcon } from "../../assets/svg/LikeIcon";
 import { memo, useState } from "react";
 import { BookMarkIcon } from "../../assets/svg/BookMarkIcon";
 import axios from "axios";
-import { debounce } from "../../Page/NoveEditor";
+import { debounce } from "../../utils/debounce";
 import { trimTitle } from "../../utils/trimTitle";
 import toast from "react-hot-toast";
 import {
@@ -201,7 +201,7 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
           {imgHasError ? (
             <div className="px-4 flex justify-center items-center rounded-lg h-20 sm:h-24 md:h-28 lg:h-32 w-[25%] md:w-[12em] bg-cdark-100  sm:max-w-[20%] lg:max-w-[100%]">
               <span className="font-scribble2 text-[0.85rem] text-c">
-               ERROR
+                ERROR
               </span>
             </div>
           ) : (

@@ -1,7 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 // import { useParams, useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { AppBar } from "../components/AppBar/AppBar";
 import { Avatar } from "../components/Blogs/Blog_Card";
 import { UseFormatDate } from "../Hooks/Blogs/Format_Date";
 import { authAtom } from "../atoms/auth.atoms";
@@ -31,14 +30,13 @@ import { GitHubIcon } from "../assets/svg/GitHubIcon";
 import { TwitterIcon } from "../assets/svg/TwitterIcon";
 import { InstagramIcon } from "../assets/svg/InstagramIcon";
 
-export const Profile = () => {
+const Profile = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { state } = location;
   const { user: userData } = useRecoilValue(authAtom);
   const setUserData = useSetRecoilState(authAtom);
   const { formattedDate } = UseFormatDate(userData.createdAt);
-  const [showAboutSection, HideBlogs] = useState(true);
 
   const [section, setSection] = useState(pageSection.ABOUT);
 
@@ -200,14 +198,7 @@ export const Profile = () => {
     );
   };
 
-  const {
-    isSuccess,
-    isError: isMutationError,
-    error: mutationError,
-    isPending,
-    mutate,
-    reset,
-  } = useMutation({
+  const { isPending, mutate } = useMutation({
     mutationFn: (formData: updateUserProfileMetaData) =>
       handleUpdateUserProfileMetadata(formData),
     onSuccess: (updatedData) => {
@@ -358,8 +349,6 @@ export const Profile = () => {
 
   return (
     <>
-      <AppBar />
-
       <div className="w-screen lg:px-24 pb-10 text-white">
         <div className="relative px-8 py-8  flex border-b-[1px] border-[#ffffff3f] shadow-sm items-center gap-8 max-w-[60rem]">
           <Avatar
@@ -703,6 +692,8 @@ export const Profile = () => {
     </>
   );
 };
+
+export default Profile;
 
 export const UserBlogs = memo(
   ({
