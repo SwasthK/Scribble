@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { useEffect, useRef, useState } from "react";
 import { UserIcon } from "../../assets/svg/UserIcon";
-import { Bell } from "../../assets/svg/Bell";
 import { EditIcon } from "../../assets/svg/EditIcon";
 import { LogoutIcon } from "../../assets/svg/LogoutIcon";
 import { FollowersIcon } from "../../assets/svg/FollowersIcon";
@@ -33,6 +32,7 @@ export const AppBar = () => {
   const [logoutLoading, setLogoutLoading] = useState(false);
 
   useEffect(() => {
+    console.log("Mounted");
     const handleClickOutside = (event: MouseEvent) => {
       if (
         menuRef.current &&
@@ -110,7 +110,7 @@ export const AppBar = () => {
           <div className="">
             <SearchComponent></SearchComponent>
           </div>
-          {/* <NavItems icon={Bell} tooltip={"Notifications"} /> */}
+
           <div ref={avatarRef}>
             <Avatar onClick={toggleMenu} className="h-9 w-9 cursor-pointer">
               <AvatarImage src={currentUser.avatarUrl} />
@@ -220,31 +220,5 @@ const MenuItems = ({
         </div>
       )}
     </>
-  );
-};
-
-const NavItems = ({
-  onClick,
-  icon: Icon,
-  tooltip,
-  iconProps,
-}: {
-  onClick?: any;
-  icon: any;
-  tooltip: string;
-  iconProps?: any;
-}) => {
-  return (
-    <div
-      onClick={onClick || undefined}
-      className=" flex justify-around gap-4 items-center ring-white"
-    >
-      <div className="relative group hover:cursor-pointer hover:bg-slate-700 p-2 rounded-full transition-all duration-500">
-        <Icon {...iconProps} />
-        <div className="font-medium top-9 text-sm absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-3 py-1 text-white rounded-full opacity-0 scale-50 transition-all duration-500 group-hover:opacity-100 group-hover:scale-100">
-          {tooltip}
-        </div>
-      </div>
-    </div>
   );
 };
