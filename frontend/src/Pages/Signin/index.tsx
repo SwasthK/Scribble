@@ -1,11 +1,11 @@
-import { RightBar } from "../components/Auth/RightBar";
-import { Login } from "../components/Auth/Login";
+import LeftBar from "../../components/Auth/LeftBar";
+import { Login } from "./login";
 
 const Signin = () => {
   return (
     <div className="flex h-screen bg-cdark-100 ">
       <div className="lg:block hidden sm:w-[60%] relative ">
-        <RightBar
+        <LeftBar
           title="Write what should not <br />
             be forgotten."
           author="Isabel Allende"

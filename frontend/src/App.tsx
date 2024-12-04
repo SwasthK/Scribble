@@ -18,8 +18,8 @@ import { LayoutUnProtected } from "./Layout/LayoutUnProtected";
 
 // Public Layout Imports
 const Home = lazy(() => import("./Pages/Home/index"));
-const Signup = lazy(() => import("./Pages/Signup"));
-const Signin = lazy(() => import("./Pages/Signin"));
+const Signup = lazy(() => import("./Pages/Signup/index"));
+const Signin = lazy(() => import("./Pages/Signin/index"));
 
 // Private Layout Imports
 const Blogs = lazy(() => import("./Pages/Blogs/index"));
@@ -34,7 +34,7 @@ const ProfileView = lazy(() => import("./Pages/ProfileView/index"));
 const Topic = lazy(() => import("./Pages/Topic/index"));
 
 // Catch-All Route Imports
-const NotFound = lazy(() => import("./Pages/NotFound"));
+const NotFound = lazy(() => import("./Pages/PageNotFound/NotFound"));
 
 function App() {
   function updateState(

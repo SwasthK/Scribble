@@ -58,4 +58,11 @@ export enum socialPlatforms {
 export enum pageSection {
     Followers = "Followers",
     Followings = "Followings",
-  }
+}
+
+export interface LeftBarType {
+    title: string;
+    author: string;
+    shortNote: string;
+    url: string;
+}

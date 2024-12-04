@@ -1,20 +1,22 @@
 import { useState } from "react";
-import {
-  validateUsername,
-  validateEmail,
-  validatePassword,
-  validateFileType,
-  validateFileSize,
-} from "./register.validate";
 import { FormErrors } from "../../Types/type";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { authAtom } from "../../atoms/auth.atoms";
 import { Cancel } from "../../assets/svg/Cancel";
 import { Next } from "../../assets/svg/Next";
 import { Eye } from "../../assets/svg/Eye";
-import { Spinner } from "../Global/Spinner";
+
+import { CustomHyperLink } from "../../components/Hyperlink";
+import { Spinner } from "../../components/Global/Spinner";
+import {
+  validateEmail,
+  validatePassword,
+  validateUsername,
+  validateFileType,
+  validateFileSize,
+} from "../../components/Auth/register.validate";
 
 export const Register = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +25,6 @@ export const Register = () => {
     password: "",
     file: null as File | null,
   });
-
   const [_, setUser] = useRecoilState(authAtom);
   const [isHidden, setIsHidden] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -341,7 +342,7 @@ export const Register = () => {
             </div>
 
             <div className="flex justify-between items-center">
-              <LinkToLogin path="/login" text={"If account already exists"} />
+              <CustomHyperLink path="/login" text="If account already exists" />
               <button
                 className=" p-3 rounded-full disabled:cursor-not-allowed bg-cgray-100 border border-b-dark-200"
                 type="button"
@@ -415,24 +416,11 @@ export const Register = () => {
               )}
             </div>
             <div className="mt-8">
-              <LinkToLogin path="/login" text={"If account already exists"} />
+              <CustomHyperLink path="/login" text="If account already exists" />
             </div>
           </div>
         )}
       </form>
     </div>
-  );
-};
-
-export const LinkToLogin = ({ path, text }: { path: string; text: string }) => {
-  return (
-    <>
-      <div className="flex gap-2">
-        <Link className="font-semibold text-[#4dccf7] " to={path}>
-          Click
-        </Link>
-        <p>{text}</p>
-      </div>
-    </>
   );
 };
