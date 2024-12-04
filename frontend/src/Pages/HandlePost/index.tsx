@@ -9,7 +9,7 @@ import { createPostFormData, statusType } from "../../Types/type";
 import {
   validateFileSize,
   validateFileType,
-} from "../../components/Auth/register.validate";
+} from "../../validation/register.validate";
 import {
   validateBlogBody,
   validateShortCaption,
