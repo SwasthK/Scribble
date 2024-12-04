@@ -94,6 +94,7 @@ export async function updateDraftPostById(c: Context) {
 
     if (data.image) {
         if (Object.values(mimeTypeSignup).includes(data.image.type as mimeTypeSignup)) {
+            let uploadPreset = 'Profile_Image'
             let cloudinaryHelpers = getCloudinaryHelpers(c);
             const timestamp = Math.round((new Date).getTime() / 1000);
             const uniqueFilename = generateUniqueFilename(data.image.name);
@@ -106,6 +107,7 @@ export async function updateDraftPostById(c: Context) {
                 const signature = await generateSignatureForReplace(
                     timestamp,
                     post.coverImagePublicId,
+                    uploadPreset,
                     cloudinaryHelpers.CLOUDINARY_API_SECRET,
                     true,
                     true
@@ -114,11 +116,13 @@ export async function updateDraftPostById(c: Context) {
                 cloudinaryFormData.append('overwrite', 'true');
                 cloudinaryFormData.append('invalidate', 'true');
                 cloudinaryFormData.append('signature', signature);
+                cloudinaryFormData.append('upload_preset', uploadPreset);
             }
             else {
-                const signature = await generateSignature(timestamp, uniqueFilename, cloudinaryHelpers.CLOUDINARY_API_SECRET);
+                const signature = await generateSignature(timestamp, uniqueFilename, uploadPreset, cloudinaryHelpers.CLOUDINARY_API_SECRET);
                 cloudinaryFormData.append('public_id', uniqueFilename);
                 cloudinaryFormData.append('signature', signature);
+                cloudinaryFormData.append('upload_preset', uploadPreset);
             }
             try {
                 const uploadResponse = await cloudinaryUploader(cloudinaryFormData, cloudinaryHelpers);
@@ -143,16 +147,13 @@ export async function updateDraftPostById(c: Context) {
                             summary: data.summary,
                             body: data.body,
                             allowComments: data.allowComments,
-                            status:PostStatus.DRAFT
+                            status: PostStatus.DRAFT
                         }
                     })
                     return apiResponse(c, 200, updateDraft, "Saved Changes");
                 } catch (error) {
                     return apiError(c, 500, "Internal Server Error", { code: "CE" });
                 }
-
-
-
 
             } catch (error) {
                 console.error("Cloudinary Error: ", error);
@@ -174,7 +175,7 @@ export async function updateDraftPostById(c: Context) {
                 summary: data.summary,
                 body: data.body,
                 allowComments: data.allowComments,
-                status:PostStatus.DRAFT
+                status: PostStatus.DRAFT
             }
         })
         return apiResponse(c, 200, updateDraft, "Saved Changes");

@@ -110,7 +110,16 @@ export async function getFileToUpload(c: Context, next: Next) {
 
         const timestamp = Math.round((new Date).getTime() / 1000);
         const uniqueFilename = generateUniqueFilename(file.name);
-        const signature = await generateSignature(timestamp, uniqueFilename, cloudinaryHelpers.CLOUDINARY_API_SECRET);
+
+        let uploadPreset = '';
+
+        if (path === routes.createNewPublishedPost || path === routes.createNewDraftPost) {
+            uploadPreset = 'Blog_Cover_Image';
+        } else {
+            uploadPreset = 'Profile_Image';
+        }
+
+        const signature = await generateSignature(timestamp, uniqueFilename, uploadPreset, cloudinaryHelpers.CLOUDINARY_API_SECRET);
 
         const cloudinaryFormData = new FormData();
         cloudinaryFormData.append('file', file);
@@ -118,6 +127,7 @@ export async function getFileToUpload(c: Context, next: Next) {
         cloudinaryFormData.append('api_key', cloudinaryHelpers.CLOUDINARY_API_KEY);
         cloudinaryFormData.append('signature', signature);
         cloudinaryFormData.append('public_id', uniqueFilename);
+        cloudinaryFormData.append('upload_preset', uploadPreset);
 
         const uploadResponse = await cloudinaryUploader(cloudinaryFormData, cloudinaryHelpers);
 
@@ -131,6 +141,7 @@ export async function getFileToUpload(c: Context, next: Next) {
 
         c.set('fileUploadMessage', fileUploadMessage.SUCCESS)
         c.set('fileUploadResponse', result)
+
         return await next();
 
     } catch (error) {
@@ -147,16 +158,16 @@ export function generateUniqueFilename(originalFilename: string): string {
     return `image_${timestamp}_${randomString}.${extension}`;
 }
 
-export async function generateSignature(timestamp: number, publicId: string, CLOUDINARY_API_SECRET: string): Promise<string> {
-    const str = `public_id=${publicId}&timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
+export async function generateSignature(timestamp: number, publicId: string, uploadPreset: string, CLOUDINARY_API_SECRET: string): Promise<string> {
+    const str = `public_id=${publicId}&timestamp=${timestamp}&upload_preset=${uploadPreset}${CLOUDINARY_API_SECRET}`;
     const msgUint8 = new TextEncoder().encode(str);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function generateSignatureForReplace(timestamp: number, publicId: string, CLOUDINARY_API_SECRET: string, invalidate: boolean = true, overwrite: boolean = true) {
-    const str = `invalidate=${invalidate}&overwrite=${overwrite}&public_id=${publicId}&timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
+export async function generateSignatureForReplace(timestamp: number, publicId: string, uploadPreset: string, CLOUDINARY_API_SECRET: string, invalidate: boolean = true, overwrite: boolean = true) {
+    const str = `invalidate=${invalidate}&overwrite=${overwrite}&public_id=${publicId}&timestamp=${timestamp}&upload_preset=${uploadPreset}${CLOUDINARY_API_SECRET}`;
     const msgUint8 = new TextEncoder().encode(str);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
