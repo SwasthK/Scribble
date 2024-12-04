@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
 
-const SaveCard = memo(({ data }: { data }) => {
+const SaveCard = memo(({ data }: { data: any }) => {
   return (
     <>
       {data?.map((post: any) => (
