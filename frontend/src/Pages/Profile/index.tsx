@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { Avatar } from "./../Blogs/blogcard";
-// import { UseFormatDate } from "../../Hooks/Blogs/Format_Date";
 import { authAtom } from "../../atoms/auth.atoms";
 import { useGetUserPosts } from "../../services/queries";
-import { UserBlogs_Skeleton } from "../../Skeleton/UserBlogs_Skeleton";
+import { UserBlogs_Skeleton } from "./skeleton";
 import {
   validateBio,
   validateEmail,
@@ -29,7 +28,8 @@ import { GitHubIcon } from "../../assets/svg/GitHubIcon";
 import { TwitterIcon } from "../../assets/svg/TwitterIcon";
 import { InstagramIcon } from "../../assets/svg/InstagramIcon";
 import { SectionBar } from "./sectionbar";
-import UserBlogs from "./userblogs";
+
+const UserBlogs = lazy(() => import("./userblogs"));
 
 const Profile = () => {
   const location = useLocation();
@@ -37,7 +37,6 @@ const Profile = () => {
   const { state } = location;
   const { user: userData } = useRecoilValue(authAtom);
   const setUserData = useSetRecoilState(authAtom);
-//   const { formattedDate } = UseFormatDate(userData.createdAt);
 
   const [section, setSection] = useState(pageSection.ABOUT);
 
@@ -48,8 +47,6 @@ const Profile = () => {
   const { data, isError, error, isLoading, isFetching, refetch } = postsQuery;
 
   const pageCount = data ? Math.ceil(data.totalPosts / 6) : 6;
-
-  console.log(data);
 
   useEffect(() => {
     if (state?.section === pageSection.ABOUT) {
@@ -486,11 +483,13 @@ const Profile = () => {
                       </div>
                     ) : (
                       <>
-                        <UserBlogs
-                          onDeleteAndArchive={handleDeleteAndArchivePost}
-                          posts={posts}
-                          currentUserId={userData.id}
-                        />
+                        <Suspense fallback={<UserBlogs_Skeleton />}>
+                          <UserBlogs
+                            onDeleteAndArchive={handleDeleteAndArchivePost}
+                            posts={posts}
+                            currentUserId={userData.id}
+                          />
+                        </Suspense>
                       </>
                     )}
                   </>

@@ -17,7 +17,7 @@ import { LayoutProtected } from "./Layout/LayoutProtected";
 import { LayoutUnProtected } from "./Layout/LayoutUnProtected";
 
 // Public Layout Imports
-const Home = lazy(() => import("./Pages/Home"));
+const Home = lazy(() => import("./Pages/Home/index"));
 const Signup = lazy(() => import("./Pages/Signup"));
 const Signin = lazy(() => import("./Pages/Signin"));
 
@@ -27,7 +27,7 @@ const Profile = lazy(() => import("./Pages/Profile/index"));
 const BlogContent = lazy(() => import("./Pages/BlogContent/index"));
 const Draft = lazy(() => import("./Pages/Draft/index"));
 const HandlePost = lazy(() => import("./Pages/HandlePost/index"));
-const Save = lazy(() => import("./Pages/Save"));
+const Save = lazy(() => import("./Pages/Save/index"));
 const Archived = lazy(() => import("./Pages/Archived/index"));
 const Followers = lazy(() => import("./Pages/Followers/index"));
 const ProfileView = lazy(() => import("./Pages/ProfileView/index"));
@@ -108,7 +108,7 @@ function App() {
   async function checkAuthOnAppMount() {
     if (!user.refreshToken || !user.accessToken) {
       resetAuthAtom();
-      return; 
+      return;
     }
 
     const newAccessTokenPromise = refreshAccessToken(user.refreshToken);
