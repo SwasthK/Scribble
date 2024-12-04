@@ -62,6 +62,7 @@ export async function updateUserAvatar(c: Context) {
         if (!user) { return apiError(c, 404, "User not found!") }
 
         let cloudinaryHelpers = getCloudinaryHelpers(c);
+        let uploadPreset = 'Profile_Image';
         const timestamp = Math.round((new Date).getTime() / 1000);
         const uniqueFilename = generateUniqueFilename(image.name);
         const cloudinaryFormData = new FormData();
@@ -73,6 +74,7 @@ export async function updateUserAvatar(c: Context) {
             const signature = await generateSignatureForReplace(
                 timestamp,
                 user.avatarPublicId,
+                uploadPreset,
                 cloudinaryHelpers.CLOUDINARY_API_SECRET,
                 true,
                 true
@@ -82,11 +84,12 @@ export async function updateUserAvatar(c: Context) {
             cloudinaryFormData.append('invalidate', 'true');
             cloudinaryFormData.append('signature', signature);
         } else {
-            const signature = await generateSignature(timestamp, uniqueFilename, cloudinaryHelpers.CLOUDINARY_API_SECRET);
+            const signature = await generateSignature(timestamp, uniqueFilename, uploadPreset, cloudinaryHelpers.CLOUDINARY_API_SECRET);
             cloudinaryFormData.append('public_id', uniqueFilename);
             cloudinaryFormData.append('signature', signature);
         }
-
+        cloudinaryFormData.append('upload_preset', uploadPreset);
+        
         const uploadResponse = await cloudinaryUploader(cloudinaryFormData, cloudinaryHelpers);
 
         if (!uploadResponse.ok) {

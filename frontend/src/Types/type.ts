@@ -54,3 +54,15 @@ export enum socialPlatforms {
     X = "x",
     INSTAGRAM = "instagram",
 }
+
+export enum pageSection {
+    Followers = "Followers",
+    Followings = "Followings",
+}
+
+export interface LeftBarType {
+    title: string;
+    author: string;
+    shortNote: string;
+    url: string;
+}

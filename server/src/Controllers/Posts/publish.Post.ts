@@ -70,9 +70,13 @@ export async function updatePublishById(c: Context) {
             uniqueFilename = generateUniqueFilename(data.image.name);
         }
 
+        let uploadPreset = 'Blog_Cover_Image';
+
         if (!post.coverImage) {
+
             if (data.image) {
-                const signature = await generateSignature(timestamp, uniqueFilename, cloudinaryHelpers.CLOUDINARY_API_SECRET);
+
+                const signature = await generateSignature(timestamp, uniqueFilename, uploadPreset, cloudinaryHelpers.CLOUDINARY_API_SECRET);
                 cloudinaryFormData.append('public_id', uniqueFilename);
                 cloudinaryFormData.append('signature', signature);
             } else {
@@ -80,9 +84,11 @@ export async function updatePublishById(c: Context) {
             }
         } else {
             if (data.image) {
+
                 const signature = await generateSignatureForReplace(
                     timestamp,
                     post.coverImagePublicId,
+                    uploadPreset,
                     cloudinaryHelpers.CLOUDINARY_API_SECRET,
                     true,
                     true
@@ -120,6 +126,7 @@ export async function updatePublishById(c: Context) {
         cloudinaryFormData.append('file', data.image);
         cloudinaryFormData.append('timestamp', timestamp.toString());
         cloudinaryFormData.append('api_key', cloudinaryHelpers.CLOUDINARY_API_KEY);
+        cloudinaryFormData.append('upload_preset', uploadPreset);
 
         const uploadResponse = await cloudinaryUploader(cloudinaryFormData, cloudinaryHelpers);
 
