@@ -11,20 +11,6 @@ export const authAtom = atom<authAtomType>({
     }
 })
 
-// export const useAuthAtomCreateValue = () => {
-//     const setAuthAtomValue = useSetRecoilState(authAtom)
-//     return () => {
-//         localStorage.createItem('accessToken');
-//         localStorage.removeItem('refreshToken');
-//         setAuthAtomValue((prev) => ({
-//             ...prev,
-//             user: {},
-//             accessToken: localStorage.getItem("accessToken") || null,
-//             refreshToken: localStorage.getItem("refreshTtoken") || null,
-//         }));
-//     }
-// }
-
 export const useAuthAtomResetValue = () => {
     const setAuthAtom = useSetRecoilState(authAtom)
     return () => {
