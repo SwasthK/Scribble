@@ -5,7 +5,7 @@ import { useGetAllFollowers } from "../../services/queries";
 import { pageSection } from "../../Types/type";
 
 import { FollowerCard_Skeleton } from "../../Skeleton/FollowerCard_Skeleton";
-import FollowersSearchBarErrors from "./followerssearchbarerrorrs";
+import ErrorBar from "../../components/Error";
 const UserCards = lazy(() => import("./usercards"));
 
 const Followers = () => {
@@ -84,9 +84,7 @@ const Followers = () => {
               <FollowerCard_Skeleton key={index} />
             ))
           ) : isError ? (
-            <FollowersSearchBarErrors
-              label={error?.message || "An error occurred."}
-            />
+            <ErrorBar label={error?.message || "An error occurred."} />
           ) : (
             <>
               <div className="w-full flex gap-2 items-center">
@@ -109,11 +107,11 @@ const Followers = () => {
               {activeSection === pageSection.Followers ? (
                 <>
                   {followers?.length === 0 ? (
-                    <FollowersSearchBarErrors label="No followers found." />
+                    <ErrorBar label="No followers found." />
                   ) : (
                     <>
                       {filteredList.length === 0 ? (
-                        <FollowersSearchBarErrors label="No results found." />
+                        <ErrorBar label="No results found." />
                       ) : (
                         <>
                           <div className="w-full">
@@ -142,7 +140,7 @@ const Followers = () => {
                   ) : (
                     <>
                       {filteredList.length === 0 ? (
-                        <FollowersSearchBarErrors label="No results found." />
+                        <ErrorBar label="No results found." />
                       ) : (
                         <>
                           <div className="w-full">

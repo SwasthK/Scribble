@@ -30,7 +30,7 @@ const HandlePost = lazy(() => import("./Pages/HandlePost"));
 const Save = lazy(() => import("./Pages/Save"));
 const Archived = lazy(() => import("./Pages/Archived/index"));
 const Followers = lazy(() => import("./Pages/Followers/index"));
-const ProfileView = lazy(() => import("./Pages/ProfileView"));
+const ProfileView = lazy(() => import("./Pages/ProfileView/index"));
 const Topic = lazy(() => import("./Pages/Topic/index"));
 
 // Catch-All Route Imports
