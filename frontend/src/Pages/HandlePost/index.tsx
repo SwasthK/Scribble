@@ -1,43 +1,43 @@
 import { memo, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { GlobeIcon } from "../assets/svg/GlobeIcon";
+import { GlobeIcon } from "../../assets/svg/GlobeIcon";
 import { Link } from "react-router-dom";
-import { SaveFileIcon } from "../assets/svg/SaveFileIcon";
+import { SaveFileIcon } from "../../assets/svg/SaveFileIcon";
 import { BlockNoteView } from "@blocknote/mantine";
 import { useCreateBlockNote } from "@blocknote/react";
-import { createPostFormData, statusType } from "../Types/type";
+import { createPostFormData, statusType } from "../../Types/type";
 import {
   validateFileSize,
   validateFileType,
-} from "../components/Auth/register.validate";
+} from "../../components/Auth/register.validate";
 import {
   validateBlogBody,
   validateShortCaption,
   validateTitle,
-} from "../validation/BlogFormValidations";
+} from "../../validation/BlogFormValidations";
 import axios from "axios";
-import { Spinner } from "../components/Global/Spinner";
+import { Spinner } from "../../components/Global/Spinner";
 import { useRecoilValue } from "recoil";
-import { authAtom } from "../atoms/auth.atoms";
+import { authAtom } from "../../atoms/auth.atoms";
 import {
   useGetAllCategoriesAndMostLikedPost,
   useGetDraftedPostFullContentByPostId,
-} from "../services/queries";
-import { Cancel } from "../assets/svg/Cancel";
-import { Blog_Handle_Skeleton } from "../Skeleton/Blog_Handle_Skeleton";
-import { CloudUploadIcon } from "../assets/svg/CloudUploadIcon";
+} from "../../services/queries";
+import { Cancel } from "../../assets/svg/Cancel";
+import { Blog_Handle_Skeleton } from "./skelton";
+import { CloudUploadIcon } from "../../assets/svg/CloudUploadIcon";
 import toast from "react-hot-toast";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "../components/ui/dialog";
-import { Checkbox } from "../components/ui/checkbox";
-import { ScrollArea } from "../components/ui/scroll-area";
-import { Button } from "../components/ui/button";
+} from "../../components/ui/dialog";
+import { Checkbox } from "../../components/ui/checkbox";
+import { ScrollArea } from "../../components/ui/scroll-area";
+import { Button } from "../../components/ui/button";
 import { Search } from "lucide-react";
-import { Category_Skeleton } from "../Skeleton/Category_Skeleton";
+import { Category_Skeleton } from "./skelton";
 
 const HandlePost = () => {
   const location = useLocation();
@@ -777,9 +777,6 @@ const ToggleComments = memo(({ formData, setFormData, setPublished }: any) => {
     }));
   };
 
-  useEffect(() => {
-    console.log("DATA : ", formData.allowComments);
-  }, [formData]);
 
   return (
     <>
