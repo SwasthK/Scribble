@@ -54,3 +54,8 @@ export enum socialPlatforms {
     X = "x",
     INSTAGRAM = "instagram",
 }
+
+export enum pageSection {
+    Followers = "Followers",
+    Followings = "Followings",
+  }

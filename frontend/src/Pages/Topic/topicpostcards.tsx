@@ -37,4 +37,4 @@ const TopicPostCards = memo(({ data }: { data: any }) => {
   );
 });
 
-export default topicpostcards;
+export default TopicPostCards;

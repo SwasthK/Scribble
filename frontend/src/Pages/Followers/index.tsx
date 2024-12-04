@@ -1,28 +1,25 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import { Link } from "react-router-dom";
-import { FollowerCard_Skeleton } from "../Skeleton/FollowerCard_Skeleton";
-import { useGetAllFollowers } from "../services/queries";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 
-enum pageSection {
-  Followers = "Followers",
-  Followings = "Followings",
-}
+import { useGetAllFollowers } from "../../services/queries";
+import { pageSection } from "../../Types/type";
+
+import { FollowerCard_Skeleton } from "../../Skeleton/FollowerCard_Skeleton";
+import FollowersSearchBarErrors from "./followerssearchbarerrorrs";
+const UserCards = lazy(() => import("./usercards"));
 
 const Followers = () => {
-  const [activeSection, setActiveSection] = useState(pageSection.Followers);
   const [followers, setFollowers] = useState([]);
   const [followings, setFollowings] = useState([]);
   const { data, isLoading, isError, error } = useGetAllFollowers();
+  const [searchValue, setSearchValue] = useState("");
+  const [filterCriteria, setFilterCriteria] = useState("new");
+  const [activeSection, setActiveSection] = useState(pageSection.Followers);
 
   useEffect(() => {
     setFollowers(data?.followers.followers);
     setFollowings(data?.followings.followings);
   }, [data]);
-
-  const [searchValue, setSearchValue] = useState("");
-  const [filterCriteria, setFilterCriteria] = useState("new");
 
   const filteredList = useMemo(() => {
     const list =
@@ -127,13 +124,10 @@ const Followers = () => {
                                 : "Followers"}
                             </h1>
                           </div>
-                          {filteredList?.map((value: any, index: number) => (
-                            <UserCards
-                              username={value.username}
-                              avatarUrl={value.avatarUrl}
-                              key={index}
-                            />
-                          ))}
+
+                          <Suspense fallback={<FollowerCard_Skeleton />}>
+                            <UserCards filteredList={filteredList} />
+                          </Suspense>
                         </>
                       )}
                     </>
@@ -159,13 +153,9 @@ const Followers = () => {
                                 : "Followings"}
                             </h1>
                           </div>
-                          {filteredList?.map((value: any, index: number) => (
-                            <UserCards
-                              username={value.username}
-                              avatarUrl={value.avatarUrl}
-                              key={index}
-                            />
-                          ))}
+                          <Suspense fallback={<FollowerCard_Skeleton />}>
+                            <UserCards filteredList={filteredList} />
+                          </Suspense>
                         </>
                       )}
                     </>
@@ -181,29 +171,3 @@ const Followers = () => {
 };
 
 export default Followers;
-
-const UserCards = memo(
-  ({ username, avatarUrl }: { username: string; avatarUrl: string }) => {
-    return (
-      <Link
-        to={""}
-        className="shadow-md px-4 p-2 flex  gap-3 items-center w-72 rounded-md bg-cdark-200 "
-      >
-        <Avatar>
-          <AvatarImage src={avatarUrl} />
-          <AvatarFallback>{username.slice(0, 2)}</AvatarFallback>
-        </Avatar>
-
-        <h1 className="font-medium">{username || "Anonymous"}</h1>
-      </Link>
-    );
-  }
-);
-
-const FollowersSearchBarErrors = memo(({ label }: { label: string }) => {
-  return (
-    <div className="px-10 rounded-md font-semibold">
-      <h1>{label}</h1>
-    </div>
-  );
-});
