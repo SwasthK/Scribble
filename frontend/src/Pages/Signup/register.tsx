@@ -16,7 +16,7 @@ import {
   validateUsername,
   validateFileType,
   validateFileSize,
-} from "../../components/Auth/register.validate";
+} from "../../validation/register.validate";
 
 export const Register = () => {
   const [formData, setFormData] = useState({
@@ -137,20 +137,23 @@ export const Register = () => {
 
       if (response.data) {
         cleanUpState();
-        const { data, accessToken, refreshToken } = response.data;
+
+        const {
+          user: userData,
+          accessToken,
+          refreshToken,
+        } = response.data.data;
+
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
 
         setUser((prev) => ({
           ...prev,
-          user: {
-            username: data.username,
-          },
+          user: { ...prev.user, ...userData },
           isAuthenticated: true,
-          accessToken: accessToken,
-          refreshToken: refreshToken,
+          accessToken,
+          refreshToken,
         }));
-
         navigate("/blogs");
       }
     } catch (error: any) {

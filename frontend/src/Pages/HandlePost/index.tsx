@@ -700,6 +700,7 @@ const HandlePost = () => {
                       {image ? (
                         <div className="flex flex-col items-center justify-center pb-1.5 h-[8.5rem] ">
                           <img
+                            loading="lazy"
                             src={image}
                             alt="Preview"
                             className="w-full h-[7rem] object-cover mb-1 rounded-lg"
@@ -776,7 +777,6 @@ const ToggleComments = memo(({ formData, setFormData, setPublished }: any) => {
       allowComments: !prev.allowComments,
     }));
   };
-
 
   return (
     <>

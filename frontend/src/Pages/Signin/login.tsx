@@ -38,21 +38,17 @@ export const Login = () => {
       const response = await axios.post("/signin", formData);
 
       if (response.data) {
-        const { data, accessToken, refreshToken } = response.data;
-        console.log("Data :", data);
+        const { user: userData, accessToken, refreshToken } = response.data.data;
 
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
 
         setUser((prev) => ({
           ...prev,
-          user: {
-            ...prev.user,
-            ...data,
-          },
+          user: { ...prev.user, ...userData },
           isAuthenticated: true,
-          accessToken: accessToken,
-          refreshToken: refreshToken,
+          accessToken,
+          refreshToken,
         }));
 
         navigate("/blogs");

@@ -1,6 +1,11 @@
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { Avatar } from "./../Blogs/blogcard";
+// import { Avatar } from "./../Blogs/blogcard";
+import {
+  Avatar as ShadcnAvatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../../components/ui/avatar";
 import { authAtom } from "../../atoms/auth.atoms";
 import { useGetUserPosts } from "../../services/queries";
 import { UserBlogs_Skeleton } from "./skeleton";
@@ -10,7 +15,7 @@ import {
   validateFileSize,
   validateFileType,
   validateUsername,
-} from "../../components/Auth/register.validate";
+} from "../../validation/register.validate";
 import { FormErrors, pageSection, socialPlatforms } from "../../Types/type";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -158,25 +163,29 @@ const Profile = () => {
     {
       platform: socialPlatforms.GITHUB,
       url:
-        userData.socials.find(
+        userData?.socials?.find(
           (social: any) => social.platform === socialPlatforms.GITHUB
-        )?.url || null,
+        )?.url || "",
     },
     {
       platform: socialPlatforms.X,
       url:
-        userData.socials.find(
+        userData?.socials?.find(
           (social: any) => social.platform === socialPlatforms.X
-        )?.url || null,
+        )?.url || "",
     },
     {
       platform: socialPlatforms.INSTAGRAM,
       url:
-        userData.socials.find(
+        userData?.socials?.find(
           (social: any) => social.platform === socialPlatforms.INSTAGRAM
-        )?.url || null,
+        )?.url || "",
     },
   ]);
+
+  useEffect(() => {
+    console.log("Social :", userData);
+  }, [socials]);
 
   const [initialSocialData, setInitialSocialData] = useState(socials);
 
@@ -347,13 +356,17 @@ const Profile = () => {
 
   return (
     <>
-      <div className="w-screen lg:px-24 pb-10 text-white">
+      <div className="w-screen lg:px-24 pb-10 text-white ">
         <div className="relative px-8 py-8  flex border-b-[1px] border-[#ffffff3f] shadow-sm items-center gap-8 max-w-[60rem]">
-          <Avatar
-            url={userData.avatarUrl}
-            size={16}
+          <ShadcnAvatar
+            className="h-16 w-16"
             onClick={() => setAvatarPreview(true)}
-          />
+          >
+            <AvatarImage src={userData.avatarUrl} />
+            <AvatarFallback>
+              <h1>{userData.username.slice(0, 2)}</h1>
+            </AvatarFallback>
+          </ShadcnAvatar>
 
           <div className="flex justify-center items-center absolute bottom-8 bg-white p-0 m-0 h-[1.2rem] rounded-full w-16">
             <label
@@ -382,6 +395,7 @@ const Profile = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <img
+                  loading="lazy"
                   src={avatarFile.url || userData.avatarUrl}
                   alt="Enlarged Avatar"
                   className="aspect-square border-none object-cover transform transition-all duration-700 ease-in-out scale-100 hover:scale-125"

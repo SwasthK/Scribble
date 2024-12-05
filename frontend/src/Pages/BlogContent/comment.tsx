@@ -5,7 +5,7 @@ import {
   AvatarImage,
 } from "../../components/ui/avatar";
 import { Textarea } from "../../components/ui/textarea";
-import { Comment_Skeleton } from "../../Skeleton/Comment_Skeleton";
+import { Comment_Skeleton } from "./skeleton";
 import toast from "react-hot-toast";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";

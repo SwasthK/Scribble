@@ -4,7 +4,7 @@ import axios from "axios";
 
 import { useGetDraftedPost } from "../../services/queries";
 
-import { DraftCardSkeleton } from "../../Skeleton/DraftCard_Skeleton";
+import { DraftCardSkeleton } from "./skeleton";
 
 import { TrashIcon } from "../../assets/svg/TrashIcon";
 import { RefreshIcon } from "../../assets/svg/RefreshIcon";
