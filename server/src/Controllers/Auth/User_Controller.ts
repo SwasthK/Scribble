@@ -75,8 +75,18 @@ export async function signup(c: Context) {
         if (!Token.success) {
             return apiError(c, 400, "Failed to create an account")
         }
-
-        return apiResponse(c, 200, Token.data, "Account Created Successully", { fileHandle, accessToken: Token.aToken, refreshToken: Token.rToken })
+        return apiResponse(c, 200, {
+            accessToken: Token.aToken, refreshToken: Token.rToken,
+            user: {
+                id: InsertData.id,
+                username: InsertData.username,
+                email: InsertData.email,
+                avatarUrl: InsertData.avatarUrl,
+                bio: InsertData.bio,
+                createdAt: InsertData.createdAt,
+                socials: InsertData.socials,
+            }
+        }, "Account Created Successully")
 
     } catch (error: any) {
         Log('Signup Controller', `ERROR:${error.message}`)
@@ -94,7 +104,7 @@ export async function signin(c: Context) {
 
         const { identifier, password } = response.data;
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const existingUser = await prisma.user.findFirst({
             where: {
@@ -102,7 +112,30 @@ export async function signin(c: Context) {
                     { email: identifier },
                     { username: identifier }
                 ]
-            }
+            },
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                password: true,
+                avatarUrl: true,
+                bio: true,
+                createdAt: true,
+                socials: {
+                    select: {
+                        platform: true,
+                        url: true
+                    }
+                },
+                // followers: {
+                //     where: {
+                //         followerId: verifiedToken.id
+                //     },
+                //     select: {
+                //         followingId: true
+                //     }
+                // }
+            },
         })
 
         if (!existingUser) {
@@ -120,7 +153,7 @@ export async function signin(c: Context) {
             return apiError(c, 400, "Failed to login")
         }
 
-        return apiResponse(c, 200, Token.data, "Login Successfull", {
+        return apiResponse(c, 200, {
             accessToken: Token.aToken, refreshToken: Token.rToken,
             user: {
                 id: existingUser.id,
@@ -128,9 +161,10 @@ export async function signin(c: Context) {
                 email: existingUser.email,
                 avatarUrl: existingUser.avatarUrl,
                 bio: existingUser.bio,
-                createdAt: existingUser.createdAt
+                createdAt: existingUser.createdAt,
+                socials: existingUser.socials,
             }
-        },)
+        }, "Login Successfull",)
 
     } catch (error: any) {
         Log('Signin Controller', `ERROR:${error.message}`)
@@ -202,15 +236,6 @@ export async function refreshAccessToken(c: Context) {
             },
         });
 
-        const posts = await prisma.post.findMany({
-            where: {
-                status: PostStatus.PUBLISHED
-            },
-            select: {
-                slug: true,
-            }
-        });
-
         if (!dbUser) return apiError(c, 401, "Failed to Authorize User")
 
         if (dbUser.refreshToken !== recievedRefreshToken) return apiError(c, 401, "Failed to Authorize User")
@@ -230,7 +255,6 @@ export async function refreshAccessToken(c: Context) {
                 socials: dbUser.socials,
             },
             following: dbUser.followers.map((follower: { followingId: string }) => follower.followingId),
-            posts: posts.map((post: { slug: string }) => post.slug)
         }, "Access Token Refreshed")
     } catch (error: any) {
         console.log("Error while refreshing token : ", error);
