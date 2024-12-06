@@ -1,14 +1,8 @@
 import { Context } from "hono";
-import z from "zod";
 import { apiError } from "../../utils/apiError";
-import { dbConnect } from "../../Connection/db.connect";
 import { apiResponse } from "../../utils/apiResponse";
 import { PostStatus } from "@prisma/client";
-
-const deletePostSchema = z.object({
-    postId: z.string({ required_error: "Post ID required", invalid_type_error: "Invalid Post ID" })
-        .uuid({ message: "Invalid Post ID" }),
-})
+import { deletePostSchema } from "Zod/zod";
 
 export async function deletePublishedPostById(c: Context) {
     const userId = c.get('user').id
@@ -81,7 +75,7 @@ export async function deleteDraftPostById(c: Context) {
 
     try {
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const post = await prisma.post.findFirst({
             where: {

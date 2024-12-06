@@ -1,5 +1,4 @@
 import { Context } from "hono";
-import { dbConnect } from "../../Connection/db.connect";
 import { apiError } from "../../utils/apiError";
 import { apiResponse } from "../../utils/apiResponse";
 
@@ -15,7 +14,7 @@ export const deleteUserProfile = async (c: Context) => {
 };
 
 const deleteUser = async (c: Context, userId: string | number) => {
-    const prisma: any = await dbConnect(c);
+    const prisma: any = await c.get('prisma');
     await prisma.$transaction(async (prisma: any) => {
         await prisma.user.delete({ where: { id: userId } });
     });

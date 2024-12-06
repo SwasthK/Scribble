@@ -1,21 +1,7 @@
 import { Context } from "hono";
-import { dbConnect } from "../../Connection/db.connect";
-import z from "zod";
 import { apiError } from "../../utils/apiError";
 import { apiResponse } from "../../utils/apiResponse";
-
-const removeCommentSchema = z.object({
-    postId: z.string({
-        required_error: "Post Id Required",
-        invalid_type_error: "Invalid post ID",
-        message: "Invalid post ID",
-    }).uuid("Invalid post ID"),
-    commentId: z.string({
-        required_error: "Comment Id Required",
-        invalid_type_error: "Invalid comment ID",
-        message: "Invalid comment ID",
-    }).uuid("Invalid comment ID"),
-});
+import { removeCommentSchema } from "Zod/zod";
 
 export const removeComment = async (c: Context) => {
     try {
@@ -33,7 +19,7 @@ export const removeComment = async (c: Context) => {
 
         const { postId, commentId } = response.data;
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const post = await prisma.post.findUnique({
             where: { id: response.data.postId },

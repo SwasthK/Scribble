@@ -5,7 +5,6 @@ import { PostStatus } from "@prisma/client";
 import { usernameSchema } from "Zod/zod";
 import { createSlug } from "utils/createSlug";
 
-
 export async function getPostById(c: Context) {
 
     const postId = c.req.param('postId');

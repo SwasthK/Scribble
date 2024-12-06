@@ -1,12 +1,9 @@
 import { Context } from "hono";
 import { Log } from "../../utils/log";
-import { dbConnect } from "../../Connection/db.connect";
 import { apiError } from "../../utils/apiError";
 import { apiResponse } from "../../utils/apiResponse";
 import { accessToken, verifyTokens, generateAccessAndRefreshToken } from "../../utils/jwt";
-import { ServerSignin, ServerSignup } from "../../Zod/zod";
-import { fileUploadMessage } from "../../Middleware/cloudinary";
-import { PostStatus } from "@prisma/client";
+import { fileUploadMessage, ServerSignin, ServerSignup } from "../../Zod/zod";
 
 export async function signup(c: Context) {
 
@@ -34,7 +31,7 @@ export async function signup(c: Context) {
 
         const { username, email, password, role } = c.get('signupData')
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const existingUser = await prisma.user.findFirst({
             where: {

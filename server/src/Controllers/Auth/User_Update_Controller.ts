@@ -2,7 +2,7 @@ import { Context } from "hono";
 import { apiResponse } from "../../utils/apiResponse";
 import { updateUserProfileSchema } from "../../Zod/zod";
 import { apiError } from "../../utils/apiError";
-import { cloudinaryUploader, fileUploadMessage, generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers } from "../../Middleware/cloudinary";
+import { cloudinaryUploader,  generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers } from "../../Middleware/cloudinary";
 
 export async function updateUserProfile(c: Context) {
     try {

@@ -2,10 +2,7 @@ import { Context } from "hono";
 import { PostStatus, Prisma, MediaType } from '@prisma/client';
 import { apiError } from "../../utils/apiError";
 import { apiResponse } from "../../utils/apiResponse";
-
-import { z } from 'zod';
-import { createSlug } from '../../utils/createSlug';
-import { fileUploadMessage } from "Middleware/cloudinary";
+import { fileUploadMessage } from "Zod/zod";
 
 // export const createPostSchema = z.object({
 //     coverImage: z.string().url({ message: "Invalid Cover Image URL" }).optional(),
@@ -40,29 +37,6 @@ import { fileUploadMessage } from "Middleware/cloudinary";
 //         .min(1, { message: "You must add atleast 1 Category" })
 //         .max(5, { message: "You can add atmost 5 Categories" }).optional()
 // })
-
-export const createNewDraftPostSchema = z.object({
-    title: z.string({
-        required_error: "Title is required",
-        invalid_type_error: "Title must be a string"
-    }),
-    shortCaption: z.string({
-        required_error: "Short Caption is required",
-        invalid_type_error: "Short Caption be a string"
-    }),
-    body: z.string({
-        required_error: "Body is required",
-        invalid_type_error: "Body must be a string"
-    }),
-    summary: z.string({
-        required_error: "Summary is required",
-        invalid_type_error: "Summary must be a string"
-    }),
-    allowComments: z.boolean({
-        required_error: "Allowed Comments is required",
-        invalid_type_error: "Allowed Comments must be a boolean"
-    })
-})
 
 export async function createNewDraftPost(c: Context) {
     try {

@@ -1,47 +1,7 @@
 import { Context } from "hono";
 import { apiError } from "utils/apiError";
 import { apiResponse } from "utils/apiResponse";
-
-import z from "zod";
-
-const updateUserSocialsSchema = z.array(
-    z.object({
-        platform: z.enum(['github', 'x', 'instagram'],
-            {
-                required_error: "Platform is required",
-                invalid_type_error: "Platform must be one of: github, x, instagram",
-                message: "Invalid Platform"
-            }),
-        url: z.string({
-            required_error: "URL is required",
-            invalid_type_error: "Invalid URL",
-        }).url().nullable()
-    })
-).min(1, "At least one social link must be provided")
-    .refine(value => value.length <= 3, { message: "Maximum 3 social links allowed" })
-    .refine(
-        (socials) => socials.some((social) => social.url && social.url.trim() !== ""),
-        {
-            message: "At least one platform must have a valid URL",
-        }
-    )
-    .refine(
-        (socials) =>
-            new Set(socials.map((social) => social.platform)).size === socials.length,
-        {
-            message: "Duplicate platforms are not allowed",
-        }
-    )
-    .refine(
-        (socials) => {
-            const urls = socials.map((social) => social.url).filter(Boolean);
-            return new Set(urls).size === urls.length;
-        },
-        {
-            message: "Duplicate URLs are not allowed",
-        }
-    );
-
+import { updateUserSocialsSchema } from "Zod/zod";
 
 export const updateUserSocials = async (c: Context) => {
     try {

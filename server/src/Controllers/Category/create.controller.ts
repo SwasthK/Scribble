@@ -3,35 +3,7 @@ import { createSlug } from "../../utils/createSlug";
 import { apiResponse } from "../../utils/apiResponse";
 import { apiError } from "../../utils/apiError";
 import { Role as userRole } from "@prisma/client";
-
-import z from "zod";
-
-export const categoryNamesSchema = z.object({
-    head: z.enum([
-        "technology",
-        "lifestyle",
-        "business",
-        "health & wellness",
-        "food & recipes",
-        "travel",
-        "education",
-        "personal development",
-        "finance",
-        "entertainment"
-    ], {
-        required_error: "Category head is required", invalid_type_error: "Category head must be a string",
-        message: "Category head is Required"
-    }),
-    categories: z.array(
-        z.string({
-            required_error: "Category name is required",
-            invalid_type_error: "Category name must be a string"
-        })
-            .min(4, { message: "Category name must be at least 4 characters long" })
-            .max(30, { message: "Category name must be at most 30 characters long" }),
-        { message: "Category is Required" }
-    ).nonempty({ message: "At least one category name is required" })
-})
+import { categoryNamesSchema } from "Zod/zod";
 
 export async function createCategory(c: Context) {
 
