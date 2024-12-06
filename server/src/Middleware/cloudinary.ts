@@ -1,50 +1,6 @@
 import { Context, Next } from "hono";
-import { apiError } from "../utils/apiError";
-
-export enum fileUploadMessage {
-    NOFILE = 'No file provided',
-    SUCCESS = 'File uploaded successfully',
-    ERROR = 'Failed to upload file',
-    TYPEERROR = 'File type not allowed',
-}
-
-export enum mimeTypeSignup {
-    JPEG = 'image/jpeg',
-    PNG = 'image/png',
-    WEBP = 'image/webp',
-}
-
-enum mimeTypeBlog {
-    JPEG = 'image/jpeg',
-    PNG = 'image/png',
-    MP4 = 'video/mp4',
-    MOV = 'video/quicktime',
-    MP3 = 'audio/mpeg',
-    WAV = 'audio/wav',
-    PDF = 'application/pdf',
-    GIF = 'image/gif',
-    SVG = 'image/svg+xml',
-    WEBP = 'image/webp',
-    AVI = 'video/x-msvideo',
-    FLV = 'video/x-flv',
-    WMV = 'video/x-ms-wmv',
-    MKV = 'video/x-matroska',
-    OGG = 'video/ogg',
-    WEBM = 'video/webm',
-    DOC = 'application/msword',
-    DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    XLS = 'application/vnd.ms-excel',
-    XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    PPT = 'application/vnd.ms-powerpoint',
-    PPTX = 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    ZIP = 'application/zip',
-    TAR = 'application/x-tar',
-    GZ = 'application/gzip',
-    RAR = 'application/vnd.rar',
-    TXT = 'text/plain',
-    CSV = 'text/csv',
-    JSON = 'application/json',
-}
+import { mimeTypeBlog } from "Types";
+import { fileUploadMessage, mimeTypeSignup } from "Zod/zod";
 
 const routes = {
     signup: '/api/v1/signup',
@@ -191,8 +147,6 @@ export function getCloudinaryHelpers(c: Context) {
         CLOUDINARY_API_SECRET: c.env.CLOUDINARY_API_SECRET
     }
 }
-
-
 
 // app.post('/upload-image', async (c) => {
 //   try {
