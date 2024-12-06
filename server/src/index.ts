@@ -1,12 +1,10 @@
 import { Hono } from 'hono'
 import api from './Routes/routes'
-
 //Import Middleware
 // import { logger } from 'hono/logger'
 // import { prettyJSON } from 'hono/pretty-json'
 import { cors } from 'hono/cors'
 import { connectPrismaClient } from 'Client/prismaClient'
-import { Context } from 'hono/jsx';
 
 const app = new Hono<{
   Bindings: {
@@ -49,7 +47,7 @@ app.notFound((c) => {
 
 app.onError((err, c) => {
   console.error(`${err}`)
-  return c.text('Unexpected Error Occurred', 500)
+  return c.text('An Unexpected Error Occurred', 500)
 })
 
 export default app;
