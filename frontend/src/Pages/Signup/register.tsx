@@ -184,14 +184,14 @@ export const Register = () => {
           <h1 className="text-3xl md:text-4xl font-medium font-scribble2">
             Create an account
           </h1>
-          <h3 className="text-cgray italic">Join the Circle of Knowledge !</h3>
+          <h2 className="text-cgray italic">Join the Circle of Knowledge !</h2>
         </div>
       ) : (
         <>
           <div className="flex flex-col gap-4 items-center mb-8">
-            <h3 className="text-cgray italic">
+            <h1 className="text-cgray italic">
               Explore ideas and stories that inspire !
-            </h3>
+            </h1>
           </div>
         </>
       )}
@@ -247,6 +247,8 @@ export const Register = () => {
                     {formData.file ? (
                       <>
                         <button
+                          id="cancelButton"
+                          title="cancel"
                           type="button"
                           onClick={() => {
                             setFormData((prev) => ({
@@ -347,6 +349,8 @@ export const Register = () => {
             <div className="flex justify-between items-center">
               <CustomHyperLink path="/login" text="If account already exists" />
               <button
+                id="nextButton"
+                title="next"
                 className=" p-3 rounded-full disabled:cursor-not-allowed bg-cgray-100 border border-b-dark-200"
                 type="button"
                 onClick={nextStep}
@@ -392,6 +396,8 @@ export const Register = () => {
             </div>
             <div className="flex justify-between pt-8 font-semibold">
               <button
+                id="previousButton"
+                title="previous"
                 className="bg-custom-gradient-1 cursor-pointer hover:bg-custom-gradient-2 rounded-lg py-2 px-5"
                 type="button"
                 onClick={prevStep}
@@ -406,6 +412,8 @@ export const Register = () => {
                 </>
               ) : (
                 <button
+                  id="registerButton"
+                  title="register"
                   type="submit"
                   className={`${
                     loading

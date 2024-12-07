@@ -5,7 +5,17 @@ export async function findActiveUser(c: Context, next: Next) {
         const id = c.get('id')
         const prisma = c.get('prisma');
 
-        const isUserExist = await prisma.user.findUnique({ where: { id } })
+        const isUserExist = await prisma.user.findUnique({
+            where: { id },
+            include: {
+                socials: {
+                    select: {
+                        platform: true,
+                        url: true
+                    }
+                },
+            }
+        })
 
         //Method to check if user exist
         if (!isUserExist) {

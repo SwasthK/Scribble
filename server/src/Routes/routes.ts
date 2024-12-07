@@ -15,24 +15,15 @@ import { FollowUser, UnFollowUser } from '../Controllers/FollowUser/user.Follow.
 import { getFollowersDetails, getFollowingsDetails } from '../Controllers/FollowUser/user.getFollow.Controller'
 
 //Import Post Route handlers
-import { createNewDraftPost } from 'Controllers/Posts/create.Post'
-import { updateDraftPostById } from '../Controllers/Posts/update.Post'
 import {
-    getPostById,
-    getPostByTitle,
-    getAllPosts,
-    getPublishedPost,
+
     getUserPosts,
     getPostBySlug,
-    getPostByAuthorId,
-    getDraftedPostShortned,
-    getDraftedPostFullContentById,
-    getPostByUsername,
     getMostLikedPosts,
     getPostByCategory,
     getAllPostsName
 } from '../Controllers/Posts/get.Posts'
-import { deleteDraftBulk, deleteDraftPostById, deletePublishedPostById } from '../Controllers/Posts/delete.Post'
+
 
 //Import Category Route handlers
 import { createCategory } from '../Controllers/Category/create.controller'
@@ -40,32 +31,15 @@ import { getAllCategory, getCategory } from '../Controllers/Category/getCategory
 import { updateCategory } from '../Controllers/Category/update.controller'
 import { deleteAllCategory, deleteCategory } from '../Controllers/Category/delete.controller'
 
-//Import Tag Route handlers
-import { createTag } from '../Controllers/Tags/create.controller'
-import { getAllTag, getTag } from '../Controllers/Tags/getTag.controller'
-import { updateTag } from '../Controllers/Tags/update.controller'
-import { deleteTag } from '../Controllers/Tags/delete.controller'
-
 //Import Like Route handlers
 import { likeAndUnlikePost } from '../Controllers/Like/like.Post'
-
-// Import Publish Post handlers
-import { createNewPublishPost, updatePublishById } from '../Controllers/Posts/publish.Post'
 
 //Archive Post
 import { archivePost, getArchivedPost, unArchivePost } from '../Controllers/Posts/Archive/archive.Post'
 
-//Import Notification Route handlers
-import {
-    createUserNotifications,
-    getUserNotifications,
-    markNotificationAsRead
-} from '../Controllers/Notification/user_Notification_Controller'
-
 //Import comment Route handlers
-import { removeComment } from '../Controllers/Comments/remove.Comment.Post'
 import { addComments } from '../Controllers/Comments/add.Comment.Post'
-import { getComments, getCommentsWithoutReply } from '../Controllers/Comments/get.Comment.Post'
+import { getCommentsWithoutReply } from '../Controllers/Comments/get.Comment.Post'
 
 //Import MiddlwWares
 import { authMiddleware } from '../Middleware/Auth'
@@ -80,7 +54,21 @@ import { handleSavePost } from 'Controllers/Posts/Save/save.Post'
 import { getSavedPost } from 'Controllers/Posts/Save/getSavedPost'
 import { updateUserSocials } from 'Controllers/Socials/socials'
 import { reportPost } from 'Controllers/Report'
-import { getAllUsersName, getUserDetailsByUsername } from 'Controllers/User/user'
+import { getAllUsersName, getUserDetailsByUsername } from 'Controllers/User/user.get'
+
+//Draft Post - Imports
+import { getDraftedPostFullContentById, getDraftedPostShortned } from 'Controllers/Postss/Draft/draft.get'
+import { deleteDraftBulk, deleteDraftPostById } from 'Controllers/Postss/Draft/draft.delete'
+import { createNewDraftPost } from 'Controllers/Postss/Draft/draft.post'
+import { updateDraftPostById } from 'Controllers/Postss/Draft/draft.put'
+
+//Publish Post - Imports
+import { createNewPublishPost } from 'Controllers/Postss/Publish/publish.post'
+import { updatePublishById } from 'Controllers/Postss/Publish/publish.put'
+import { deletePublishedPostById } from 'Controllers/Postss/Publish/publish.delete'
+
+//Post Manipulation - Imports
+import { getAllPosts, getPostByAuthorId, getPostByUsername } from 'Controllers/Postss/Post/post.get'
 
 const api = new Hono();
 
@@ -125,6 +113,7 @@ api
     .get('/posts/getall', authMiddleware, findActiveUser, getAllPosts)
     .get('/posts/getBy/authorId/:authorId', authMiddleware, findActiveUser, getPostByAuthorId)
     .get('/posts/getBy/username/:username', authMiddleware, findActiveUser, getPostByUsername)
+    // --Yet to implement
     .get('/posts/getBy/slug/:postSlug', authMiddleware, findActiveUser, getPostBySlug)
     .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
     .get('/posts/mostliked', authMiddleware, findActiveUser, getMostLikedPosts)
@@ -166,66 +155,13 @@ api
     // --------------------------------------------------------------------------
 
 
-    //Post Routes
-    // .put('/post/updateDraftPost', authMiddleware, findActiveUser, updateDraftPost)
-    .get('/posts/get/:postId', authMiddleware, findActiveUser, getPostById)
 
-    .get('/posts/getBy/title/:postTitle', authMiddleware, findActiveUser, getPostByTitle)
-    .get('posts/published', authMiddleware, findActiveUser, getPublishedPost)
-
-    // .post('/posts/upsert', authMiddleware, findActiveUser, upSertDraftPost)
-
-
-
-    //Notification Routes
-    .post('/notification/createUserNotifications', authMiddleware, findActiveUser, createUserNotifications)
-    .get('/notification/getUserNotifications', authMiddleware, findActiveUser, getUserNotifications)
-    .put('/notification/markNotificationAsRead/:id', authMiddleware, findActiveUser, markNotificationAsRead)
-
-
-    //Tag Routes
-    .post('/tag/create', authMiddleware, findActiveUser, createTag)
-    .put('/tag/update', authMiddleware, findActiveUser, updateTag)
-    .delete('/tag/delete', authMiddleware, findActiveUser, deleteTag)
-    .get('/tag/getall', authMiddleware, findActiveUser, getAllTag)
-    .get('/tag/get', authMiddleware, findActiveUser, getTag)
-
-
-    //Category Routes
+    // ADMIN_USAGE - > Category Routes
     .post('/category/create', authMiddleware, findActiveUser, createCategory)
     .put('/category/update', authMiddleware, findActiveUser, updateCategory)
     .delete('/category/delete', authMiddleware, findActiveUser, deleteCategory)
     .get('/category/get', authMiddleware, findActiveUser, getCategory)
     .delete('/category/deleteAll', authMiddleware, findActiveUser, deleteAllCategory)
-
-
-    //Comment Routes
-    .delete('/comment/remove', authMiddleware, findActiveUser, removeComment)
-    .get('/comment/get/:postId', authMiddleware, findActiveUser, getComments)
-
-
-    //Followers
-    .get('followers', async (c: Context) => {
-        const prisma: any = await dbConnect(c);
-        const id = '05409e56-0cf7-4073-a991-307d21382e61';
-
-        const data = await prisma.follower.findMany({
-            where: { followerId: id },
-            include: {
-                follower: {
-                    select: {
-                        username: true
-                    }
-                },
-                following: {
-                    select: {
-                        username: true
-                    }
-                }
-            }
-        });
-        return apiResponse(c, 200, { data });
-    })
 
     //all data
     .get('/alldetails', async (c: Context) => {
@@ -236,12 +172,22 @@ api
         try {
             const userWithDetails = await prisma.post.findMany({
                 where: {
-                    author: {
-                        username: 'AlphaWolf'
-                    }
+                    status: 'PUBLISHED'
+                    // author: {
+                    //     username: 'AlphaWolf'
+                    // }
                 },
-                include: {
-                    author: true
+                // include: {
+                //     author: true
+                // },
+                select: {
+                    id: true,
+                    author: {
+                        select: {
+                            username: true,
+                            password: true
+                        }
+                    }
                 }
 
             }
@@ -267,11 +213,6 @@ api
             console.log('Fetch User Details Error:', error.message);
             return apiError(c, 500, "Internal Server Error", { code: "CE" });
         }
-    })
-
-    .post('/upload', getFileToUpload, async (c: Context) => {
-        const upload = c.get('fileUploadResponse')
-        return apiResponse(c, 200, upload);
     })
 
     .delete('/delete', async (c: Context) => {

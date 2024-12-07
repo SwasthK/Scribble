@@ -4,8 +4,6 @@ import { apiResponse } from "utils/apiResponse";
 import { usernameSchema } from "Zod/zod";
 
 export async function getUserDetailsByUsername(c: Context) {
-    //Used
-
     try {
         const username = c.req.param('username');
 
@@ -14,9 +12,18 @@ export async function getUserDetailsByUsername(c: Context) {
             return apiError(c, 400, parseUsername.error.errors[0].message);
         }
 
-        // if (currentUser.username === username) {
-        //     return apiError(c, 400, "You can't view your own posts");
-        // }
+        const userData = c.get('user');
+
+        if (userData.username === username) {
+            return apiResponse(c, 200, {
+                avatarUrl: userData.avatarUrl,
+                username: userData.username,
+                bio: userData.bio,
+                email: userData.email,
+                socials: userData.socials,
+                createdAt: userData.createdAt,
+            }, "Post fetched successfully");
+        }
 
         const prisma: any = c.get('prisma');
 
@@ -41,19 +48,15 @@ export async function getUserDetailsByUsername(c: Context) {
 
         if (!user) { return apiError(c, 404, "User not found"); }
 
-        console.log(user);
-
         return apiResponse(c, 200, user, "Post fetched successfully");
 
     } catch (error: any) {
         console.log("Get UserDetails By Username Error: ", error.message);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        return apiError(c, 500, "Internal Server Error");
     }
 }
 
 export async function getAllUsersName(c: Context) {
-    //Used
-
     try {
         const prisma: any = c.get('prisma');
 
@@ -66,10 +69,10 @@ export async function getAllUsersName(c: Context) {
 
         if (!users) { return apiError(c, 404, "Users Not Found"); }
 
-        return apiResponse(c, 200, users, "users fetched successfully");
+        return apiResponse(c, 200, users, "Users fetched successfully");
 
     } catch (error: any) {
-        console.log("Get all Usersname Error: ", error.message);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        console.log("Get All Users UserName Error: ", error.message);
+        return apiError(c, 500, "Internal Server Error");
     }
 }

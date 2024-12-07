@@ -88,78 +88,14 @@ export async function createNewDraftPost(c: Context) {
 
         return apiResponse(c, 200, newPost, "Post Drafted successfully");
 
-        // const result = await prisma.$transaction(async (prisma: any) => {
-        //     const newPost = await prisma.post.create({
-        //         data: {
-        //             // coverImage: coverImage ?? null,
-        //             title,
-        //             shortCaption,
-        //             body,
-        //             summary,
-        //             allowComments,
-        //             author: {
-        //                 connect: { id: authorId }
-        //             },
-        //             status: PostStatus.DRAFT,
-        //         }
-        //     });
-
-        //     if (tags && tags.length > 0) {
-        //         await prisma.post.update({
-        //             where: { id: newPost.id },
-        //             data: {
-        //                 tags: {
-        //                     connect: tags.map((tagId: string | number) => ({ id: tagId }))
-        //                 }
-        //             }
-        //         });
-        //     }
-
-        //     if (categories && categories.length > 0) {
-        //         await prisma.post.update({
-        //             where: { id: newPost.id },
-        //             data: {
-        //                 categories: {
-        //                     connect: categories.map((categoryId: string | number) => ({ id: categoryId }))
-        //                 }
-        //             }
-        //         });
-        //     }
-
-        //     if (multiMedias && multiMedias.length > 0) {
-        //         await prisma.multiMedia.createMany({
-        //             data: multiMedias.map((media: any) => ({
-        //                 postId: newPost.id,
-        //                 caption: media.caption || null,
-        //                 altText: media.altText,
-        //                 url: media.url,
-        //                 type: media.type,
-        //             })),
-        //         });
-
-        //         multiMedias.map((media: any) => {
-        //             console.log("Post ID: ", newPost.id);
-        //             console.log("Caption: ", media.caption);
-        //             console.log("Alt Text: ", media.altText);
-        //             console.log("URL: ", media.url);
-        //             console.log("Type: ", media.type);
-        //         });
-        //     };
-
-        //     return newPost;
-        // }, {
-        //     timeout: 10000,
-        // });
-
-        //     return apiResponse(c, 200, result, "Post Created Successfully");
 
     } catch (error: any) {
         console.log("Create Draft Post Error: ", error.message);
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            console.error("Prisma Transaction Error: ", error.message);
+            console.error("Prisma Transaction Error-Create Draft Post: ", error.message);
             return apiError(c, 400, "Post Creation Failed");
         }
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        return apiError(c, 500, "Internal Server Error");
     }
 
 }
