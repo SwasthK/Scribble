@@ -15,9 +15,17 @@ const app = new Hono<{
 
 app.use('*', connectPrismaClient)
 
+app.use('*', async (c, next) => {
+  const start = Date.now();
+  await next();
+  const duration = Date.now() - start;
+  console.log(`${c.req.method} ${c.req.url} took ${duration} ms`);
+});
+
+
 //Middlewares
 app.use('*', cors({
-  origin: 'http://localhost:5173',
+  origin: '*',
   allowHeaders: ['Content-Type', 'Authorization', 'accessToken', 'refreshToken'],
   allowMethods: ['POST', 'GET', 'DELETE', 'PUT', 'OPTIONS'],
   credentials: true,
