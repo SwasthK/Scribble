@@ -5,9 +5,10 @@ const LeftBar: React.FC<LeftBarType> = ({ title, author, shortNote, url }) => {
   return (
     <>
       <img
-        className="w-full h-full object-cover object-center blur-[3px] brightness-[.7]"
+        className="w-[60vw] h-[100vh] object-cover object-center blur-[3px] brightness-[.7]"
         src={url}
-        alt=""
+        loading="lazy"
+        alt="Signin Bg"
       />
       <div className="absolute inset-0 flex flex-col justify-center items-center font-scribble2">
         <div>
@@ -17,12 +18,12 @@ const LeftBar: React.FC<LeftBarType> = ({ title, author, shortNote, url }) => {
             {parts[1]}
           </h1>
 
-          <h5 className="sm:text-sm md:text-base mt-3 text-cgray font-giest font-semibold">
+          <h2 className="sm:text-sm md:text-base mt-3 text-cgray font-giest font-semibold">
             {`— ${author}`}
-          </h5>
-          <h6 className="sm:text-xs md:text-sm text-cyan-600 pl-6 mt-2 font-light font-giest">
+          </h2>
+          <h3 className="sm:text-xs md:text-sm text-cyan-600 pl-6 mt-2 font-light font-giest">
             {shortNote}
-          </h6>
+          </h3>
         </div>
       </div>
     </>
