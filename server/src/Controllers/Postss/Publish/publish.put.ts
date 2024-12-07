@@ -1,10 +1,10 @@
-import { Context } from "hono";
-import { apiError } from "../../utils/apiError";
-import { apiResponse } from "../../utils/apiResponse";
 import { PostStatus } from "@prisma/client";
+import { Context } from "hono";
+import { cloudinaryUploader, generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers } from "Middleware/cloudinary";
+import { apiError } from "utils/apiError";
+import { apiResponse } from "utils/apiResponse";
 import { createSlug } from "utils/createSlug";
-import { cloudinaryUploader,  generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers } from "Middleware/cloudinary";
-import {  mimeTypeSignup } from "Zod/zod";
+import { mimeTypeSignup } from "Zod/zod";
 
 export async function updatePublishById(c: Context) {
     try {
@@ -140,8 +140,6 @@ export async function updatePublishById(c: Context) {
             }
         });
 
-        console.log("Updated Post: ", updatedPost);
-
         return apiResponse(c, 200, updatedPost, "Post published successfully");
 
     } catch (error: any) {
@@ -149,4 +147,3 @@ export async function updatePublishById(c: Context) {
         return apiError(c, 500, "Internal Server Error");
     }
 }
-
