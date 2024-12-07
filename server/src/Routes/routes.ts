@@ -236,12 +236,22 @@ api
         try {
             const userWithDetails = await prisma.post.findMany({
                 where: {
-                    author: {
-                        username: 'AlphaWolf'
-                    }
+                    status: 'PUBLISHED'
+                    // author: {
+                    //     username: 'AlphaWolf'
+                    // }
                 },
-                include: {
-                    author: true
+                // include: {
+                //     author: true
+                // },
+                select: {
+                    id: true,
+                    author: {
+                        select: {
+                            username: true,
+                            password: true
+                        }
+                    }
                 }
 
             }
