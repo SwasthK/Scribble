@@ -97,10 +97,10 @@ export default {
 			}
 		}
 	},
-	plugins: [
-		// require('daisyui'),
-		// require("tailwindcss-animate")
-	],
+	// plugins: [
+	// 	require('daisyui'),
+	// 	require("tailwindcss-animate")
+	// ],
 	// daisyui: {
 	// 	themes: false, // Disable all DaisyUI themes
 	// 	// Optionally enable just a specific set of DaisyUI components you want
