@@ -17,6 +17,7 @@ import { authAtom } from "../../atoms/auth.atoms";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetAllPostsNameAndGetAllUsersName } from "../../services/queries";
+import { DialogTitle } from "../ui/dialog";
 
 export const SearchComponent = memo(() => {
   const queryClient = useQueryClient();
@@ -103,6 +104,7 @@ export const SearchComponent = memo(() => {
 
       <Command>
         <CommandDialog open={open} onOpenChange={setOpen}>
+          <DialogTitle></DialogTitle>
           <div className="mt-1">
             <CommandInput
               disabled={isLoading}
@@ -183,25 +185,24 @@ export const SearchComponent = memo(() => {
                   heading="Search authors by username"
                   className="mt-1.5 "
                 >
-                  {filteredUsers.map((user: any) => (
-                    <>
-                      <CommandItemLink
-                        onClick={handleSearchClick}
-                        url={`/view/profile/${user.username}`}
-                        className="px-5"
-                      >
-                        <div className="flex w-full gap-4">
-                          <Avatar className="h-6 w-6">
-                            <AvatarImage src={user.avatarUrl} />
-                            <AvatarFallback>
-                              <h1> {user.username.slice(0, 2)}</h1>
-                            </AvatarFallback>
-                          </Avatar>
+                  {filteredUsers.map((user: any, index: number) => (
+                    <CommandItemLink
+                      key={index}
+                      onClick={handleSearchClick}
+                      url={`/view/profile/${user.username}`}
+                      className="px-5"
+                    >
+                      <div className="flex w-full gap-4">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={user.avatarUrl} />
+                          <AvatarFallback>
+                            <h1> {user.username.slice(0, 2)}</h1>
+                          </AvatarFallback>
+                        </Avatar>
 
-                          <h1>{user.username}</h1>
-                        </div>
-                      </CommandItemLink>
-                    </>
+                        <h1>{user.username}</h1>
+                      </div>
+                    </CommandItemLink>
                   ))}
                 </CommandGroup>
 
@@ -228,25 +229,23 @@ export const SearchComponent = memo(() => {
             )}
 
             {filteredCategories?.length > 0 && (
-              <>
-                <CommandGroup
-                  heading="Search Posts by Category"
-                  className="mt-1.5 "
-                >
-                  {filteredCategories.map((category: any, index: number) => (
-                    <CommandItemLink
-                      onClick={handleSearchClick}
-                      url={`/topic/${category.name
-                        .toLowerCase()
-                        .replace(/\s+/g, "-")}`}
-                      className="px-5"
-                      key={index}
-                    >
-                      {`# ${category.name}`}
-                    </CommandItemLink>
-                  ))}
-                </CommandGroup>
-              </>
+              <CommandGroup
+                heading="Search Posts by Category"
+                className="mt-1.5 "
+              >
+                {filteredCategories.map((category: any, index: number) => (
+                  <CommandItemLink
+                    onClick={handleSearchClick}
+                    url={`/topic/${category.name
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")}`}
+                    className="px-5"
+                    key={index}
+                  >
+                    {`# ${category.name}`}
+                  </CommandItemLink>
+                ))}
+              </CommandGroup>
             )}
 
             <CommandGroup heading="Other">
