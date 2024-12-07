@@ -23,13 +23,13 @@ const Home = () => {
               <h1 className="mb-2 text-7xl sm:text-9xl font-scribble2 sm:mb-9 font-bold">
                 Scribble .
               </h1>
-              <h3 className="text rotate-[-3deg] absolute bottom-[-1.2rem] right-[-1rem] sm:absolute sm:bottom-0 sm:right-0  font-scribble2 sm:text-xl">
+              <h2 className="text rotate-[-3deg] absolute bottom-[-1.2rem] right-[-1rem] sm:absolute sm:bottom-0 sm:right-0  font-scribble2 sm:text-xl">
                 Unleash Your Voice, Share Your Story !
-              </h3>
+              </h2>
             </div>
-            <h1 className="  text-[#8C969B]  text-center">
+            <h3 className=" text-[#8C969B]  text-center">
               Write, connect, and inspire with our modern blogging platform
-            </h1>
+            </h3>
 
             <div className="flex gap-5 sm:gap-12 w-full justify-center mt-4 font-scribble2">
               <CtaButton
@@ -50,17 +50,19 @@ const Home = () => {
           >
             <div className="flex items-center gap-12 flex-col lg:flex-row lg:gap-24 py-8 justify-center">
               <img
+                alt="Block-Note Editor"
                 loading="lazy"
                 src="/Block-animation.gif"
                 className="border border-alphaborder w-[24rem] sm:w-[30rem] object-contain rounded-lg"
               />
               <div className="max-w-[30rem] flex flex-col gap-4 sm:gap-10 font-scribble2 -tracking-wide">
-                <h1 className="text-3xl md:text-5xl font-semibold">
+                <h2 className="text-3xl md:text-5xl font-semibold">
                   Rich Text Editing Made Easy .
-                </h1>
+                </h2>
                 <p className="md:text-lg text-neutral-400">
                   Craft beautiful content effortlessly with our intuitive <br />
                   <Link
+                    aria-label="Visit the BlockNote editor website"
                     to={"https://www.blocknotejs.org/"}
                     target="_blank"
                     className="text-[#EE9521] hover:underline"
@@ -73,6 +75,7 @@ const Home = () => {
 
             <div className="flex items-center gap-12 flex-col lg:flex-row-reverse lg:gap-24 py-8 justify-center">
               <img
+                alt="Custom Search "
                 loading="lazy"
                 src="/Block-animation.gif"
                 className="border border-alphaborder w-[24rem] sm:w-[30rem]  object-contain rounded-lg"
@@ -85,6 +88,7 @@ const Home = () => {
                   Quickly discover posts, categories, and users with <br /> our
                   custom{" "}
                   <Link
+                    aria-label="Visit the ShadCN website"
                     to={"https://www.blocknotejs.org/"}
                     target="_blank"
                     className="text-[#EE9521] hover:underline"
@@ -115,50 +119,50 @@ const Home = () => {
             <div className=" grid lg:grid-cols-3 gap-12 sm:gap-14 md:gap-20 lg:gap-10 grid-cols-1 place-items-center sm:mt-16 mt-8">
               <div className="flex gap-2 flex-col items-center  w-full max-w-96">
                 <img
+                  alt="Draft, Archive, Publish"
                   loading="lazy"
                   src="/Block-animation.gif"
-                  alt=""
                   className="xl:h-60 mb-4  w-full rounded-md object-cover object-center"
                 />
                 <h1 className="font-semibold text-[1.1rem]  w-full  ">
                   Draft, Archive, Publish
                 </h1>
-                <h6 className="text-sm text-giest-100 font-light font-giest w-full  ">
+                <h2 className="text-sm text-giest-100 font-light font-giest w-full  ">
                   "Manage your posts your way — work in progress, organize
                   archived ideas, or share with the world.
-                </h6>
+                </h2>
               </div>
 
               <div className="flex gap-2 flex-col items-center  w-full max-w-96">
                 <img
+                  alt="Draft, Archive, Publish"
                   loading="lazy"
                   src="/Block-animation.gif"
-                  alt=""
                   className="xl:h-60 mb-4  w-full rounded-md object-cover object-center"
                 />
                 <h1 className="font-semibold text-[1.1rem]  w-full  ">
                   Engage & Connect
                 </h1>
-                <h6 className="text-sm text-giest-100 font-light font-giest w-full  ">
+                <h2 className="text-sm text-giest-100 font-light font-giest w-full  ">
                   "Follow creators, comment on posts, and build meaningful
                   connections."
-                </h6>
+                </h2>
               </div>
 
               <div className="flex gap-2 flex-col items-center  w-full max-w-96">
                 <img
                   loading="lazy"
                   src="/Block-animation.gif"
-                  alt=""
+                  alt="Draft, Archive, Publish"
                   className="xl:h-60 mb-4  w-full rounded-md object-cover object-center"
                 />
                 <h1 className="font-semibold text-[1.1rem]  w-full  ">
                   Like, Save & Report
                 </h1>
-                <h6 className="text-sm text--400  w-full text-giest-100 font-light font-giest">
+                <h2 className="text-sm text--400  w-full text-giest-100 font-light font-giest">
                   "Engage with posts you love, save them for later, or report
                   inappropriate content."
-                </h6>
+                </h2>
               </div>
             </div>
           </div>
@@ -176,13 +180,13 @@ const Home = () => {
               <img
                 loading="lazy"
                 src="/Block-animation.gif"
-                alt="Profile example 1"
+                alt="Profile Feature"
                 className="w-96 h-60  rounded-md object-cover"
               />
               <img
                 loading="lazy"
                 src="/Block-animation.gif"
-                alt="Profile example 2"
+                alt="Profile Feature"
                 className="w-96 h-60  rounded-md object-cover"
               />
             </div>
@@ -214,6 +218,7 @@ const Home = () => {
             <p className="text-[#95959D]">
               Built by{" "}
               <Link
+                aria-label="Visit Developer's Profile"
                 to={"https://www.blocknotejs.org/"}
                 target="_blank"
                 className="text-[#EE9521] hover:underline"
@@ -222,6 +227,7 @@ const Home = () => {
               </Link>
               . The source code is available on{" "}
               <Link
+                aria-label="Visit the Github Repository"
                 to={"https://www.blocknotejs.org/"}
                 target="_blank"
                 className="text-[#EE9521] hover:underline"

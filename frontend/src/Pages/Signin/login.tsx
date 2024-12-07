@@ -38,7 +38,11 @@ export const Login = () => {
       const response = await axios.post("/signin", formData);
 
       if (response.data) {
-        const { user: userData, accessToken, refreshToken } = response.data.data;
+        const {
+          user: userData,
+          accessToken,
+          refreshToken,
+        } = response.data.data;
 
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
@@ -120,6 +124,8 @@ export const Login = () => {
               </>
             ) : (
               <button
+                id="loginButton"
+                title="login"
                 type="submit"
                 className={`${
                   loading
