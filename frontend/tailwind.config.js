@@ -98,15 +98,15 @@ export default {
 		}
 	},
 	plugins: [
-		require('daisyui'),
-		require("tailwindcss-animate")
+		// require('daisyui'),
+		// require("tailwindcss-animate")
 	],
-	daisyui: {
-		themes: false, // Disable all DaisyUI themes
-		// Optionally enable just a specific set of DaisyUI components you want
-		styled: false, // Enable/disable DaisyUI styling
-		base: false,   // Enable/disable base styles
-		utils: true,  // Enable/disable utility classes
-		logs: false,  // Disable DaisyUI logs
-	},
+	// daisyui: {
+	// 	themes: false, // Disable all DaisyUI themes
+	// 	// Optionally enable just a specific set of DaisyUI components you want
+	// 	styled: false, // Enable/disable DaisyUI styling
+	// 	base: false,   // Enable/disable base styles
+	// 	utils: true,  // Enable/disable utility classes
+	// 	logs: false,  // Disable DaisyUI logs
+	// },
 }
