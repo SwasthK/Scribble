@@ -1,7 +1,6 @@
 import { Context } from "hono";
 import { apiError } from "../../utils/apiError";
 import { updateUserPasswordSchema } from "../../Zod/zod";
-import { dbConnect } from "../../Connection/db.connect";
 import { apiResponse } from "../../utils/apiResponse";
 
 export async function updateUserPassword(c: Context) {
@@ -17,7 +16,7 @@ export async function updateUserPassword(c: Context) {
             return apiError(c, 400, "Old password is incorrect");
         }
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const updatePassword = await prisma.user.update({
             where: { id: user.id },

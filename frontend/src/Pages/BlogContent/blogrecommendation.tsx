@@ -4,7 +4,7 @@ import {
   AvatarImage,
 } from "../../components/ui/avatar";
 import { Link } from "react-router-dom";
-import { Blog_Recommendation_Skeleton } from "../../Skeleton/Blog_Recommendation_Skeleton";
+import { Blog_Recommendation_Skeleton } from "./skeleton";
 import { memo, useEffect } from "react";
 
 const Blog_Recommendation = memo(
@@ -45,6 +45,7 @@ const Blog_Recommendation = memo(
                     >
                       <div className="">
                         <img
+                          loading="lazy"
                           src={post.coverImage}
                           alt=""
                           className="aspect-video rounded-lg object-cover object-center"

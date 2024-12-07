@@ -15,7 +15,6 @@ const UserBlogs = memo(
     onDeleteAndArchive: (id: string) => void;
     currentUserId: string;
   }) => {
-    const [isImageLoaded, setIsImageLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
 
     const handleDeleteAndArchive = async ({
@@ -64,10 +63,6 @@ const UserBlogs = memo(
         {posts.map((blog: any) => (
           <div className="bg-[#1F2937] relative border-2 min-w-[16rem] border-[#212121] transition-all ease-in duration-700 hover:border-[#ffffff] overflow-hidden group max-w-72 pb-3 rounded-2xl flex flex-col gap-6 justify-center items-center md:max-w-60 ">
             <Link to={`/blog/${blog.slug}`} className="w-full">
-              {!isImageLoaded && !hasError && (
-                <div className="w-[20rem] h-[8rem] rounded-2xl rounded-b-none bg-gray-200 animate-pulse" />
-              )}
-
               {hasError ? (
                 <div className="h-[8rem] rounded-2xl rounded-b-none bg-cdark-100 flex justify-center items-center">
                   <h1 className="text-sm text-giest-100 font-light">
@@ -77,12 +72,10 @@ const UserBlogs = memo(
               ) : (
                 <div className="overflow-hidden">
                   <img
+                    loading="lazy"
                     src={blog.coverImage}
                     alt="blog"
-                    className={`aspect-video w-full group-hover:scale-[1.2] transition-transform duration-300 ease-in sm:max-w-full rounded-2xl rounded-b-none object-cover object-center ${
-                      isImageLoaded ? "" : "hidden"
-                    }`}
-                    onLoad={() => setIsImageLoaded(true)}
+                    className={`aspect-video w-full group-hover:scale-[1.2] transition-transform duration-300 ease-in sm:max-w-full rounded-2xl rounded-b-none object-cover object-center`}
                     onError={() => setHasError(true)}
                   />
                 </div>

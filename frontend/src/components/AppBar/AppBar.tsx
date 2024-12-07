@@ -32,7 +32,6 @@ export const AppBar = () => {
   const [logoutLoading, setLogoutLoading] = useState(false);
 
   useEffect(() => {
-    console.log("Mounted");
     const handleClickOutside = (event: MouseEvent) => {
       if (
         menuRef.current &&
@@ -114,7 +113,9 @@ export const AppBar = () => {
           <div ref={avatarRef}>
             <Avatar onClick={toggleMenu} className="h-9 w-9 cursor-pointer">
               <AvatarImage src={currentUser.avatarUrl} />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarFallback>
+                <h1> {currentUser.username.slice(0, 2)}</h1>
+              </AvatarFallback>
             </Avatar>
           </div>
         </div>
@@ -133,7 +134,9 @@ export const AppBar = () => {
           <>
             <Avatar>
               <AvatarImage src={currentUser.avatarUrl} />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarFallback>
+                <h1>{currentUser.username.slice(0, 2)}</h1>
+              </AvatarFallback>
             </Avatar>
 
             <Link
@@ -167,7 +170,9 @@ export const AppBar = () => {
           />
 
           {currentUser.email && (
-            <h1 className="mt-4 text-cgray menuItems font-light">{currentUser.email}</h1>
+            <h1 className="mt-4 text-cgray menuItems font-light">
+              {currentUser.email}
+            </h1>
           )}
 
           <MenuItems

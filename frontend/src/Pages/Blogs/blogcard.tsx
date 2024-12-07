@@ -52,7 +52,6 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
       year: "numeric",
     });
 
-    const [imgLoaded, setImgLoaded] = useState(false);
     const [imgHasError, setimgHasError] = useState(false);
     const [saved, setSaved] = useState(isSaved || false);
 
@@ -130,7 +129,9 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
               >
                 <ShadcnAvatar className="h-6 w-6">
                   <AvatarImage src={author.avatarUrl} />
-                  <AvatarFallback>{author.username.slice(0, 3)}</AvatarFallback>
+                  <AvatarFallback>
+                    <h1>{author.username.slice(0, 3)}</h1>
+                  </AvatarFallback>
                 </ShadcnAvatar>
                 <h1 className="capitalize text-[0.850rem] font-semibold ">
                   {author.username}
@@ -187,65 +188,61 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
             </div>
           </div>
 
-          {!imgLoaded && !imgHasError && (
-            <div className="animate-pulse rounded-lg h-20 sm:h-24 md:h-28 lg:h-32 w-[25%] md:w-[12em] bg-gray-200 sm:max-w-[20%] lg:max-w-[100%]"></div>
-          )}
-
-          {imgHasError ? (
-            <div className="px-4 flex justify-center items-center rounded-lg h-20 sm:h-24 md:h-28 lg:h-32 w-[25%] md:w-[12em] bg-cdark-100  sm:max-w-[20%] lg:max-w-[100%]">
-              <span className="font-scribble2 text-[0.85rem] text-c">
-                ERROR
-              </span>
-            </div>
-          ) : (
-            <img
-              src={coverImage || ""}
-              alt="blog"
-              className={` object-cover rounded-lg h-20 sm:h-24 md:h-28 lg:h-32 w-[25%] md:w-[12em] bg-white sm:max-w-[20%] lg:max-w-[100%]  ${
-                imgLoaded ? "" : "hidden"
-              }`}
-              onLoad={() => setImgLoaded(true)}
-              onError={() => setimgHasError(true)}
-            />
-          )}
+          <>
+            {imgHasError ? (
+              <div className="px-4 flex justify-center items-center rounded-lg h-20 sm:h-24 md:h-28 lg:h-32 w-[25%] md:w-[12em] bg-cdark-100  sm:max-w-[20%] lg:max-w-[100%]">
+                <span className="font-scribble2 text-[0.85rem] text-c">
+                  ERROR
+                </span>
+              </div>
+            ) : (
+              <img
+                loading="lazy"
+                src={coverImage}
+                alt="blog"
+                className={` object-cover rounded-lg h-20 sm:h-24 md:h-28 lg:h-32 w-[25%] md:w-[12em] bg-white sm:max-w-[20%] lg:max-w-[100%] `}
+                onError={() => setimgHasError(true)}
+              />
+            )}
+          </>
         </div>
       </>
     );
   }
 );
 
-export const Avatar = memo(
-  ({
-    size,
-    url,
-    onClick,
-    className,
-  }: {
-    name?: string;
-    size: number;
-    url?: string;
-    onClick?: any;
-    className?: string;
-  }) => {
-    return (
-      // <div
-      //   className={`w-${size} border-black border rounded-full bg-gray-200 h-${size} flex justify-center items-center font-semibold cursor-pointer`}
-      //   // className="rounded-full bg-gray-200 h-10 w-10 flex justify-center items-center font-semibold cursor-pointer"
-      // >
-      //   {name ? (
-      //     name[0].toUpperCase()
-      //   ) : (
-      //     <img className="rounded-full bg-gray-200 h-10 w-10 flex justify-center items-center font-semibold cursor-pointer" src={url} alt="Me" loading="lazy" />
-      //   )}
-      // </div>
-      <>
-        <img
-          onClick={onClick}
-          className={`w-${size} ${className} border-black border rounded-full bg-white h-${size} flex justify-center items-center font-semibold cursor-pointer`}
-          src={url}
-          loading="lazy"
-        />
-      </>
-    );
-  }
-);
+// export const Avatar = memo(
+//   ({
+//     size,
+//     url,
+//     onClick,
+//     className,
+//   }: {
+//     name?: string;
+//     size: number;
+//     url?: string;
+//     onClick?: any;
+//     className?: string;
+//   }) => {
+//     return (
+//       // <div
+//       //   className={`w-${size} border-black border rounded-full bg-gray-200 h-${size} flex justify-center items-center font-semibold cursor-pointer`}
+//       //   // className="rounded-full bg-gray-200 h-10 w-10 flex justify-center items-center font-semibold cursor-pointer"
+//       // >
+//       //   {name ? (
+//       //     name[0].toUpperCase()
+//       //   ) : (
+//       //     <img className="rounded-full bg-gray-200 h-10 w-10 flex justify-center items-center font-semibold cursor-pointer" src={url} alt="Me" loading="lazy" />
+//       //   )}
+//       // </div>
+//       <>
+//         <img
+//           onClick={onClick}
+//           className={`w-${size} ${className} border-black border rounded-full bg-white h-${size} flex justify-center items-center font-semibold cursor-pointer`}
+//           src={url}
+//           loading="lazy"
+//         />
+//       </>
+//     );
+//   }
+// );

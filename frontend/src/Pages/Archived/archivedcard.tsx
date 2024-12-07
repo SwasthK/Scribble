@@ -40,6 +40,7 @@ const ArchivedCard = memo(
             className="w-full flex gap-4 justify-start items-center rounded-md pr-2 bg-[#27272A]"
           >
             <img
+              loading="lazy"
               src={post.coverImage || ""}
               className="h-16 w-16 bg-gray-300 rounded-l-md object-cover"
             ></img>

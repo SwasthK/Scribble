@@ -1,52 +1,10 @@
 import { Context } from 'hono';
 import { apiError } from '../../utils/apiError';
 import { apiResponse } from '../../utils/apiResponse';
-import { MediaType, PostStatus, Prisma } from '@prisma/client';
-import { number, z } from 'zod';
-import { createSlug } from '../../utils/createSlug';
-import { cloudinaryUploader, generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers, mimeTypeSignup } from 'Middleware/cloudinary';
+import { PostStatus, Prisma } from '@prisma/client';
 
-const updatePostSchema =
-    z.object({
-        coverImage: z.string().url({ message: "Invalid Cover Image URL" }).optional(),
-        title: z.string()
-            .min(10, { message: "Title must be atleast 6 Characters" })
-            .max(100, { message: "Title must be atmost 25 Characters" })
-            .optional(),
-        shortCaption: z.string()
-            .min(10, { message: "Short Caption must be atleast 10 Characters" })
-            .max(100, { message: "Short Caption must be atmost 100 Characters" })
-            .optional(),
-        body: z.string()
-            .min(100, { message: "Your Content Seems to be Small, Write More !" })
-            .max(10000, { message: "You have Reached Your Content Limit" })
-            .optional(),
-        summary: z.string()
-            .min(10, { message: "Summary must be atleast 10 Characters" })
-            .max(200, { message: "Summary must be atmost 200 Characters" })
-            .optional(),
-        allowComments: z.boolean({ message: "Invalid Comment type" }).optional(),
-        multiMedias: z.array(z.object({
-            caption: z.string()
-                .min(10, { message: "Caption must be atleast 10 Characters" })
-                .max(50, { message: "Caption must be atmost 50 Characters" })
-                .optional(),
-            altText: z.string()
-                .min(10, { message: "Alt Text must be atleast 10 Characters" }),
-            url: z.string().url({ message: "Invalid Media URL" }),
-            type: z.enum([MediaType.IMAGE, MediaType.AUDIO, MediaType.DOCUMENT, MediaType.VIDEO], { message: "Invalid Media type" }),
-        }), { message: "Invalid Multimedia Type" }).optional(),
-        tags: z.array(z.string().uuid({ message: "Invalid Tag ID" }), { message: "Invalid Tag ID" })
-            .min(1, { message: "You must add atleast 1 Tag" })
-            .max(5, { message: "You can add atmost 5 Tags" })
-            .optional(),
-        categories: z.array(z.string().uuid({ message: "Invalid Category ID" }), { message: "Invalid Category ID" })
-            .min(1, { message: "You must add atleast 1 Category" })
-            .max(5, { message: "You can add atmost 5 Categories" })
-            .optional(),
-    }).refine((data) => Object.values(data).some(value => value !== undefined), {
-        message: "No update field provided",
-    });
+import { cloudinaryUploader, generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers } from 'Middleware/cloudinary';
+import { mimeTypeSignup } from 'Zod/zod';
 
 // const updateDraftPostByIdSchema = z.object({
 //     title: z.string({
@@ -70,8 +28,6 @@ const updatePostSchema =
 //         invalid_type_error: "Allowed Comments must be a boolean"
 //     })
 // })
-
-
 
 export async function updateDraftPostById(c: Context) {
 

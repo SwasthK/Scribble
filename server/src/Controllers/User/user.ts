@@ -51,27 +51,25 @@ export async function getUserDetailsByUsername(c: Context) {
     }
 }
 
-export async function getAllUsersNames(c: Context) {
+export async function getAllUsersName(c: Context) {
     //Used
 
     try {
         const prisma: any = c.get('prisma');
 
-        const user = await prisma.user.findMany({
+        const users = await prisma.user.findMany({
             select: {
                 username: true,
                 avatarUrl: true,
             }
         });
 
-        if (!user) { return apiError(c, 404, "Users Not Found"); }
+        if (!users) { return apiError(c, 404, "Users Not Found"); }
 
-        console.log(user);
-
-        return apiResponse(c, 200, user, "users fetched successfully");
+        return apiResponse(c, 200, users, "users fetched successfully");
 
     } catch (error: any) {
-        console.log("Get all Username Error: ", error.message);
+        console.log("Get all Usersname Error: ", error.message);
         return apiError(c, 500, "Internal Server Error", { code: "CE" });
     }
 }

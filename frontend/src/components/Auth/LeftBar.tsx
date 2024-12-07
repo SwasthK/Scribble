@@ -1,6 +1,6 @@
 import { LeftBarType } from "../../Types/type";
 
-const LeftBar: React.FC<LeftBar> = ({ title, author, shortNote, url }) => {
+const LeftBar: React.FC<LeftBarType> = ({ title, author, shortNote, url }) => {
   const parts = title.split("<br />");
   return (
     <>

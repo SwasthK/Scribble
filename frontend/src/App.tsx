@@ -4,9 +4,7 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import { refreshAccessToken } from "./utils/authHandler";
 import { authAtom, useAuthAtomResetValue } from "./atoms/auth.atoms";
 import { followAtom } from "./atoms/followAtom";
-import { allUsersNames, postsAtom } from "./atoms";
-import axios from "axios";
-import { Loader } from "./Skeleton/Loader";
+import { Loader } from "./components/Global/Loader";
 import SuspendedComponent from "./Layout/SuspensedComponent";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/core/style.css";
@@ -37,13 +35,7 @@ const Topic = lazy(() => import("./Pages/Topic/index"));
 const NotFound = lazy(() => import("./Pages/PageNotFound/NotFound"));
 
 function App() {
-  function updateState(
-    userData: any,
-    accessToken: any,
-    following: any,
-    posts: any,
-    userNames: any
-  ) {
+  function updateState(userData: any, accessToken: any, following: any) {
     setUser((prev) => ({
       ...prev,
       user: { ...prev.user, ...userData },
@@ -51,13 +43,9 @@ function App() {
       accessToken,
     }));
     setFollowing((prev) => ({ ...prev, following }));
-    setPostsAtom(posts);
-    setAllUsersNames(userNames);
   }
   const [user, setUser] = useRecoilState(authAtom);
   const setFollowing = useSetRecoilState(followAtom);
-  const setPostsAtom = useSetRecoilState(postsAtom);
-  const setAllUsersNames = useSetRecoilState(allUsersNames);
   const [loading, setLoading] = useState(true);
   const [hasFetched, setHasFetched] = useState(false);
 
@@ -111,27 +99,14 @@ function App() {
       return;
     }
 
-    const newAccessTokenPromise = refreshAccessToken(user.refreshToken);
-
-    const [newAccessToken, userNames] = await Promise.all([
-      refreshAccessToken(user.refreshToken),
-      newAccessTokenPromise.then((token) => {
-        if (token) {
-          return axios
-            .get(`/user/getAllUserNames`, {
-              headers: { accessToken: `Bearer ${token.accessToken}` },
-            })
-            .then((res) => res.data.data);
-        } else {
-          return [];
-        }
-      }),
-    ]);
-
-    const { accessToken, user: userData, following, posts } = newAccessToken;
+    const {
+      accessToken,
+      user: userData,
+      following,
+    } = await refreshAccessToken(user.refreshToken);
 
     if (accessToken) {
-      updateState(userData, accessToken, following, posts, userNames);
+      updateState(userData, accessToken, following);
       return;
     } else {
       resetAuthAtom();

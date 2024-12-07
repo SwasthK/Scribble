@@ -1,12 +1,11 @@
 import axios from 'axios';
 import { updateUserProfileMetaData } from '../Types/type';
-const baseUrl = import.meta.env.VITE_AXIOS_BASE_URL;
 
 export const getAllPosts = async (
     { pageParam }: { pageParam: number }
 ) => {
     try {
-        const response = await axios.get<any>(`${baseUrl}/posts/getall?page=${pageParam}&&limit=10`, {
+        const response = await axios.get<any>(`/posts/getall?page=${pageParam}&&limit=10`, {
             headers: {
                 accessToken: `Bearer ${localStorage.getItem("accessToken")}`
             }
@@ -18,7 +17,7 @@ export const getAllPosts = async (
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         }
         throw new Error('Something went wrong. Please try again later.');
     }
@@ -28,7 +27,7 @@ export const getUserPosts = async (
     { pageParam }: { pageParam: number }
 ) => {
     try {
-        const response = await axios.get<any>(`${baseUrl}/posts/user?page=${pageParam}`, {
+        const response = await axios.get<any>(`/posts/user?page=${pageParam}`, {
             headers: {
                 accessToken: `Bearer ${localStorage.getItem("accessToken")}`
             }
@@ -40,7 +39,7 @@ export const getUserPosts = async (
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -49,7 +48,7 @@ export const getUserPosts = async (
 
 export const getPostBySlug = async (slug: string | undefined) => {
     try {
-        const response = await axios.get<any>(`${baseUrl}/posts/getBy/slug/${slug}`, {
+        const response = await axios.get<any>(`/posts/getBy/slug/${slug}`, {
             headers: {
                 accessToken: `Bearer ${localStorage.getItem("accessToken")}`
             }
@@ -61,7 +60,7 @@ export const getPostBySlug = async (slug: string | undefined) => {
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -70,7 +69,7 @@ export const getPostBySlug = async (slug: string | undefined) => {
 
 export const getPostByAuthorId = async (authorId: string, slug: string) => {
     try {
-        const response = await axios.get<any>(`${baseUrl}/posts/getBy/authorId/${authorId}`, {
+        const response = await axios.get<any>(`/posts/getBy/authorId/${authorId}`, {
             headers: {
                 accessToken: `Bearer ${localStorage.getItem("accessToken")}`
             },
@@ -85,7 +84,7 @@ export const getPostByAuthorId = async (authorId: string, slug: string) => {
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -95,7 +94,7 @@ export const getPostByAuthorId = async (authorId: string, slug: string) => {
 export const handleUpdateUserProfileMetadata = async (formData: updateUserProfileMetaData) => {
     try {
         const response = await axios.put<any>(
-            `${baseUrl}/updateUserProfile`,
+            `/updateUserProfile`,
             {
                 username: formData.username,
                 email: formData.email,
@@ -114,7 +113,7 @@ export const handleUpdateUserProfileMetadata = async (formData: updateUserProfil
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -135,7 +134,7 @@ export const getDraftPost = async () => {
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -159,7 +158,7 @@ export const getDraftPostFullContentByPostId = async ({ postId }: { postId: stri
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -178,7 +177,7 @@ export const getAllUserSavedPosts = async () => {
         }
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -197,7 +196,7 @@ export const getAllUserArchivedPosts = async () => {
         }
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -207,7 +206,7 @@ export const getAllUserArchivedPosts = async () => {
 export const handleUpdateUserSocials = async (socials: any) => {
     try {
         const response = await axios.put<any>(
-            `${baseUrl}/user/socials/update`,
+            `/user/socials/update`,
             socials,
             {
                 headers: {
@@ -222,7 +221,7 @@ export const handleUpdateUserSocials = async (socials: any) => {
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -246,7 +245,7 @@ export const handleGetAllFollowers = async () => {
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -270,7 +269,7 @@ export const handleGetAllFollowings = async () => {
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -297,7 +296,7 @@ export const handleGetUserProfileDetailsByUsername = async ({ username }: { user
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -324,7 +323,7 @@ export const handleGetUserPostsDetailsByUsername = async ({ username }: { userna
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -349,7 +348,7 @@ export const handleGetAllCategories = async () => {
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -374,7 +373,7 @@ export const handleGetMostLikedPosts = async () => {
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }
@@ -399,7 +398,57 @@ export const handleGetPostsByCategoryName = async (categoryName: string) => {
 
     } catch (error: any) {
         if (error.response && error.response.data) {
-            throw new Error(error.response.data.message || 'Unexpected error');
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
+        } else {
+            throw new Error('Something went wrong. Please try again later.');
+        }
+    }
+}
+
+export const handleGetAllUsersName = async () => {
+    try {
+
+        const response = await axios.get<any>(
+            `/user/getAllUsersName`,
+            {
+                headers: {
+                    accessToken: `Bearer ${localStorage.getItem("accessToken")}`
+                }
+            }
+        );
+
+        if (response.data) {
+            return response.data.data;
+        }
+
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
+        } else {
+            throw new Error('Something went wrong. Please try again later.');
+        }
+    }
+}
+
+export const handleGetAllPostsName = async () => {
+    try {
+
+        const response = await axios.get<any>(
+            `/posts/getAllPostsName`,
+            {
+                headers: {
+                    accessToken: `Bearer ${localStorage.getItem("accessToken")}`
+                }
+            }
+        );
+
+        if (response.data) {
+            return response.data.data;
+        }
+
+    } catch (error: any) {
+        if (error.response && error.response.data) {
+            throw new Error(error.response.data.message || 'An unexpected error occurred');
         } else {
             throw new Error('Something went wrong. Please try again later.');
         }

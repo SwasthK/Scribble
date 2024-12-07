@@ -1,28 +1,8 @@
 import { Context } from "hono";
 import { apiResponse } from "../../utils/apiResponse";
 import { Role as UserRole } from "@prisma/client";
-
-import z from 'zod'
 import { apiError } from "../../utils/apiError";
-import { dbConnect } from "../../Connection/db.connect";
-
-const registerAdminSchema = z.object({
-    id: z.string({
-        required_error: "User ID is required",
-        invalid_type_error: "Invalid User ID",
-        message: "Invalid User ID"
-    }).uuid({ message: "Invalid User ID" }),
-    Role: z.string({
-        required_error: "Invalid Request",
-        invalid_type_error: "Invalid Request",
-        message: "Invalid Request"
-    }).includes('ADMIN', { message: "Invalid Request" }),
-    PASSKEY: z.string({
-        required_error: "Invalid Request",
-        invalid_type_error: "Invalid Request",
-        message: "Invalid Request"
-    })
-})
+import { registerAdminSchema } from "Zod/zod";
 
 export async function registerAdmin(c: Context) {
     try {
@@ -44,7 +24,7 @@ export async function registerAdmin(c: Context) {
             return apiError(c, 400, 'Unothorized')
         }
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const admin = await prisma.user.update({
             where: { id: userId },

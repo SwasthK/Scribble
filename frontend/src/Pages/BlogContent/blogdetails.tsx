@@ -42,7 +42,7 @@ export const Blog_Details = memo(({ blogContent }: { blogContent: any }) => {
 
   const commentsPerPage = 3;
 
-  const [loadImage, setLoadImage] = useState(false);
+
   const [imageError, setImageError] = useState(false);
   const location = useLocation();
   const { state } = location;
@@ -247,7 +247,9 @@ export const Blog_Details = memo(({ blogContent }: { blogContent: any }) => {
               <div className="flex gap-4 items-center justify-center">
                 <Avatar>
                   <AvatarImage src={author.avatarUrl} />
-                  <AvatarFallback>{author.username.slice(0, 3)}</AvatarFallback>
+                  <AvatarFallback>
+                    <h1>{author.username.slice(0, 3)}</h1>
+                  </AvatarFallback>
                 </Avatar>
                 <div>
                   <div className="justify-between flex items-center mb-1 ">
@@ -311,9 +313,6 @@ export const Blog_Details = memo(({ blogContent }: { blogContent: any }) => {
             </div>
 
             <div className="py-6 pb-3 pt-4">
-              {!loadImage && !imageError && (
-                <div className="animate-pulse aspect-video bg-gray-200 rounded-xl"></div>
-              )}
               {imageError ? (
                 <div className="aspect-video bg-cdark-100 rounded-xl flex justify-center items-center">
                   <h1 className="text-white font-semibold text-lg">
@@ -322,10 +321,10 @@ export const Blog_Details = memo(({ blogContent }: { blogContent: any }) => {
                 </div>
               ) : (
                 <img
+                  loading="lazy"
                   src={coverImage}
                   alt=""
-                  className="aspect-video rounded-xl object-cover"
-                  onLoad={() => setLoadImage(true)}
+                  className="aspect-video rounded-xl object-cover "
                   onError={() => setImageError(true)}
                 />
               )}

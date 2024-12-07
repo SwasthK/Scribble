@@ -1,19 +1,8 @@
 import { Context } from "hono";
 import { apiError } from "../../utils/apiError";
-import { dbConnect } from "../../Connection/db.connect";
 import { apiResponse } from "../../utils/apiResponse";
-
-import z from 'zod';
 import { createSlug } from "../../utils/createSlug";
-
-const getTagSchema = z.object({
-    name: z.string({
-        required_error: "Tag name is required",
-        invalid_type_error: "Tag name must be a string"
-    })
-        .min(4, { message: "Tag name must be at least 4 characters long" })
-        .max(30, { message: "Tag name must be at most 30 characters long" }),
-});
+import { getTagSchema } from "Zod/zod";
 
 export async function getTag(c: Context) {
     try {
@@ -33,7 +22,7 @@ export async function getTag(c: Context) {
 
         const slug = createSlug(name, 25);
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const tag = await prisma.tag.findFirst({
             where: { slug }
@@ -53,7 +42,7 @@ export async function getTag(c: Context) {
 export async function getAllTag(c: Context) {
 
     try {
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const tag = await prisma.tag.findMany({})
 

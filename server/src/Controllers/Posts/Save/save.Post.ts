@@ -3,11 +3,7 @@ import { Context } from "hono";
 import { apiError } from "utils/apiError";
 import { apiResponse } from "utils/apiResponse";
 import { GlobalResponse, savePostResponse } from "utils/responses";
-
-enum saveAction {
-    SAVE = "save",
-    UNSAVE = "unsave"
-}
+import { saveAction } from "Zod/zod";
 
 export const handleSavePost = async (c: Context) => {
     const userId = c.get("user").id;

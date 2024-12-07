@@ -2,21 +2,7 @@ import { Context } from "hono";
 import { createSlug } from "../../utils/createSlug";
 import { apiResponse } from "../../utils/apiResponse";
 import { apiError } from "../../utils/apiError";
-
-import z from "zod";
-import { dbConnect } from "../../Connection/db.connect";
-
-export const tagNamesSchema = z.array(
-    z.string({
-        required_error: "Tag name is required",
-        invalid_type_error: "Tag name must be a string"
-    })
-        .min(2, { message: "Tag name must be at least 2 characters long" })
-        .max(20, { message: "Tag name must be at most 20 characters long" })
-        .regex(/^[a-zA-Z0-9]+$/, { message: "Tag name can only contain letters and numbers" }),
-    { message: "Tag is Required" }
-).nonempty({ message: "At least one tag name is required" });
-
+import { tagNamesSchema } from "Zod/zod";
 
 export async function createTag(c: Context) {
 
@@ -37,7 +23,7 @@ export async function createTag(c: Context) {
             return apiError(c, 400, response.error.errors[0].message);
         }
 
-        const prisma: any = await dbConnect(c)
+        const prisma: any = await c.get('prisma');
 
         const results = await prisma.$transaction(async (tx: any) => {
             const createdTags = [];

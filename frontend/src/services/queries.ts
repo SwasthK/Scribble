@@ -1,5 +1,5 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { getAllPosts, getAllUserArchivedPosts, getAllUserSavedPosts, getDraftPost, getDraftPostFullContentByPostId, getPostByAuthorId, getPostBySlug, getUserPosts, handleGetAllCategories, handleGetAllFollowers, handleGetAllFollowings, handleGetMostLikedPosts, handleGetPostsByCategoryName, handleGetUserPostsDetailsByUsername, handleGetUserProfileDetailsByUsername } from "./api";
+import { getAllPosts, getAllUserArchivedPosts, getAllUserSavedPosts, getDraftPost, getDraftPostFullContentByPostId, getPostByAuthorId, getPostBySlug, getUserPosts, handleGetAllCategories, handleGetAllFollowers, handleGetAllFollowings, handleGetAllPostsName, handleGetAllUsersName, handleGetMostLikedPosts, handleGetPostsByCategoryName, handleGetUserPostsDetailsByUsername, handleGetUserProfileDetailsByUsername } from "./api";
 
 export function useGetAllPosts() {
     return useInfiniteQuery(
@@ -147,6 +147,25 @@ export function useGetPostsByCategoryName(categoryName: string) {
         queryKey: ["postsByCategoryName", categoryName],
         queryFn: () => handleGetPostsByCategoryName(categoryName),
         enabled: Boolean(categoryName),
+        retry: false,
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnMount: false,
+    })
+}
+
+
+export function useGetAllPostsNameAndGetAllUsersName() {
+    return useQuery({
+        queryKey: ["AllpostsAndAllUsersName"],
+        queryFn: async () => {
+            const [allUsers, allPosts] = await Promise.all([
+                handleGetAllUsersName(),
+                handleGetAllPostsName(),
+            ]);
+            return { allUsers, allPosts };
+        },
+        enabled: true,
         retry: false,
         staleTime: Infinity,
         refetchOnWindowFocus: false,

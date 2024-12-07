@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import {
   Profile_View_About_Skeleton,
   Profile_View_Posts_Skeleton,
-} from "../../Skeleton/Profile_View_Skeleton";
+} from "./skeleton";
 
 import { useGetUserProfileDetailsAndPostsDetails } from "../../services/queries";
 

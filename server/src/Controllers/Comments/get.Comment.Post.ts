@@ -1,6 +1,5 @@
 import { Context } from "hono";
 import { apiError } from "../../utils/apiError";
-import { dbConnect } from "../../Connection/db.connect";
 import { apiResponse } from "../../utils/apiResponse";
 
 export async function getComments(c: Context) {
@@ -8,7 +7,7 @@ export async function getComments(c: Context) {
         const postId = c.req.param("postId");
         if (!postId) { return apiError(c, 400, "Post ID is required"); }
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const post = await prisma.post.findUnique({ where: { id: postId }, select: { id: true } });
 

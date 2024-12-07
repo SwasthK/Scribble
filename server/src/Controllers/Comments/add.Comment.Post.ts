@@ -1,17 +1,7 @@
 import { Context } from "hono";
 import { apiResponse } from "../../utils/apiResponse";
 import { apiError } from "../../utils/apiError";
-import z from "zod";
-import { dbConnect } from "../../Connection/db.connect";
-
-const addCommentSchema = z.object({
-    content: z.string({ required_error: "Comment cannnot be empty" }).min(1, "Comment content cannot be empty"),
-    postId: z.string({ required_error: "Post ID required" }).uuid("Invalid post ID"),
-    parentId: z.string({ required_error: "Invalid" }).uuid().optional()
-}, {
-    required_error: "Comment is required",
-    message: "Invalid data"
-});
+import { addCommentSchema } from "Zod/zod";
 
 export async function addComments(c: Context) {
     try {
@@ -30,7 +20,7 @@ export async function addComments(c: Context) {
 
         const { content, postId, parentId } = response.data;
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const [post, author] = await Promise.all([
             prisma.post.findUnique({ where: { id: postId } }),

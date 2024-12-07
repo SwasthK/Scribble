@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { useGetAllUserSavedPosts } from "../../services/queries";
 import ErrorBar from "../../components/Error";
-import { Saved_Post_Skeleton } from "../../Skeleton/Saved_Post_Skeleton";
+import { Saved_Post_Skeleton } from "./skeleton";
 import { GridIcon } from "../../assets/svg/GridIcon";
 import { RefreshIcon } from "../../assets/svg/RefreshIcon";
 

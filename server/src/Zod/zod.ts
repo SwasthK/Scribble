@@ -1,4 +1,4 @@
-import { PostReportType } from '@prisma/client';
+import { MediaType, PostReportType } from '@prisma/client';
 import { z } from 'zod'
 
 const allowedDomains = [
@@ -118,3 +118,293 @@ export const postReportSchema = z.object({
         }
     )
 });
+
+export const registerAdminSchema = z.object({
+    id: z.string({
+        required_error: "User ID is required",
+        invalid_type_error: "Invalid User ID",
+        message: "Invalid User ID"
+    }).uuid({ message: "Invalid User ID" }),
+    Role: z.string({
+        required_error: "Invalid Request",
+        invalid_type_error: "Invalid Request",
+        message: "Invalid Request"
+    }).includes('ADMIN', { message: "Invalid Request" }),
+    PASSKEY: z.string({
+        required_error: "Invalid Request",
+        invalid_type_error: "Invalid Request",
+        message: "Invalid Request"
+    })
+})
+
+export const categoryNamesSchema = z.object({
+    head: z.enum([
+        "technology",
+        "lifestyle",
+        "business",
+        "health & wellness",
+        "food & recipes",
+        "travel",
+        "education",
+        "personal development",
+        "finance",
+        "entertainment"
+    ], {
+        required_error: "Category head is required", invalid_type_error: "Category head must be a string",
+        message: "Category head is Required"
+    }),
+    categories: z.array(
+        z.string({
+            required_error: "Category name is required",
+            invalid_type_error: "Category name must be a string"
+        })
+            .min(4, { message: "Category name must be at least 4 characters long" })
+            .max(30, { message: "Category name must be at most 30 characters long" }),
+        { message: "Category is Required" }
+    ).nonempty({ message: "At least one category name is required" })
+})
+
+export const categoryDeleteSchema = z.object({
+    name: z.string({
+        required_error: "Category name is required",
+        invalid_type_error: "Category name must be a string"
+    })
+        .min(4, { message: "Category name must be at least 4 characters long" })
+        .max(30, { message: "Category name must be at most 30 characters long" }),
+});
+
+export const getCategorySchema = z.object({
+    name: z.string({
+        required_error: "Category name is required",
+        invalid_type_error: "Category name must be a string"
+    })
+        .min(4, { message: "Category name must be at least 4 characters long" })
+        .max(30, { message: "Category name must be at most 30 characters long" }),
+});
+
+export const categoryUpdateSchema = z.object({
+    name: z.string({
+        required_error: "Category name is required",
+        invalid_type_error: "Category name must be a string"
+    })
+        .min(4, { message: "Category name must be at least 4 characters long" })
+        .max(30, { message: "Category name must be at most 30 characters long" }),
+    update: z.string({
+        required_error: "New category name is required",
+        invalid_type_error: "New category name must be a string"
+    })
+        .min(4, { message: "New category name must be at least 4 characters long" })
+        .max(30, { message: "New category name must be at most 30 characters long" }),
+});
+
+export const addCommentSchema = z.object({
+    content: z.string({ required_error: "Comment cannnot be empty" }).min(1, "Comment content cannot be empty"),
+    postId: z.string({ required_error: "Post ID required" }).uuid("Invalid post ID"),
+    parentId: z.string({ required_error: "Invalid" }).uuid().optional()
+}, {
+    required_error: "Comment is required",
+    message: "Invalid data"
+});
+
+export const removeCommentSchema = z.object({
+    postId: z.string({
+        required_error: "Post Id Required",
+        invalid_type_error: "Invalid post ID",
+        message: "Invalid post ID",
+    }).uuid("Invalid post ID"),
+    commentId: z.string({
+        required_error: "Comment Id Required",
+        invalid_type_error: "Invalid comment ID",
+        message: "Invalid comment ID",
+    }).uuid("Invalid comment ID"),
+});
+
+export enum saveAction {
+    SAVE = "save",
+    UNSAVE = "unsave"
+}
+
+export const createNewDraftPostSchema = z.object({
+    title: z.string({
+        required_error: "Title is required",
+        invalid_type_error: "Title must be a string"
+    }),
+    shortCaption: z.string({
+        required_error: "Short Caption is required",
+        invalid_type_error: "Short Caption be a string"
+    }),
+    body: z.string({
+        required_error: "Body is required",
+        invalid_type_error: "Body must be a string"
+    }),
+    summary: z.string({
+        required_error: "Summary is required",
+        invalid_type_error: "Summary must be a string"
+    }),
+    allowComments: z.boolean({
+        required_error: "Allowed Comments is required",
+        invalid_type_error: "Allowed Comments must be a boolean"
+    })
+})
+
+export const deletePostSchema = z.object({
+    postId: z.string({ required_error: "Post ID required", invalid_type_error: "Invalid Post ID" })
+        .uuid({ message: "Invalid Post ID" }),
+})
+
+export const publishPostSchema = z.object({
+    title: z.string()
+        .min(6, { message: "Title must be atleast 6 Characters" })
+        .max(25, { message: "Title must be atmost 25 Characters" }),
+    shortCaption: z.string()
+        .min(10, { message: "Short Caption must be atleast 10 Characters" })
+        .max(100, { message: "Short Caption must be atmost 100 Characters" }),
+    body: z.string()
+        .min(250, { message: "Your Content Seems to be Small, Write More !" })
+        .max(10000, { message: "You have Reached Your Content Limit" }),
+    summary: z.string()
+        .min(10, { message: "Summary must be atleast 10 Characters" })
+        .max(200, { message: "Summary must be atmost 200 Characters" })
+        .optional().nullable().or(z.literal('')),
+    allowComments: z.boolean({ message: "Invalid Comment type" }),
+})
+
+export const updatePostSchema =
+    z.object({
+        coverImage: z.string().url({ message: "Invalid Cover Image URL" }).optional(),
+        title: z.string()
+            .min(10, { message: "Title must be atleast 6 Characters" })
+            .max(100, { message: "Title must be atmost 25 Characters" })
+            .optional(),
+        shortCaption: z.string()
+            .min(10, { message: "Short Caption must be atleast 10 Characters" })
+            .max(100, { message: "Short Caption must be atmost 100 Characters" })
+            .optional(),
+        body: z.string()
+            .min(100, { message: "Your Content Seems to be Small, Write More !" })
+            .max(10000, { message: "You have Reached Your Content Limit" })
+            .optional(),
+        summary: z.string()
+            .min(10, { message: "Summary must be atleast 10 Characters" })
+            .max(200, { message: "Summary must be atmost 200 Characters" })
+            .optional(),
+        allowComments: z.boolean({ message: "Invalid Comment type" }).optional(),
+        multiMedias: z.array(z.object({
+            caption: z.string()
+                .min(10, { message: "Caption must be atleast 10 Characters" })
+                .max(50, { message: "Caption must be atmost 50 Characters" })
+                .optional(),
+            altText: z.string()
+                .min(10, { message: "Alt Text must be atleast 10 Characters" }),
+            url: z.string().url({ message: "Invalid Media URL" }),
+            type: z.enum([MediaType.IMAGE, MediaType.AUDIO, MediaType.DOCUMENT, MediaType.VIDEO], { message: "Invalid Media type" }),
+        }), { message: "Invalid Multimedia Type" }).optional(),
+        tags: z.array(z.string().uuid({ message: "Invalid Tag ID" }), { message: "Invalid Tag ID" })
+            .min(1, { message: "You must add atleast 1 Tag" })
+            .max(5, { message: "You can add atmost 5 Tags" })
+            .optional(),
+        categories: z.array(z.string().uuid({ message: "Invalid Category ID" }), { message: "Invalid Category ID" })
+            .min(1, { message: "You must add atleast 1 Category" })
+            .max(5, { message: "You can add atmost 5 Categories" })
+            .optional(),
+    }).refine((data) => Object.values(data).some(value => value !== undefined), {
+        message: "No update field provided",
+    });
+
+export const updateUserSocialsSchema = z.array(
+    z.object({
+        platform: z.enum(['github', 'x', 'instagram'],
+            {
+                required_error: "Platform is required",
+                invalid_type_error: "Platform must be one of: github, x, instagram",
+                message: "Invalid Platform"
+            }),
+        url: z.string({
+            required_error: "URL is required",
+            invalid_type_error: "Invalid URL",
+        }).url().nullable()
+    })
+).min(1, "At least one social link must be provided")
+    .refine(value => value.length <= 3, { message: "Maximum 3 social links allowed" })
+    .refine(
+        (socials) => socials.some((social) => social.url && social.url.trim() !== ""),
+        {
+            message: "At least one platform must have a valid URL",
+        }
+    )
+    .refine(
+        (socials) =>
+            new Set(socials.map((social) => social.platform)).size === socials.length,
+        {
+            message: "Duplicate platforms are not allowed",
+        }
+    )
+    .refine(
+        (socials) => {
+            const urls = socials.map((social) => social.url).filter(Boolean);
+            return new Set(urls).size === urls.length;
+        },
+        {
+            message: "Duplicate URLs are not allowed",
+        }
+    );
+
+export const tagNamesSchema = z.array(
+    z.string({
+        required_error: "Tag name is required",
+        invalid_type_error: "Tag name must be a string"
+    })
+        .min(2, { message: "Tag name must be at least 2 characters long" })
+        .max(20, { message: "Tag name must be at most 20 characters long" })
+        .regex(/^[a-zA-Z0-9]+$/, { message: "Tag name can only contain letters and numbers" }),
+    { message: "Tag is Required" }
+).nonempty({ message: "At least one tag name is required" });
+
+export const tagDeleteSchema = z.object({
+    name: z.string({
+        required_error: "tag name is required",
+        invalid_type_error: "tag name must be a string"
+    })
+        .min(2, { message: "tag name must be at least 4 characters long" })
+        .max(20, { message: "tag name must be at most 30 characters long" }),
+});
+
+export const getTagSchema = z.object({
+    name: z.string({
+        required_error: "Tag name is required",
+        invalid_type_error: "Tag name must be a string"
+    })
+        .min(4, { message: "Tag name must be at least 4 characters long" })
+        .max(30, { message: "Tag name must be at most 30 characters long" }),
+});
+
+export enum fileUploadMessage {
+    NOFILE = 'No file provided',
+    SUCCESS = 'File uploaded successfully',
+    ERROR = 'Failed to upload file',
+    TYPEERROR = 'File type not allowed',
+}
+
+export enum mimeTypeSignup {
+    JPEG = 'image/jpeg',
+    PNG = 'image/png',
+    WEBP = 'image/webp',
+}
+
+export const tagUpdateSchema = z.object({
+    name:   z.string({
+        required_error: "Tag name is required",
+        invalid_type_error: "Tag name must be a string"
+    })
+        .min(2, { message: "Tag name must be at least 2 characters long" })
+        .max(20, { message: "Tag name must be at most 20 characters long" })
+        .regex(/^[a-zA-Z0-9]+$/, { message: "Tag name can only contain letters and numbers" }),
+    update: z.string({
+        required_error: "New tag name is required",
+        invalid_type_error: "New tag name must be a string"
+    })
+    .min(2, { message: "New tag name must be at least 2 characters long" })
+    .max(20, { message: "New tag name must be at most 20 characters long" })
+    .regex(/^[a-zA-Z0-9]+$/, { message: "Tag name can only contain letters and numbers" }),
+});
+

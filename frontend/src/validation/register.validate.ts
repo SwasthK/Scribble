@@ -1,4 +1,4 @@
-import { mimeTypeSignup } from "../../Types/type";
+import { mimeTypeSignup } from "../Types/type";
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
 const allowedDomains = [

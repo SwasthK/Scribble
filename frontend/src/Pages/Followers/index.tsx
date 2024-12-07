@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { useGetAllFollowers } from "../../services/queries";
 import { pageSection } from "../../Types/type";
 
-import { FollowerCard_Skeleton } from "../../Skeleton/FollowerCard_Skeleton";
+import { FollowerCard_Skeleton } from "./skeleton";
 import ErrorBar from "../../components/Error";
 const UserCards = lazy(() => import("./usercards"));
 

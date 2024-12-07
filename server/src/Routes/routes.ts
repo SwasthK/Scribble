@@ -22,7 +22,6 @@ import {
     getPostByTitle,
     getAllPosts,
     getPublishedPost,
-
     getUserPosts,
     getPostBySlug,
     getPostByAuthorId,
@@ -30,7 +29,8 @@ import {
     getDraftedPostFullContentById,
     getPostByUsername,
     getMostLikedPosts,
-    getPostByCategory
+    getPostByCategory,
+    getAllPostsName
 } from '../Controllers/Posts/get.Posts'
 import { deleteDraftBulk, deleteDraftPostById, deletePublishedPostById } from '../Controllers/Posts/delete.Post'
 
@@ -80,7 +80,7 @@ import { handleSavePost } from 'Controllers/Posts/Save/save.Post'
 import { getSavedPost } from 'Controllers/Posts/Save/getSavedPost'
 import { updateUserSocials } from 'Controllers/Socials/socials'
 import { reportPost } from 'Controllers/Report'
-import { getAllUsersNames, getUserDetailsByUsername } from 'Controllers/User/user'
+import { getAllUsersName, getUserDetailsByUsername } from 'Controllers/User/user'
 
 const api = new Hono();
 
@@ -106,7 +106,7 @@ api
 
     // User Details Routes
     .get('/user/getBy/username/:username', authMiddleware, findActiveUser, getUserDetailsByUsername)
-    .get('/user/getAllUserNames', authMiddleware, findActiveUser, getAllUsersNames)
+    .get('/user/getAllUsersName', authMiddleware, findActiveUser, getAllUsersName)
 
     // Draft Routes
     .get('/posts/drafts/shortened', authMiddleware, findActiveUser, getDraftedPostShortned)
@@ -129,6 +129,7 @@ api
     .get('posts/user', authMiddleware, findActiveUser, getUserPosts)
     .get('/posts/mostliked', authMiddleware, findActiveUser, getMostLikedPosts)
     .get('/posts/getBy/Category/:categoryName', authMiddleware, findActiveUser, getPostByCategory)
+    .get('/posts/getAllPostsName', authMiddleware, findActiveUser, getAllPostsName)
 
     // Save & Unsave Post
     .get("/posts/saved/getAll", authMiddleware, findActiveUser, getSavedPost)

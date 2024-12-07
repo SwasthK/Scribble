@@ -1,28 +1,10 @@
 import { Context } from "hono";
 import { apiError } from "../../utils/apiError";
-import { dbConnect } from "../../Connection/db.connect";
 import { apiResponse } from "../../utils/apiResponse";
-import z from 'zod'
 import { PostStatus } from "@prisma/client";
 import { createSlug } from "utils/createSlug";
-import { cloudinaryUploader, fileUploadMessage, generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers, mimeTypeSignup } from "Middleware/cloudinary";
-
-export const publishPostSchema = z.object({
-    title: z.string()
-        .min(6, { message: "Title must be atleast 6 Characters" })
-        .max(25, { message: "Title must be atmost 25 Characters" }),
-    shortCaption: z.string()
-        .min(10, { message: "Short Caption must be atleast 10 Characters" })
-        .max(100, { message: "Short Caption must be atmost 100 Characters" }),
-    body: z.string()
-        .min(250, { message: "Your Content Seems to be Small, Write More !" })
-        .max(10000, { message: "You have Reached Your Content Limit" }),
-    summary: z.string()
-        .min(10, { message: "Summary must be atleast 10 Characters" })
-        .max(200, { message: "Summary must be atmost 200 Characters" })
-        .optional().nullable().or(z.literal('')),
-    allowComments: z.boolean({ message: "Invalid Comment type" }),
-})
+import { cloudinaryUploader,  generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers } from "Middleware/cloudinary";
+import { fileUploadMessage, mimeTypeSignup } from "Zod/zod";
 
 export async function updatePublishById(c: Context) {
     try {

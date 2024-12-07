@@ -5,7 +5,6 @@ import { PostStatus } from "@prisma/client";
 import { usernameSchema } from "Zod/zod";
 import { createSlug } from "utils/createSlug";
 
-
 export async function getPostById(c: Context) {
 
     const postId = c.req.param('postId');
@@ -648,6 +647,32 @@ export async function getPostByCategory(c: Context) {
 
     } catch (error: any) {
         console.log("Get Post By Category Error: ", error.message);
+        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+    }
+}
+
+export async function getAllPostsName(c: Context) {
+
+    try {
+        const prisma = c.get('prisma');
+
+        const posts = await prisma.post.findMany({
+            where: {
+                status: PostStatus.PUBLISHED
+            },
+            select: {
+                slug: true,
+            }
+        });
+
+        if (!posts) {
+            return apiError(c, 404, "Posts Not Found");
+        }
+
+        return apiResponse(c, 200, posts, "Posts fetched successfully");
+
+    } catch (error: any) {
+        console.log("Get All Post Names Error: ", error.message);
         return apiError(c, 500, "Internal Server Error", { code: "CE" });
     }
 }

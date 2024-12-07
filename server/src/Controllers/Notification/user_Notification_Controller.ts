@@ -1,5 +1,4 @@
 import { Context } from "hono";
-import { dbConnect } from "../../Connection/db.connect";
 import { apiResponse } from "../../utils/apiResponse";
 import { apiError } from "../../utils/apiError";
 import { createUserNotificationsSchema, markNotificationAsReadSchema } from "../../Zod/zod";
@@ -15,7 +14,7 @@ export async function createUserNotifications(c: Context) {
             return apiError(c, 400, response.error.errors[0].message);
         }
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const createNotification = await prisma.notification.create({
             data: {
@@ -38,7 +37,7 @@ export async function getUserNotifications(c: Context) {
     try {
         const userId = c.get("user").id;
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const getUserNotifications = await prisma.notification.findMany({
             select: {
@@ -80,7 +79,7 @@ export async function markNotificationAsRead(c: Context) {
             return apiError(c, 400, "Notification ID is required");
         }
 
-        const prisma: any = await dbConnect(c);
+        const prisma: any = await c.get('prisma');
 
         const markNotificationAsRead = await prisma.notification.updateMany({
             where: {
