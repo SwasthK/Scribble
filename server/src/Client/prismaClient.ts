@@ -33,7 +33,7 @@ export const getPrismaClient = async (dbUrl: any) => {
         currentDbUrl = dbUrl;
     }
 
-
+    console.log('Not Creating Prisma Client');
     return prisma as PrismaClient;
 };
 
