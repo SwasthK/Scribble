@@ -1,9 +1,8 @@
 import { Context } from "hono";
-import { Log } from "../../utils/log";
 import { apiError } from "../../utils/apiError";
 import { apiResponse } from "../../utils/apiResponse";
-import { accessToken, verifyTokens, generateAccessAndRefreshToken } from "../../utils/jwt";
-import { fileUploadMessage, ServerSignin, ServerSignup } from "../../Zod/zod";
+import { accessToken, generateAccessAndRefreshToken, verifyTokens } from "../../utils/jwt";
+import { fileUploadMessage, ServerSignin } from "../../Zod/zod";
 
 export async function signup(c: Context) {
 
@@ -86,8 +85,8 @@ export async function signup(c: Context) {
         }, "Account Created Successully")
 
     } catch (error: any) {
-        Log('Signup Controller', `ERROR:${error.message}`)
-        return apiError(c, 400, "Something went wrong", { code: 'CE' })
+        console.log('Signup Controller', `ERROR:${error.message}`)
+        return apiError(c, 400, "Something went wrong")
     }
 }
 
@@ -124,14 +123,6 @@ export async function signin(c: Context) {
                         url: true
                     }
                 },
-                // followers: {
-                //     where: {
-                //         followerId: verifiedToken.id
-                //     },
-                //     select: {
-                //         followingId: true
-                //     }
-                // }
             },
         })
 
@@ -164,15 +155,14 @@ export async function signin(c: Context) {
         }, "Login Successfull",)
 
     } catch (error: any) {
-        Log('Signin Controller', `ERROR:${error.message}`)
-        return apiError(c, 500, "Internal Server Error", { code: "CE" })
+        console.log('Signin Controller', `ERROR:${error.message}`)
+        return apiError(c, 500, "Internal Server Error")
     }
 }
 
 export async function logout(c: Context) {
     try {
         const user = c.get('user');
-        console.log(user);
 
         const prisma: any = await c.get('prisma');
 
@@ -191,7 +181,7 @@ export async function logout(c: Context) {
 
     } catch (error) {
         console.log("Error while logging out : ", error);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" })
+        return apiError(c, 500, "Internal Server Error")
     }
 }
 
@@ -255,6 +245,6 @@ export async function refreshAccessToken(c: Context) {
         }, "Access Token Refreshed")
     } catch (error: any) {
         console.log("Error while refreshing token : ", error);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" })
+        return apiError(c, 500, "Internal Server Error")
     }
 }
