@@ -36,6 +36,6 @@ export const updateUserSocials = async (c: Context) => {
         return apiResponse(c, 200, updatedSocials, "Socials Updated Successfully");
     } catch (error: any) {
         console.log("Error while Updating user socials : ", error);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" })
+        return apiError(c, 500, "Internal Server Error")
     }
 }

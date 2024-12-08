@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { apiResponse } from "../../utils/apiResponse";
+import { apiResponse } from "utils/apiResponse";
 import { apiError } from "utils/apiError";
 import { GlobalResponse } from "utils/responses";
 
@@ -33,7 +33,7 @@ export async function getFollowersDetails(c: Context) {
 
         return apiResponse(c, 200, { followers: normalizedFollowers, count: followers.length });
     } catch (error: any) {
-        console.log("get- followers - error ", error);
+        console.log("Get- followers - error ", error);
         return apiError(c, 500, GlobalResponse.INTERNALERROR)
     }
 }

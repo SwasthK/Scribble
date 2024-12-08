@@ -1,12 +1,164 @@
-import { Context } from "hono";
-import { apiError } from "../../utils/apiError";
-import { apiResponse } from "../../utils/apiResponse";
 import { PostStatus } from "@prisma/client";
-import { usernameSchema } from "Zod/zod";
+import { Context } from "hono";
+import { apiError } from "utils/apiError";
+import { apiResponse } from "utils/apiResponse";
 import { createSlug } from "utils/createSlug";
+import { usernameSchema } from "Zod/zod";
+
+export async function getAllPosts(c: Context) {
+
+    const user = c.get("user");
+    console.log(user);
+    const page = Number(c.req.query("page") || 1);
+    if (page < 1) { return apiError(c, 400, "Invalid page number"); }
+    const limit = Number(c.req.query("limit") || 10);
+    if (limit < 1) { return apiError(c, 400, "Invalid limit number"); }
+
+    const skip = (page - 1) * limit;
+
+    try {
+        const prisma = c.get('prisma');
+
+        const totalPosts = await prisma.post.count(
+            {
+                where: {
+                    status: PostStatus.PUBLISHED
+                }
+            }
+        );
+
+        const totalPages = Math.ceil(totalPosts / limit);
+
+        let posts = await prisma.post.findMany({
+            skip: skip,
+            take: limit,
+            where: {
+                authorId: {
+                    not: user.id
+                },
+                status: PostStatus.PUBLISHED
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+            select: {
+                id: true,
+                author: {
+                    select: {
+                        username: true,
+                        avatarUrl: true
+                    }
+                },
+                coverImage: true,
+                title: true,
+                shortCaption: true,
+                slug: true,
+                savedBy: {
+                    where: { userId: user.id },
+                    select: { postId: true }
+                },
+                likes: {
+                    where: { userId: user.id },
+                    select: { postId: true }
+                },
+                categories: true,
+                createdAt: true,
+                _count: {
+                    select: {
+                        likes: true,
+                        comments: true
+                    }
+                },
+            }
+        });
 
 
+        posts = posts.map((post: any) => {
+            const { savedBy, ...rest } = post;
+            return {
+                ...rest,
+                isSaved: savedBy.length > 0 ? true : false
+            }
+        })
 
+        return apiResponse(c, 200, { posts, currentPage: page, totalPages, totalPosts, user }, "Posts fetched successfully");
+
+    } catch (error: any) {
+        console.log("Get All Posts Error: ", error.message);
+        return apiError(c, 500, "Internal Server Error");
+    }
+
+}
+
+export async function getPostByAuthorId(c: Context) {
+
+    const currentUser = c.get("user");
+    const currentSlug = c.req.query('slug');
+
+    const author = c.req.param('authorId');
+    const limitQuery = c.req.query("limit");
+    const limit = limitQuery ? parseInt(limitQuery, 10) : 6;
+
+    if (!author) {
+        return apiError(c, 400, "Author Id is required");
+    }
+
+    if (currentUser.id === author) {
+        return apiError(c, 400, "You can't view your own posts");
+    }
+
+    try {
+        const prisma = c.get('prisma');
+
+        const post = await prisma.post.findMany({
+            take: limit,
+            orderBy: {
+                createdAt: 'desc',
+            },
+            where: {
+                AND: [
+                    {
+                        authorId: {
+                            equals: author
+                        },
+                    },
+                    {
+                        authorId: {
+                            not: currentUser.id
+                        },
+                    },
+                    {
+                        slug: {
+                            not: currentSlug,
+                        },
+                    },
+                    {
+                        status: PostStatus.PUBLISHED
+                    }
+                ]
+            },
+            select: {
+                id: true,
+                coverImage: true,
+                title: true,
+                shortCaption: true,
+                slug: true,
+            }
+        });
+
+        console.log(post);
+
+        if (!post) {
+            return apiError(c, 404, "Post Not Found");
+        }
+
+        return apiResponse(c, 200, post, "Post fetched successfully");
+
+    } catch (error: any) {
+        console.log("Get Post By AuthorId Error: ", error.message);
+        return apiError(c, 500, "Internal Server Error");
+    }
+}
 
 export async function getPostByUsername(c: Context) {
     try {
@@ -49,7 +201,6 @@ export async function getPostByUsername(c: Context) {
 }
 
 export async function getPostBySlug(c: Context) {
-    //Used
     const userId = c.get("user").id;
     const slug = c.req.param('postSlug');
 
@@ -107,14 +258,12 @@ export async function getPostBySlug(c: Context) {
         return apiResponse(c, 200, post, "Post fetched successfully");
 
     } catch (error: any) {
-        console.log("Get Post By Title Error: ", error.message);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        console.log("Get Post By Slug Error: ", error.message);
+        return apiError(c, 500, "Internal Server Error");
     }
 }
 
-
 export async function getUserPosts(c: Context) {
-    //Used
 
     const user = c.get("user");
 
@@ -165,24 +314,15 @@ export async function getUserPosts(c: Context) {
 
         return apiResponse(c, 200, {
             posts, currentPage: page, totalPages, totalPosts,
-            // user: {
-            //     id: user.id,
-            //     username: user.username,
-            //     email: user.email,
-            //     avatarUrl: user.avatarUrl,
-            //     bio: user.bio,
-            //     createdAt: user.createdAt
-            // }
         }, "Posts fetched successfully");
 
     } catch (error: any) {
         console.log("Get User Posts Error: ", error.message);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        return apiError(c, 500, "Internal Server Error");
     }
 }
 
 export async function getMostLikedPosts(c: Context) {
-    //Used
 
     const user = c.get("user");
 
@@ -221,7 +361,7 @@ export async function getMostLikedPosts(c: Context) {
 
     } catch (error: any) {
         console.log("Get Most Liked Posts Error: ", error.message);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        return apiError(c, 500, "Internal Server Error");
     }
 }
 
@@ -270,7 +410,7 @@ export async function getPostByCategory(c: Context) {
 
     } catch (error: any) {
         console.log("Get Post By Category Error: ", error.message);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        return apiError(c, 500, "Internal Server Error");
     }
 }
 
@@ -296,6 +436,6 @@ export async function getAllPostsName(c: Context) {
 
     } catch (error: any) {
         console.log("Get All Post Names Error: ", error.message);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        return apiError(c, 500, "Internal Server Error");
     }
 }

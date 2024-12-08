@@ -1,33 +1,9 @@
-import { Context } from 'hono';
-import { apiError } from '../../utils/apiError';
-import { apiResponse } from '../../utils/apiResponse';
-import { PostStatus, Prisma } from '@prisma/client';
-
-import { cloudinaryUploader, generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers } from 'Middleware/cloudinary';
-import { mimeTypeSignup } from 'Zod/zod';
-
-// const updateDraftPostByIdSchema = z.object({
-//     title: z.string({
-//         required_error: "Title is required",
-//         invalid_type_error: "Title must be a string"
-//     }),
-//     shortCaption: z.string({
-//         required_error: "Short Caption is required",
-//         invalid_type_error: "Short Caption be a string"
-//     }),
-//     body: z.string({
-//         required_error: "Body is required",
-//         invalid_type_error: "Body must be a string"
-//     }),
-//     summary: z.string({
-//         required_error: "Summary is required",
-//         invalid_type_error: "Summary must be a string"
-//     }),
-//     allowComments: z.boolean({
-//         required_error: "Allowed Comments is required",
-//         invalid_type_error: "Allowed Comments must be a boolean"
-//     })
-// })
+import { PostStatus, Prisma } from "@prisma/client";
+import { Context } from "hono";
+import { cloudinaryUploader, generateSignature, generateSignatureForReplace, generateUniqueFilename, getCloudinaryHelpers } from "Middleware/cloudinary";
+import { apiError } from "utils/apiError";
+import { apiResponse } from "utils/apiResponse";
+import { mimeTypeSignup } from "Zod/zod";
 
 export async function updateDraftPostById(c: Context) {
 
@@ -145,4 +121,3 @@ export async function updateDraftPostById(c: Context) {
     }
 
 }
-

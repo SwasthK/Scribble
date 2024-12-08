@@ -83,5 +83,3 @@ export const handleSavePost = async (c: Context) => {
         return apiError(c, 500, GlobalResponse.INTERNALERROR);
     }
 };
-
-
