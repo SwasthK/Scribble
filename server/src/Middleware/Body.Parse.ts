@@ -27,7 +27,7 @@ export async function signupBodyParse(c: Context, next: Next) {
         return await next();
     } catch (error) {
         console.error('Signup Body Parse Middleware Error: ', error);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        return apiError(c, 500, "Internal Server Error");
     }
 }
 
@@ -56,7 +56,7 @@ export async function DraftPostBodyParse(c: Context, next: Next) {
         return await next();
     } catch (error) {
         console.error('createNewDraftPostParseBody Parse Middleware Error: ', error);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        return apiError(c, 500, "Internal Server Error");
     }
 }
 
@@ -90,7 +90,7 @@ export async function publishPostBodyParse(c: Context, next: Next) {
         return await next();
     } catch (error) {
         console.error('createNewPublishPostParse Body Parse Middleware Error: ', error);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        return apiError(c, 500, "Internal Server Error");
     }
 }
 

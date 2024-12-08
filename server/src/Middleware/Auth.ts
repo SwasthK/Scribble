@@ -4,7 +4,6 @@ import { verifyTokens } from "../utils/jwt";
 
 export async function authMiddleware(c: Context, next: Next) {
     try {
-        console.log("authMiddleware");
         const accessToken = c.req.header('accessToken')?.split(' ')[1]
 
         if (!accessToken) return apiError(c, 401, "Failed to Authorize User");
