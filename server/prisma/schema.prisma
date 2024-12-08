@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearch"]
+  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 datasource db {
@@ -21,7 +21,6 @@ model User {
   following             Follower[]     @relation("UserFollowing")
   posts                 Post[]         @relation("UserPosts")
   likes                 Like[]
-  notifications         Notification[]
   savedBlog             SavedBlog[]    @relation("UserSavedBlogs")
   comments              Comment[]      @relation("UserComments")
   PostReport            PostReport[]
@@ -45,11 +44,8 @@ model Post {
   author             User         @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
   authorId           String
   likes              Like[]
-  multiMedias        MultiMedia[] @relation("PostMultimedia")
   savedBy            SavedBlog[]  @relation("PostSavedBlog")
-  revisions          Revision[]   @relation("UserRevision")
   categories         Category[]   @relation("PostCategories")
-  tags               Tag[]        @relation("PostTags")
   comments           Comment[]    @relation("PostComments")
   reports            PostReport[] @relation("PostReports")
   allowComments      Boolean      @default(true)
@@ -113,36 +109,6 @@ model PostReport {
   updatedAt DateTime       @updatedAt
 }
 
-model Notification {
-  id        String           @id @default(uuid())
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  type      NotificationType
-  title     String
-  body      String
-  read      Boolean          @default(false)
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-}
-
-model MultiMedia {
-  id         String    @id @default(uuid())
-  caption    String?
-  altText    String?
-  url        String
-  type       MediaType
-  post       Post?     @relation("PostMultimedia", fields: [postId], references: [id], onDelete: Cascade)
-  postId     String?
-  uploadedAt DateTime  @default(now())
-}
-
-model Revision {
-  id        String   @id @default(uuid())
-  Post      Post     @relation("UserRevision", fields: [postId], references: [id], onDelete: Cascade)
-  postId    String
-  content   Json
-  createdAt DateTime @default(now())
-}
 
 model Category {
   id        String   @id @default(uuid())
@@ -150,17 +116,6 @@ model Category {
   name      String   @unique
   slug      String   @unique
   posts     Post[]   @relation("PostCategories")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([slug])
-}
-
-model Tag {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  slug      String   @unique
-  posts     Post[]   @relation("PostTags")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -188,24 +143,10 @@ enum Role {
   CONTRIBUTOR
 }
 
-enum NotificationType {
-  INFO
-  WARNING
-  ERROR
-  SUCCESS
-}
-
 enum PostStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
-}
-
-enum MediaType {
-  IMAGE
-  VIDEO
-  AUDIO
-  DOCUMENT
 }
 
 enum PostReportType {
