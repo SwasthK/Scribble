@@ -88,20 +88,6 @@ export const updateUserPasswordSchema = z.object({
         message: "Old password and new password cannot be same"
     })
 
-export const createUserNotificationsSchema = z.object({
-    type: z.enum(["INFO", "WARNING", "ERROR", "SUCCESS"], { message: "Invalid notification type" }),
-    title: z.string({ required_error: "Title is required", invalid_type_error: "Title must be a string" })
-        .min(5, { message: "Title must be at least 5 characters long" })
-        .max(50, { message: "Title must be at most 50 characters long" }),
-    body: z.string({ required_error: "Body is required", invalid_type_error: "Body must be a string" })
-        .min(10, { message: "Body must be at least 5 characters long" })
-        .max(200, {
-            message: "Body must be at most 200 characters long"
-        })
-});
-
-export const markNotificationAsReadSchema = z.string().uuid({ message: "Invalid notification ID" });
-
 export const postReportSchema = z.object({
     type: z.enum(
         Object.values(PostReportType) as [string, ...string[]]
@@ -299,10 +285,6 @@ export const updatePostSchema =
             url: z.string().url({ message: "Invalid Media URL" }),
             type: z.enum([MediaType.IMAGE, MediaType.AUDIO, MediaType.DOCUMENT, MediaType.VIDEO], { message: "Invalid Media type" }),
         }), { message: "Invalid Multimedia Type" }).optional(),
-        tags: z.array(z.string().uuid({ message: "Invalid Tag ID" }), { message: "Invalid Tag ID" })
-            .min(1, { message: "You must add atleast 1 Tag" })
-            .max(5, { message: "You can add atmost 5 Tags" })
-            .optional(),
         categories: z.array(z.string().uuid({ message: "Invalid Category ID" }), { message: "Invalid Category ID" })
             .min(1, { message: "You must add atleast 1 Category" })
             .max(5, { message: "You can add atmost 5 Categories" })

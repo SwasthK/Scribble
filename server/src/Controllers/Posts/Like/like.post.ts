@@ -1,8 +1,8 @@
 import { Context } from "hono";
-import { apiError } from "../../utils/apiError";
-import { apiResponse } from "../../utils/apiResponse";
 import { GlobalResponse } from "utils/responses";
 import { LikesResponse } from "utils/responseData";
+import { apiError } from "utils/apiError";
+import { apiResponse } from "utils/apiResponse";
 
 export async function likeAndUnlikePost(c: Context) {
 

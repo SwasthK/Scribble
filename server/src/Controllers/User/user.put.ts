@@ -47,8 +47,8 @@ export async function updateUserProfile(c: Context) {
 
         return apiResponse(c, 200, updateUser, "User Profile Updated");
     } catch (error: any) {
-        console.log('UpdateUserProfile Controller', `ERROR:${error.message}`);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        console.log('Update User Profile Controller', `ERROR:${error.message}`);
+        return apiError(c, 500, "Internal Server Error");
     }
 }
 
@@ -117,6 +117,6 @@ export async function updateUserAvatar(c: Context) {
         return apiResponse(c, 200, updateUser, "Avatar Updated");
     } catch (error: any) {
         console.log("Update User Avatar Controller", `ERROR:${error.message}`);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        return apiError(c, 500, "Internal Server Error");
     }
 }

@@ -55,3 +55,30 @@ export async function deleteDraftPostById(c: Context) {
     }
 
 }
+
+export async function deleteDraftBulk(c: Context) {
+    const userId = c.get('user').id
+    try {
+
+        const prisma: any = c.get('prisma');
+
+        const deletePost = await prisma.post.deleteMany({
+            where: {
+                AND: [{
+                    authorId: userId,
+                    status: PostStatus.DRAFT
+                }]
+            }
+        });
+
+        if (deletePost.count === 0) {
+            return apiError(c, 404, "No drafts found to delete");
+        }
+
+        return apiResponse(c, 200, deletePost, "Post deleted successfully");
+
+    } catch (error: any) {
+        console.log("Delete Draft Posts By Bulk Error", error);
+        return apiError(c, 500, "Internal Server Error");
+    }
+}

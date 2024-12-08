@@ -1,6 +1,6 @@
 import { Context } from "hono";
-import { apiError } from "../../utils/apiError";
-import { apiResponse } from "../../utils/apiResponse";
+import { apiError } from "../../../utils/apiError";
+import { apiResponse } from "../../../utils/apiResponse";
 
 export async function getCommentsWithoutReply(c: Context) {
     try {
@@ -31,6 +31,6 @@ export async function getCommentsWithoutReply(c: Context) {
 
     catch (error: any) {
         console.log("Error in getCommentsWithoutReply: ", error);
-        return apiError(c, 500, "Internal server error", { code: "CE" });
+        return apiError(c, 500, "Internal server error");
     }
 }

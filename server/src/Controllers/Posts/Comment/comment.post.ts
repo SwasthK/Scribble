@@ -1,6 +1,6 @@
 import { Context } from "hono";
-import { apiResponse } from "../../utils/apiResponse";
-import { apiError } from "../../utils/apiError";
+import { apiResponse } from "../../../utils/apiResponse";
+import { apiError } from "../../../utils/apiError";
 import { addCommentSchema } from "Zod/zod";
 
 export async function addComments(c: Context) {
@@ -78,7 +78,7 @@ export async function addComments(c: Context) {
 
     } catch (error: any) {
         console.error("Add Comments Error: ", error.message);
-        return apiError(c, 500, "Internal Server Error", { code: "CE" });
+        return apiError(c, 500, "Internal Server Error");
     }
 
 }
