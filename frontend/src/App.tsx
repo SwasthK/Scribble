@@ -54,7 +54,7 @@ function App() {
   const router = createBrowserRouter([
     // Public Layout
     {
-      path: "/",
+      path: "/unsecure",
       element: <LayoutUnProtected />,
       errorElement: <NotFound />,
       children: [
@@ -63,10 +63,19 @@ function App() {
         { path: "login", element: SuspendedComponent(Signin) },
       ],
     },
+    {
+      path: "/",
+      element: (
+        <div className="bg-black text-white">
+          <h1>heloo</h1>
+        </div>
+      ),
+      errorElement: <NotFound />,
+    },
 
     // Protected Layout
     {
-      path: "/",
+      path: "/secure",
       element: <LayoutProtected />,
       errorElement: <NotFound />,
       children: [
