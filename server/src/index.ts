@@ -24,7 +24,7 @@ app.use('*', async (c, next) => {
 
 //Middlewares
 app.use('*', cors({
-  origin: '*',
+  origin: 'https://scribble-orpin.vercel.app/',
   allowHeaders: ['Content-Type', 'Authorization', 'accessToken', 'refreshToken'],
   allowMethods: ['POST', 'GET', 'DELETE', 'PUT', 'OPTIONS'],
   credentials: true,
