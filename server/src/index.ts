@@ -22,7 +22,6 @@ app.use('*', async (c, next) => {
   console.log(`${c.req.method} ${c.req.url} took ${duration} ms`);
 });
 
-
 //Middlewares
 app.use('*', cors({
   origin: '*',
