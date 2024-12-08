@@ -20,7 +20,7 @@ import { Toaster } from "react-hot-toast";
 
 // Axios - Imports & Config
 import axios from "axios";
-axios.defaults.baseURL = import.meta.env.VITE_AXIOS_BASE_URL;
+axios.defaults.baseURL = "https://server.swasth319.workers.dev/api/v1";
 
 // React Query - Imports & Config
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
