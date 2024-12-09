@@ -1,4 +1,4 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { RouterProvider, createBrowserRouter.Navigate } from "react-router-dom";
 import { lazy, useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { refreshAccessToken } from "./utils/authHandler";
@@ -59,6 +59,7 @@ function App() {
       element: <LayoutUnProtected />,
       errorElement: <NotFound />,
       children: [
+        { path: "/", element: <Navigate to="/home" replace /> },
         { path: "home", element: SuspendedComponent(Home) },
         { path: "register", element: SuspendedComponent(Signup) },
         { path: "login", element: SuspendedComponent(Signin) },
