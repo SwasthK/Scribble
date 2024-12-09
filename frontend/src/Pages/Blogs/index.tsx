@@ -36,7 +36,7 @@ const Blogs = () => {
     isError,
     error,
     fetchNextPage,
-    isFetchedAfterMount,
+    // isFetchedAfterMount,
     hasNextPage,
     isFetchingNextPage,
   } = useGetAllPosts();
