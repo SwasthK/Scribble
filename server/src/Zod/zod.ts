@@ -75,19 +75,6 @@ export const updateUserProfileSchema = z.object({
     invalid_type_error: "Invalid update field",
 }).refine(value => value.username || value.email || value.bio, { message: "No update field found" })
 
-export const updateUserPasswordSchema = z.object({
-    oldPassword: passwordSchema.optional(),
-    newPassword: passwordSchema.optional(),
-}, {
-    required_error: "No update field found",
-    invalid_type_error: "Invalid update field",
-})
-    .refine(value => value.oldPassword, { message: "Old Password Not found" })
-    .refine(value => value.newPassword, { message: "New Password Not found" })
-    .refine(value => value.oldPassword !== value.newPassword, {
-        message: "Old password and new password cannot be same"
-    })
-
 export const postReportSchema = z.object({
     type: z.enum(
         Object.values(PostReportType) as [string, ...string[]]
@@ -192,19 +179,6 @@ export const addCommentSchema = z.object({
     message: "Invalid data"
 });
 
-export const removeCommentSchema = z.object({
-    postId: z.string({
-        required_error: "Post Id Required",
-        invalid_type_error: "Invalid post ID",
-        message: "Invalid post ID",
-    }).uuid("Invalid post ID"),
-    commentId: z.string({
-        required_error: "Comment Id Required",
-        invalid_type_error: "Invalid comment ID",
-        message: "Invalid comment ID",
-    }).uuid("Invalid comment ID"),
-});
-
 export enum saveAction {
     SAVE = "save",
     UNSAVE = "unsave"
@@ -255,44 +229,6 @@ export const publishPostSchema = z.object({
     allowComments: z.boolean({ message: "Invalid Comment type" }),
 })
 
-export const updatePostSchema =
-    z.object({
-        coverImage: z.string().url({ message: "Invalid Cover Image URL" }).optional(),
-        title: z.string()
-            .min(10, { message: "Title must be atleast 6 Characters" })
-            .max(100, { message: "Title must be atmost 25 Characters" })
-            .optional(),
-        shortCaption: z.string()
-            .min(10, { message: "Short Caption must be atleast 10 Characters" })
-            .max(100, { message: "Short Caption must be atmost 100 Characters" })
-            .optional(),
-        body: z.string()
-            .min(100, { message: "Your Content Seems to be Small, Write More !" })
-            .max(10000, { message: "You have Reached Your Content Limit" })
-            .optional(),
-        summary: z.string()
-            .min(10, { message: "Summary must be atleast 10 Characters" })
-            .max(200, { message: "Summary must be atmost 200 Characters" })
-            .optional(),
-        allowComments: z.boolean({ message: "Invalid Comment type" }).optional(),
-        multiMedias: z.array(z.object({
-            caption: z.string()
-                .min(10, { message: "Caption must be atleast 10 Characters" })
-                .max(50, { message: "Caption must be atmost 50 Characters" })
-                .optional(),
-            altText: z.string()
-                .min(10, { message: "Alt Text must be atleast 10 Characters" }),
-            url: z.string().url({ message: "Invalid Media URL" }),
-            type: z.enum([MediaType.IMAGE, MediaType.AUDIO, MediaType.DOCUMENT, MediaType.VIDEO], { message: "Invalid Media type" }),
-        }), { message: "Invalid Multimedia Type" }).optional(),
-        categories: z.array(z.string().uuid({ message: "Invalid Category ID" }), { message: "Invalid Category ID" })
-            .min(1, { message: "You must add atleast 1 Category" })
-            .max(5, { message: "You can add atmost 5 Categories" })
-            .optional(),
-    }).refine((data) => Object.values(data).some(value => value !== undefined), {
-        message: "No update field provided",
-    });
-
 export const updateUserSocialsSchema = z.array(
     z.object({
         platform: z.enum(['github', 'x', 'instagram'],
@@ -331,35 +267,6 @@ export const updateUserSocialsSchema = z.array(
         }
     );
 
-export const tagNamesSchema = z.array(
-    z.string({
-        required_error: "Tag name is required",
-        invalid_type_error: "Tag name must be a string"
-    })
-        .min(2, { message: "Tag name must be at least 2 characters long" })
-        .max(20, { message: "Tag name must be at most 20 characters long" })
-        .regex(/^[a-zA-Z0-9]+$/, { message: "Tag name can only contain letters and numbers" }),
-    { message: "Tag is Required" }
-).nonempty({ message: "At least one tag name is required" });
-
-export const tagDeleteSchema = z.object({
-    name: z.string({
-        required_error: "tag name is required",
-        invalid_type_error: "tag name must be a string"
-    })
-        .min(2, { message: "tag name must be at least 4 characters long" })
-        .max(20, { message: "tag name must be at most 30 characters long" }),
-});
-
-export const getTagSchema = z.object({
-    name: z.string({
-        required_error: "Tag name is required",
-        invalid_type_error: "Tag name must be a string"
-    })
-        .min(4, { message: "Tag name must be at least 4 characters long" })
-        .max(30, { message: "Tag name must be at most 30 characters long" }),
-});
-
 export enum fileUploadMessage {
     NOFILE = 'No file provided',
     SUCCESS = 'File uploaded successfully',
@@ -372,21 +279,3 @@ export enum mimeTypeSignup {
     PNG = 'image/png',
     WEBP = 'image/webp',
 }
-
-export const tagUpdateSchema = z.object({
-    name:   z.string({
-        required_error: "Tag name is required",
-        invalid_type_error: "Tag name must be a string"
-    })
-        .min(2, { message: "Tag name must be at least 2 characters long" })
-        .max(20, { message: "Tag name must be at most 20 characters long" })
-        .regex(/^[a-zA-Z0-9]+$/, { message: "Tag name can only contain letters and numbers" }),
-    update: z.string({
-        required_error: "New tag name is required",
-        invalid_type_error: "New tag name must be a string"
-    })
-    .min(2, { message: "New tag name must be at least 2 characters long" })
-    .max(20, { message: "New tag name must be at most 20 characters long" })
-    .regex(/^[a-zA-Z0-9]+$/, { message: "Tag name can only contain letters and numbers" }),
-});
-

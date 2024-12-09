@@ -89,7 +89,7 @@ const Home = () => {
                   custom{" "}
                   <Link
                     aria-label="Visit the ShadCN website"
-                    to={"https://www.blocknotejs.org/"}
+                    to={"https://ui.shadcn.com/"}
                     target="_blank"
                     className="text-[#EE9521] hover:underline"
                   >
@@ -105,15 +105,15 @@ const Home = () => {
           <div className=" bg-[#0C0C0C] sm:py-16 sm:pt-20 pb-12 pt-20 flex flex-col gap-10 lg:px-16 sm:px-16  md:px-16 sm:mx-10 lg:mx-20 mx-0   rounded-b-xl font-scribble2">
             <div className=" flex gap-4 flex-col w-full  px-8 sm:px-0">
               <p className="font-semibold w-[100%] md:w-[30rem] text-sm text-[#95959D]">
-                Runway | Tools for human imagination.
+                Inspire & Express | Your Platform for Stories.
               </p>
               <p className="font-scribble2 font-[700] text-[#585F69  ] font-[100] sm:text-4xl text-2xl w-[100%]  md:w-[30rem] lg:w-[35rem]">
-                We are pioneering general-purpose multimodal simulators of the
-                world.
+                From thoughts to words, create, connect, and inspire through
+                your blog.
               </p>
-              <button className="px-2 py-2 border rounded-full w-28">
+              {/* <button className="px-2 py-2 border rounded-full w-28">
                 Read more
-              </button>
+              </button> */}
             </div>
 
             <div className=" grid lg:grid-cols-3 gap-12 sm:gap-14 md:gap-20 lg:gap-10 grid-cols-1 place-items-center sm:mt-16 mt-8">
@@ -219,7 +219,7 @@ const Home = () => {
               Built by{" "}
               <Link
                 aria-label="Visit Developer's Profile"
-                to={"https://www.blocknotejs.org/"}
+                to={"https://x.com/swasthik319"}
                 target="_blank"
                 className="text-[#EE9521] hover:underline"
               >
@@ -228,7 +228,7 @@ const Home = () => {
               . The source code is available on{" "}
               <Link
                 aria-label="Visit the Github Repository"
-                to={"https://www.blocknotejs.org/"}
+                to={"https://github.com/SwasthK/Scribble"}
                 target="_blank"
                 className="text-[#EE9521] hover:underline"
               >
@@ -239,10 +239,26 @@ const Home = () => {
             <div className="flex gap-10 items-center">
               <p className="text-[#95959D]">Socials</p>
               <div className="flex gap-7 items-center">
-                <GitHubIcon size={20} />
-                <TwitterIcon size={18} />
-                <InstagramIcon size={20} />
-                <Mail />
+                <GitHubIcon
+                  size={20}
+                  url="https://github.com/SwasthK/"
+                  target="_blank"
+                />
+                <TwitterIcon
+                  size={18}
+                  url="https://x.com/swasthik319"
+                  target="_blank"
+                />
+                <InstagramIcon
+                  size={20}
+                  url="https://www.instagram.com/swasth_k?igsh=N2F0dDBoeTY2cWR2"
+                  target="_blank"
+                />
+                <Mail
+                  onClick={() =>
+                    window.open("mailto:swasth319@gmail.com", "_blank")
+                  }
+                />
               </div>
             </div>
           </div>

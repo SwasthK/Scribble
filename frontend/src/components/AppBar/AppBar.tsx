@@ -96,7 +96,6 @@ export const AppBar = () => {
 
   return (
     <>
-      {/* // <div className="sticky top-7 shadow-lg border-none mx-8 rounded-full z-50 bg-white/5 backdrop-blur-md flex justify-between items-center text-4xl md:hidden border-b py-4 px-10 font-bold text-white transition-all duration-300"> */}
       <div
         className={`font-scribble2 sticky transition-transform duration-300 ${
           visible ? "translate-y-0" : "-translate-y-full"
@@ -109,6 +108,7 @@ export const AppBar = () => {
           <div className="">
             <SearchComponent></SearchComponent>
           </div>
+  
 
           <div ref={avatarRef}>
             <Avatar onClick={toggleMenu} className="h-9 w-9 cursor-pointer">
@@ -121,7 +121,7 @@ export const AppBar = () => {
         </div>
       </div>
       <div
-        className={`fixed top-[0rem] z-[100] text-white right-0  py-6 px-5 font-semibold rounded-md shadow-xl bg-base-200 h-screen sm:min-w-72
+        className={`fixed top-[0rem] z-[100] text-white right-0   py-6 px-5 font-semibold rounded-md shadow-xl bg-[#151B23] h-screen sm:min-w-72
             transition-all duration-300 ease-in-out
             ${
               showMenu

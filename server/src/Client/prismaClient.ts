@@ -6,7 +6,7 @@ import { apiError } from 'utils/apiError';
 let prisma: any;
 let currentDbUrl: string | undefined;
 
-export const getPrismaClient = async (dbUrl: any) => {
+const getPrismaClient = async (dbUrl: any) => {
     if (!prisma || currentDbUrl !== dbUrl) {
         if (prisma) {
             await prisma.$disconnect().catch((error: any) => {

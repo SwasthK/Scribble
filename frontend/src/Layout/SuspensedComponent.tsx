@@ -1,14 +1,8 @@
 import { Suspense } from "react";
 
 const SuspendedComponent = (Component: React.FC) => {
-  const FallbackUI = () => (
-    <div className="h-screen bg-black text-white">
-      <p>Loading...</p>
-    </div>
-  );
-
   return (
-    <Suspense fallback={<FallbackUI />}>
+    <Suspense fallback={<div className="overlay-loader"></div>}>
       <Component />
     </Suspense>
   );

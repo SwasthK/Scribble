@@ -122,7 +122,8 @@ const Comment = ({
                     <select
                       value={sorting}
                       onChange={(e) => setSorting(e.target.value)}
-                      className="px-2 py-1 rounded-md text-sm font-semibold cursor-pointer"
+                      // className="px-2 py-1 rounded-md text-sm font-semibold cursor-pointer text-black bg-[#222630] focus:outline-none border-none"
+                      className="px-2 py-1 border-2 rounded-md text-sm font-semibold cursor-pointer text-white bg-[#222630] hover:bg-[#2c3241]"
                     >
                       <option value="newest">Newest</option>
                       <option value="oldest">Oldest</option>
