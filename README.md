@@ -1,7 +1,7 @@
 
 # **Scribble** : Fullstack Blog Application
 
-**Live at : https://scribbleio.vercel.app**
+**Live at : https://scribble-orpin.vercel.app**
 
 A Fullstack Blog Application
 Scribble is a full-featured, modern blog application that enables users to create, manage, and interact with blogs. It supports a wide range of functionalities like user profiles, post management, social features, and more. The application is built with robust tools and technologies for a seamless user experience.
