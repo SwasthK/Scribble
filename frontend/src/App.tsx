@@ -72,6 +72,15 @@ function App() {
       ),
       errorElement: <NotFound />,
     },
+    {
+      path: "/test",
+      element: (
+        <div className="bg-black text-white">
+          <h1>Just Testing</h1>
+        </div>
+      ),
+      errorElement: <NotFound />,
+    },
 
     // Protected Layout
     {
