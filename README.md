@@ -98,12 +98,12 @@ npm run dev
 ```
 5 . Access Frontend At :
 ```bash
-http://loclhost:5173
+http://loclhost:5173/
 
 ```
 5 . Access Server At :
 ```bash
-http://loclhost:8787
+http://loclhost:8787/api/v1/
 
 ```
 
