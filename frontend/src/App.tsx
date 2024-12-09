@@ -1,4 +1,8 @@
-import { RouterProvider, createBrowserRouter.Navigate } from "react-router-dom";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  Navigate,
+} from "react-router-dom";
 import { lazy, useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { refreshAccessToken } from "./utils/authHandler";
@@ -122,7 +126,7 @@ function App() {
 
     if (!hasFetched) {
       interval = setInterval(() => {
-        setProgress((prev:any) => Math.min(prev + 5, 100));
+        setProgress((prev: any) => Math.min(prev + 5, 100));
       }, 100);
       checkAuthOnAppMount().finally(() => {
         const elapsedTime = Date.now() - startTime;
