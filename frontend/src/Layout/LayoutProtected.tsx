@@ -5,8 +5,8 @@ import { ProtectedRoute } from "../utils/Route.Protect";
 export const LayoutProtected = () => {
   return (
     <>
-      <AppBar />
       <ProtectedRoute>
+        <AppBar />
         <Outlet />
       </ProtectedRoute>
     </>
