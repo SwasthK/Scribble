@@ -1,13 +1,4 @@
-import { Context, Hono } from 'hono'
-
-
-
-import { dbConnect } from '../Connection/db.connect'
-import { apiResponse } from '../utils/apiResponse'
-import { apiError } from '../utils/apiError'
-
-
-// ---------------------
+import { Hono } from 'hono'
 
 //Middleware Imports
 import { authMiddleware } from '../Middleware/Auth'
@@ -75,8 +66,6 @@ const api = new Hono();
 api.use('/blog/*', authMiddleware, findActiveUser)
 
 api
-    // --------------------------------------------------------------------------
-
     //Admin Specific
     .post('/register/admin/:id', authMiddleware, findActiveUser, registerAdmin)
     .post('/category/create', authMiddleware, findActiveUser, createCategory)
@@ -150,78 +139,5 @@ api
 
     //Post Report Routes
     .post('/post/report/:postId', authMiddleware, findActiveUser, reportPost)
-
-    // --------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //all data
-    .get('/alldetails', async (c: Context) => {
-        console.log('All Details--------------------');
-
-        const prisma = c.get('prisma');
-
-        try {
-            const userWithDetails = await prisma.post.findMany({
-                where: {
-                    status: 'PUBLISHED'
-                    // author: {
-                    //     username: 'AlphaWolf'
-                    // }
-                },
-                // include: {
-                //     author: true
-                // },
-                select: {
-                    id: true,
-                    author: {
-                        select: {
-                            username: true,
-                            password: true
-                        }
-                    }
-                }
-
-            }
-
-
-            );
-
-            if (!userWithDetails) {
-                return apiError(c, 404, "User not found");
-            }
-
-            // const formattedData = userWithDetails.map((user: any) => ({
-            //     username: user.username,
-            //     followers: user.followers.map((f: any) => f.following.username),
-            //     following: user.following.map((f: any) => f.follower.username)
-            // }));
-
-            return apiResponse(c, 200, userWithDetails, "User details fetched successfully");
-
-
-
-        } catch (error: any) {
-            console.log('Fetch User Details Error:', error.message);
-            return apiError(c, 500, "Internal Server Error", { code: "CE" });
-        }
-    })
-
-    .delete('/delete', async (c: Context) => {
-        const prisma: any = await dbConnect(c);
-        const data = await prisma.user.deleteMany({
-        });
-        return apiResponse(c, 200, data);
-    })
 
 export default api;

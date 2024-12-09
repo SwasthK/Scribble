@@ -1,50 +1,24 @@
 import { Hono } from 'hono'
 import api from './Routes/routes'
-//Import Middleware
-// import { logger } from 'hono/logger'
-// import { prettyJSON } from 'hono/pretty-json'
 import { cors } from 'hono/cors'
 import { connectPrismaClient } from 'Client/prismaClient'
 
 const app = new Hono<{
   Bindings: {
     DATABASE_URL: string,
-    JWT_SECRET: string
+    JWT_SECRET: string,
+    CORS_ORIGIN: string,
   }
 }>().basePath('/api/v1');
 
 app.use('*', connectPrismaClient)
 
 app.use('*', async (c, next) => {
-  const start = Date.now();
-  await next();
-  const duration = Date.now() - start;
-  console.log(`${c.req.method} ${c.req.url} took ${duration} ms`);
-});
-
-//Middlewares
-app.use('*', cors({
-  origin: 'https://scribble-orpin.vercel.app',
-  allowHeaders: ['Content-Type', 'Authorization', 'accessToken', 'refreshToken'],
-  allowMethods: ['POST', 'GET', 'DELETE', 'PUT', 'OPTIONS'],
-  credentials: true,
-  exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
-  maxAge: 86400, 
-}))
-
-// app.options('*', (req) => {
-//   return new Response(null, {
-//     status: 204,
-//     headers: {
-//       'Access-Control-Allow-Origin': 'http://localhost:5173',
-//       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-//       'Access-Control-Allow-Headers': 'Content-Type, Authorization, accessToken, refreshToken',
-//     },
-//   });
-// });
-
-// app.use(prettyJSON())
-// app.use(logger())
+  const corsMiddlewareHandler = cors({
+    origin: c.env.CORS_ORIGIN,
+  })
+  return corsMiddlewareHandler(c, next)
+})
 
 app.route('/', api)
 

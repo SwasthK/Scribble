@@ -47,7 +47,7 @@ export async function accessToken(c: Context, id: number | string) {
     }
 }
 
-export async function refreshToken(c: Context, id: number | string) {
+async function refreshToken(c: Context, id: number | string) {
     try {
         const payload = {
             id: id,
