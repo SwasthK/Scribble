@@ -20,7 +20,7 @@ import { Toaster } from "react-hot-toast";
 
 // Axios - Imports & Config
 import axios from "axios";
-axios.defaults.baseURL = "https://server.swasth319.workers.dev/api/v1";
+axios.defaults.baseURL = import.meta.env.VITE_AXIOS_BASE_URL;
 
 // React Query - Imports & Config
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
@@ -35,7 +35,30 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <RecoilRoot>
     <QueryClientProvider client={queryClient}>
       <App />
-      <Toaster />
+      <Toaster
+        position="top-right"
+        reverseOrder={true}
+        toastOptions={{
+          success: {
+            id: "success-toast",
+            style: {
+              background: "#166534",
+              color: "white",
+              fontWeight: "500",
+              fontSize: ".9rem",
+            },
+          },
+          error: {
+            id: "error-toast",
+            style: {
+              background: "#7F1D1D",
+              color: "white",
+              fontWeight: "500",
+              fontSize: ".9rem",
+            },
+          },
+        }}
+      />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </RecoilRoot>

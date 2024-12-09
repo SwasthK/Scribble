@@ -47,6 +47,7 @@ function App() {
   const [user, setUser] = useRecoilState(authAtom);
   const setFollowing = useSetRecoilState(followAtom);
   const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState<any>(null);
   const [hasFetched, setHasFetched] = useState(false);
 
   const resetAuthAtom = useAuthAtomResetValue();
@@ -115,19 +116,37 @@ function App() {
   }
 
   useEffect(() => {
+    let interval: any;
+    const startTime = Date.now();
+
     if (!hasFetched) {
+      interval = setInterval(() => {
+        setProgress((prev:any) => Math.min(prev + 5, 100));
+      }, 100);
       checkAuthOnAppMount().finally(() => {
-        setLoading(false);
-        setHasFetched(true);
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 2000 - elapsedTime);
+        setTimeout(() => {
+          setProgress(100);
+          setLoading(false);
+          setHasFetched(true);
+        }, remainingTime);
       });
     } else {
       setLoading(false);
     }
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   return (
     <>
-      {loading ? <Loader /> : <RouterProvider router={router}></RouterProvider>}
+      {loading ? (
+        <Loader progress={progress} />
+      ) : (
+        <RouterProvider router={router}></RouterProvider>
+      )}
     </>
   );
 }
