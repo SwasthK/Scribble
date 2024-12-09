@@ -3,7 +3,7 @@
 
 **Live at : https://scribble-orpin.vercel.app/**
 
-Scribble: Fullstack Blog Application
+A Fullstack Blog Application
 Scribble is a full-featured, modern blog application that enables users to create, manage, and interact with blogs. It supports a wide range of functionalities like user profiles, post management, social features, and more. The application is built with robust tools and technologies for a seamless user experience.
 
 
@@ -11,10 +11,12 @@ Scribble is a full-featured, modern blog application that enables users to creat
 
 #### Blog Management
 - Create, view, edit, delete, and manage blogs.
+
 - Draft and archive functionality for better blog organization.
 
 #### Social Interactions
 - Follow/unfollow other users.
+
 - Like, save, and report posts.
 - Comment on posts.
 
@@ -23,6 +25,7 @@ Scribble is a full-featured, modern blog application that enables users to creat
 
 #### User Profiles
 - Add and manage social links.
+
 - Connect with other users via their profiles.
 
 ## 🛠️ Technologies Used
@@ -51,6 +54,7 @@ Scribble is a full-featured, modern blog application that enables users to creat
 ### Prerequisites
 
 - Node.js (>=16)
+
 - PostgreSQL database URL
 - Prisma Accelerated URL
 - Cloudinary account for media storage
