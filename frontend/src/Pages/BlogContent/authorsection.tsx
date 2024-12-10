@@ -53,7 +53,7 @@ const AuthorSection = memo(
                 to={`/profile/@${author.username}`}
                 className="text-lg font-semibold text-white hover:underline"
               >
-                <p>{`More posts from you - @${author.username}`}</p>
+                <p className="text-cyan-400">{`More posts from you - @${author.username}`}</p>
               </Link>
               <blockquote className="text-sm italic text-giest-100 mb-2 mt-4">
                 "Writing is the painting of the voice." {"-"} Voltaire

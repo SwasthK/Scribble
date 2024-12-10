@@ -229,12 +229,12 @@ export const Blog_Details = memo(({ blogContent }: { blogContent: any }) => {
           <div className="min-h-96 max-w-3/4 ">
             <h1
               style={{ wordBreak: "break-word", lineHeight: "1.3" }}
-              className="text-4xl md:text-5xl font-bold tracking-wide"
+              className="text-4xl md:text-5xl font-semibold tracking-wide"
             >
               {title}
             </h1>
             <p
-              className="pt-2 text-lg lg:text-xl font-giest text-giest-100 "
+              className="pt-2 text-base md:text-lg  font-giest text-giest-100 "
               style={{ wordBreak: "break-word", lineHeight: "1.9" }}
             >
               {shortCaption}
@@ -353,7 +353,7 @@ export const Blog_Details = memo(({ blogContent }: { blogContent: any }) => {
           {summary && (
             <div className="z-10 flex flex-col gap-4 font-giest">
               <h1 className="text-base font-semibold">Summary</h1>
-              <div className="bg-[#7663630e] p-6 text-sm md:text-base lg:text-lg">
+              <div className="bg-[#7663630e] p-6 text-sm md:text-base italic">
                 <h1 className="  text-giest-100">{summary}</h1>
               </div>
             </div>

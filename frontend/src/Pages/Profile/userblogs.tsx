@@ -83,13 +83,13 @@ const UserBlogs = memo(
 
               <div className="flex flex-col gap-3 w-full  px-3 mt-2">
                 <h1 className="text-[1.1rem] font-semibold ">
-                  {blog.title.length > 25
-                    ? blog.title.substring(0, 50) + " ..."
+                  {blog.title.length > 22
+                    ? blog.title.substring(0, 22) + " ..."
                     : blog.title}
                 </h1>
                 <h6 className="text-sm text-giest-100  font-giest">
-                  {blog.shortCaption.length > 30
-                    ? blog.shortCaption.substring(0, 30) + " ..."
+                  {blog.shortCaption.length > 28
+                    ? blog.shortCaption.substring(0, 28) + " ..."
                     : blog.shortCaption}
                 </h6>
                 <div className="text-xs flex justify-between items-start w-full">
