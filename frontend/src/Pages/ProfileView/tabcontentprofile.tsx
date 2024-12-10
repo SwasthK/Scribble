@@ -74,7 +74,9 @@ const TabContentProfile = ({
                   !data?.userProfileDetails.bio ? "text-center" : ""
                 }`}
               >
-                {data?.userProfileDetails.bio || "Bio Not Added"}
+                {data?.userProfileDetails.bio || (
+                  <p className="text-giest-100 text-sm">Bio Not Added</p>
+                )}
               </h1>
             </div>
             <div className="py-2 flex flex-col gap-3  max-w-[400px]">
@@ -82,9 +84,11 @@ const TabContentProfile = ({
                 Socials
               </span>
               <div className="flex justify-evenly input-style">
-                {data?.userProfileDetails.socials.length === 0
-                  ? "No Socials Found"
-                  : data?.userProfileDetails.socials.map((social: any,index:number) => (
+                {data?.userProfileDetails.socials.length === 0 ? (
+                  <p className="text-giest-100 text-sm">No Socials Found</p>
+                ) : (
+                  data?.userProfileDetails.socials.map(
+                    (social: any, index: number) => (
                       <Fragment key={index}>
                         {social.platform === "github" ? (
                           <GitHubIcon url={social.url} target={"_blank"} />
@@ -94,7 +98,9 @@ const TabContentProfile = ({
                           <TwitterIcon url={social.url} target={"_blank"} />
                         ) : null}
                       </Fragment>
-                    ))}
+                    )
+                  )
+                )}
               </div>
             </div>
           </ScrollArea>

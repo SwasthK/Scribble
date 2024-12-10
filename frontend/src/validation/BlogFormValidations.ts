@@ -1,16 +1,16 @@
 export const validateTitle = (value: string) => {
     if (!value) return "Title is required";
     if (value.length < 6) return "Title must be at least 6 characters long";
-    if (value.length > 25)
-        return "Title must be at most 25 characters long";
+    if (value.length > 40)
+        return "Title must be at most 40 characters long";
     return "";
 };
 
 export const validateShortCaption = (value: string) => {
     if (!value) return "Short Caption is required";
     if (value.length < 10) return "Short Caption must be at least 10 characters long";
-    if (value.length > 100)
-        return "Short Caption must be at most 100 characters long";
+    if (value.length > 120)
+        return "Short Caption must be at most 120 characters long";
     return "";
 };
 

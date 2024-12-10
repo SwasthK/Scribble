@@ -507,7 +507,7 @@ const HandlePost = () => {
                                   onChange={(e) =>
                                     setSearchQuery(e.target.value)
                                   }
-                                  className="w-full p-2 border-none focus:outline-none"
+                                  className="w-full p-2 border-none focus:outline-none bg-[#121212]"
                                 />
                               </div>
                               <ScrollArea className="h-[250px] w-full   p-4">

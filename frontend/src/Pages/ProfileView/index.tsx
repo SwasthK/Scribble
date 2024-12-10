@@ -12,7 +12,6 @@ import { useGetUserProfileDetailsAndPostsDetails } from "../../services/queries"
 
 const TabContentProfile = lazy(() => import("./tabcontentprofile"));
 const TabContentBlogs = lazy(() => import("./tabcontentblogs"));
-// import TabContentBlogs from "./tabcontentblogs";
 
 const ProfileView = () => {
   const { username } = useParams<{ username: string }>();
@@ -22,10 +21,10 @@ const ProfileView = () => {
 
   return (
     <>
-      <div className="flex justify-center  py-20  items-center">
+      <div className="flex justify-center  sm:py-20  items-center">
         <Tabs
           defaultValue="profile"
-          className="w-[400px] sm:w-[600px] lg:w-[600px] max-h-[500px] h-[500px] border-[3px] border-[#596a9535] p-2 bg-[#212020] rounded-xl overflow-y-scroll"
+          className="w-screen h-screen sm:w-[600px] lg:w-[600px] sm:max-h-[500px] sm:h-[500px] border-[3px] border-[#596a9535] p-2 bg-[#212020] rounded-xl overflow-y-scroll"
         >
           <TabsList className=" w-full gap-2">
             <TabsTrigger value="profile" className="w-full ">
