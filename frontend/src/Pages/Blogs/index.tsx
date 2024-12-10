@@ -36,7 +36,7 @@ const Blogs = () => {
     isError,
     error,
     fetchNextPage,
-    // isFetchedAfterMount,
+    isFetchedAfterMount,
     hasNextPage,
     isFetchingNextPage,
   } = useGetAllPosts();
@@ -49,9 +49,9 @@ const Blogs = () => {
   }, [inView, hasNextPage, isFetchingNextPage]);
 
   useEffect(() => {
-    // if (isFetchedAfterMount) {
+    if (isFetchedAfterMount) {
       categoryAndLikedpost.refetch();
-    // }
+    }
   }, []);
 
   return (
