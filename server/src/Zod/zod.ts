@@ -215,10 +215,10 @@ export const deletePostSchema = z.object({
 export const publishPostSchema = z.object({
     title: z.string()
         .min(6, { message: "Title must be atleast 6 Characters" })
-        .max(25, { message: "Title must be atmost 25 Characters" }),
+        .max(40, { message: "Title must be atmost 40 Characters" }),
     shortCaption: z.string()
         .min(10, { message: "Short Caption must be atleast 10 Characters" })
-        .max(100, { message: "Short Caption must be atmost 100 Characters" }),
+        .max(120, { message: "Short Caption must be atmost 120 Characters" }),
     body: z.string()
         .min(250, { message: "Your Content Seems to be Small, Write More !" })
         .max(10000, { message: "You have Reached Your Content Limit" }),
