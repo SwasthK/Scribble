@@ -10,7 +10,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const user = useRecoilValue(authAtom);
   
-  const redirectPath = "/login";
+  const redirectPath = "/home";
 
   const { handleAuth } = useAuthHandler(redirectPath);
 
