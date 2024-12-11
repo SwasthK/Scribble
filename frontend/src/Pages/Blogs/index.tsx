@@ -52,7 +52,7 @@ const Blogs = () => {
     if (isFetchedAfterMount) {
       categoryAndLikedpost.refetch();
     }
-  }, []);
+  }, [isFetchedAfterMount]);
 
   return (
     <div className="bg-gradient-1 w-screen">
