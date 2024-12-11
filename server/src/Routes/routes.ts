@@ -59,6 +59,7 @@ import { reportPost } from 'Controllers/Posts/Report/report.post'
 
 //Category - Imports
 import { getAllCategory } from 'Controllers/Posts/Category/category.get'
+import { registerDemoUser, signinDemoUser } from 'Controllers/Demo/demo.post'
 
 const api = new Hono();
 
@@ -66,13 +67,17 @@ const api = new Hono();
 api.use('/blog/*', authMiddleware, findActiveUser)
 
 api
-    //Admin Specific
+//Admin Specific
     .post('/register/admin/:id', authMiddleware, findActiveUser, registerAdmin)
     .post('/category/create', authMiddleware, findActiveUser, createCategory)
     .put('/category/update', authMiddleware, findActiveUser, updateCategory)
     .delete('/category/delete', authMiddleware, findActiveUser, deleteCategory)
     .delete('/category/deleteAll', authMiddleware, findActiveUser, deleteAllCategory)
     .get('/category/get', authMiddleware, findActiveUser, getCategory)
+    
+    //Demo User Routes
+    .post('/demo/signin', signinDemoUser)
+    .post('/register/demo/:id', authMiddleware, findActiveUser, registerDemoUser)
 
     //Auth Routes
     .post('/signup', signupBodyParse, getFileToUpload, signup)
