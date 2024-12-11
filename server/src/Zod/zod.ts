@@ -92,6 +92,24 @@ export const postReportSchema = z.object({
     )
 });
 
+export const registerDemoUserSchema = z.object({
+    id: z.string({
+        required_error: "User ID is required",
+        invalid_type_error: "Invalid User ID",
+        message: "Invalid User ID"
+    }).uuid({ message: "Invalid User ID" }),
+    Role: z.string({
+        required_error: "Invalid Request",
+        invalid_type_error: "Invalid Request",
+        message: "Invalid Request"
+    }).includes('EDITOR', { message: "Invalid Request" }),
+    PASSKEY: z.string({
+        required_error: "Invalid Request",
+        invalid_type_error: "Invalid Request",
+        message: "Invalid Request"
+    })
+})
+
 export const registerAdminSchema = z.object({
     id: z.string({
         required_error: "User ID is required",
