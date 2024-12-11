@@ -1,12 +1,61 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { LandingBg } from "../../components/Home/LandingBg";
 import { GitHubIcon } from "../../assets/svg/GitHubIcon";
 import { TwitterIcon } from "../../assets/svg/TwitterIcon";
 import { InstagramIcon } from "../../assets/svg/InstagramIcon";
 import { Mail } from "lucide-react";
 import { CtaButton } from "../../components/Buttons/ctaButton";
+import { useRecoilState } from "recoil";
+import { authAtom } from "../../atoms/auth.atoms";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useState } from "react";
 
 const Home = () => {
+  const [_, setUser] = useRecoilState(authAtom);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const signinDemoUser = async () => {
+    const signInPromise = async () => {
+      try {
+        const response = await axios.post("demo/signin", {});
+
+        if (response.data) {
+          const {
+            user: userData,
+            accessToken,
+            refreshToken,
+          } = response.data.data;
+
+          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("refreshToken", refreshToken);
+
+          setUser((prev) => ({
+            ...prev,
+            user: { ...prev.user, ...userData },
+            isAuthenticated: true,
+            accessToken,
+            refreshToken,
+          }));
+
+          navigate("/blogs");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    setLoading(true);
+
+    toast.promise(signInPromise(), {
+      loading: "Signing in...",
+      success: "Signed in successfully",
+      error: (error: any) =>
+        error.response?.data?.message || "Something went wrong",
+    });
+  };
+
   return (
     <div className="relative w-screen h-screen overflow-hidden">
       {/* Background SVG */}
@@ -31,19 +80,20 @@ const Home = () => {
               Write, connect, and inspire with our modern blogging platform
             </h3>
 
-            <div className="flex gap-5 sm:gap-12 w-full justify-center mt-4 font-scribble2">
+            <div className="flex gap-3 sm:gap-12 w-full justify-center mt-4 font-scribble2 ">
               <CtaButton
                 label1="Register"
                 label2="Continue without Registering &#8594;"
-                url1="/login"
-                url2="/login"
+                onClick1={() => navigate("/login")}
+                onClick2={() => signinDemoUser()}
+                disabled={loading}
               />
             </div>
           </div>
 
           {/* Features Section -1 */}
           <div
-            className="rounded-t-xl sm:py-16 py-4 flex flex-col gap-10  md:px-16 sm:mx-10 lg:mx-20 mx-0"
+            className="rounded-t-xl sm:py-16 py-4 flex flex-col gap-10 px-4  md:px-16 sm:mx-10 lg:mx-20 mx-0"
             style={{
               background: "linear-gradient(to bottom, #051E2E, #000)",
             }}
@@ -52,8 +102,8 @@ const Home = () => {
               <img
                 alt="Block-Note Editor"
                 loading="lazy"
-                src="/Block-animation.gif"
-                className="border border-alphaborder w-[24rem] sm:w-[30rem] object-contain rounded-lg"
+                src="https://res.cloudinary.com/dvpaztqr9/image/upload/f_auto,q_auto/v1/Home/vn6748rvsecxr51hxvbp"
+                className="border border-alphaborder w-[24rem] sm:w-[30rem] h-[18rem] sm:h-[22rem] object-cover rounded-lg"
               />
               <div className="max-w-[30rem] flex flex-col gap-4 sm:gap-10 font-scribble2 -tracking-wide">
                 <h2 className="text-3xl md:text-5xl font-semibold">
@@ -77,8 +127,8 @@ const Home = () => {
               <img
                 alt="Custom Search "
                 loading="lazy"
-                src="/Block-animation.gif"
-                className="border border-alphaborder w-[24rem] sm:w-[30rem]  object-contain rounded-lg"
+                src="https://res.cloudinary.com/dvpaztqr9/image/upload/f_auto,q_auto/v1/Home/nllrb7dpqxndkyqkqp2u"
+                className="border border-alphaborder w-[24rem] sm:w-[30rem] h-[18rem] sm:h-[22rem]  object-cover rounded-lg"
               />
               <div className="max-w-[30rem] flex flex-col gap-4 sm:gap-10 font-scribble2 -tracking-wide">
                 <h1 className="text-3xl md:text-5xl font-semibold ">
@@ -102,7 +152,7 @@ const Home = () => {
           </div>
 
           {/* Features Section-2 */}
-          <div className=" bg-[#0C0C0C] sm:py-16 sm:pt-20 pb-12 pt-20 flex flex-col gap-10 lg:px-16 sm:px-16  md:px-16 sm:mx-10 lg:mx-20 mx-0   rounded-b-xl font-scribble2">
+          <div className=" bg-[#0C0C0C] sm:py-16 sm:pt-20 pb-12 pt-20 flex flex-col gap-10 lg:px-16 sm:px-16  px-4   md:px-16 sm:mx-10 lg:mx-20 mx-0   rounded-b-xl font-scribble2">
             <div className=" flex gap-4 flex-col w-full  px-8 sm:px-0">
               <p className="font-semibold w-[100%] md:w-[30rem] text-sm text-[#95959D]">
                 Inspire & Express | Your Platform for Stories.
@@ -121,8 +171,8 @@ const Home = () => {
                 <img
                   alt="Draft, Archive, Publish"
                   loading="lazy"
-                  src="/Block-animation.gif"
-                  className="xl:h-60 mb-4  w-full rounded-md object-cover object-center"
+                  src="https://res.cloudinary.com/dvpaztqr9/image/upload/f_auto,q_auto/v1/Home/gojgoj38aumlx2gyxhgk"
+                  className="xl:h-60 mb-4  w-full rounded-md object-cover object-top"
                 />
                 <h1 className="font-semibold text-[1.1rem]  w-full  ">
                   Draft, Archive, Publish
@@ -135,24 +185,8 @@ const Home = () => {
 
               <div className="flex gap-2 flex-col items-center  w-full max-w-96">
                 <img
-                  alt="Draft, Archive, Publish"
                   loading="lazy"
-                  src="/Block-animation.gif"
-                  className="xl:h-60 mb-4  w-full rounded-md object-cover object-center"
-                />
-                <h1 className="font-semibold text-[1.1rem]  w-full  ">
-                  Engage & Connect
-                </h1>
-                <h2 className="text-sm text-giest-100 font-light font-giest w-full  ">
-                  "Follow creators, comment on posts, and build meaningful
-                  connections."
-                </h2>
-              </div>
-
-              <div className="flex gap-2 flex-col items-center  w-full max-w-96">
-                <img
-                  loading="lazy"
-                  src="/Block-animation.gif"
+                  src="https://res.cloudinary.com/dvpaztqr9/image/upload/f_auto,q_auto/v1/Home/srtb6e9lqvp13gssew6v"
                   alt="Draft, Archive, Publish"
                   className="xl:h-60 mb-4  w-full rounded-md object-cover object-center"
                 />
@@ -162,6 +196,22 @@ const Home = () => {
                 <h2 className="text-sm text--400  w-full text-giest-100 font-light font-giest">
                   "Engage with posts you love, save them for later, or report
                   inappropriate content."
+                </h2>
+              </div>
+
+              <div className="flex gap-2 flex-col items-center  w-full max-w-96">
+                <img
+                  alt="Draft, Archive, Publish"
+                  loading="lazy"
+                  src="https://res.cloudinary.com/dvpaztqr9/image/upload/f_auto,q_auto/v1/Home/semjhtihmlqmxss4kd0s"
+                  className="xl:h-60 mb-4  w-full rounded-md object-cover object-top"
+                />
+                <h1 className="font-semibold text-[1.1rem]  w-full  ">
+                  Engage & Connect
+                </h1>
+                <h2 className="text-sm text-giest-100 font-light font-giest w-full  ">
+                  "Follow creators, comment on posts, and build meaningful
+                  connections."
                 </h2>
               </div>
             </div>
@@ -179,15 +229,15 @@ const Home = () => {
             <div className="grid sm:grid-cols-2 grid-cols-1 gap-x-16 mt-8 gap-y-10">
               <img
                 loading="lazy"
-                src="/Block-animation.gif"
+                src="https://res.cloudinary.com/dvpaztqr9/image/upload/f_auto,q_auto/v1/Home/dpzir2z3act9fwtvlyh7"
                 alt="Profile Feature"
-                className="w-96 h-60  rounded-md object-cover"
+                className="w-96 h-60  rounded-md object-cover object-top"
               />
               <img
                 loading="lazy"
-                src="/Block-animation.gif"
+                src="https://res.cloudinary.com/dvpaztqr9/image/upload/v1733913565/Home/egqfnpnyahdvtni9cxbq.png"
                 alt="Profile Feature"
-                className="w-96 h-60  rounded-md object-cover"
+                className="w-96 h-60  rounded-md object-cover object-bottom"
               />
             </div>
           </div>
@@ -207,14 +257,15 @@ const Home = () => {
               <CtaButton
                 label1="Register"
                 label2="Continue without Registering &#8594;"
-                url1="/login"
-                url2="/login"
+                onClick1={() => navigate("/login")}
+                onClick2={() => signinDemoUser()}
+                disabled={loading}
               />
             </div>
           </div>
 
           {/* Footer */}
-          <div className="w-screen font-scribble1 py-12 md:px-10 lg:px-36 text-sm flex justify-between items-center bg-[#09090B] flex-col md:flex-row gap-8 md:gap-0">
+          <div className="w-screen font-scribble1 py-12 md:px-10 lg:px-36 px-4 text-sm flex justify-between items-center bg-[#09090B] flex-col md:flex-row gap-8 md:gap-0">
             <p className="text-[#95959D]">
               Built by{" "}
               <Link

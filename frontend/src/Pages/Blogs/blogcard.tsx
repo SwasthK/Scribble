@@ -137,8 +137,8 @@ export const Blog_Card: React.FC<Blog_CardProps> = memo(
                   {author.username}
                 </h1>
               </Link>
-              <span className="font-bold ">&#183;</span>
-              <h1 className="text-xs sm:text-sm text-giest-100 capitalize cursor-auto font-light">
+              <span>&#x2022;</span>
+              <h1 className="sm:text-[0.850rem] text-giest-100 capitalize cursor-auto font-light">
                 {formattedDate}
               </h1>
             </div>

@@ -89,7 +89,7 @@ export const AppBar = () => {
       console.error("Logout failed:", error);
     } finally {
       resetAuthAtom();
-      navigate("/login", { replace: true });
+      navigate("/home", { replace: true });
       setLogoutLoading(false);
     }
   };
