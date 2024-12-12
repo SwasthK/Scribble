@@ -75,12 +75,10 @@ Scribble is a full-featured, modern blog application that enables users to creat
   For convenience, open two seperate terminal :   
 
 2 . Install dependencies :  
-#### termnial - 1
 ```bash
  cd frontend && npm install
 
 ```
-#### termnial - 2
 ```bash
  cd server && npm install
 
