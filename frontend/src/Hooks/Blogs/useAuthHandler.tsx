@@ -35,7 +35,7 @@ export const useAuthHandler = (redirectPath: string) => {
         return;
       } else {
         resetAtom();
-        navigate(redirectPath);
+        navigate(redirectPath)
       }
     }
     return;
