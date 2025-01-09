@@ -32,8 +32,7 @@ const getPrismaClient = async (dbUrl: any) => {
 
         currentDbUrl = dbUrl;
     }
-
-    console.log('Not Creating Prisma Client');
+    console.log('Prisma Client exists');
     return prisma as PrismaClient;
 };
 
