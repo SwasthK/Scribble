@@ -194,7 +194,7 @@ Please adhere to this project's `code of conduct`.
 
 ## 📝 Authors
 
-- [@SwasthK](https://x.com/swasthik319)
+- [@SwasthK](https://swasthk.netlify.app/)
 
 
 ## 🙌 Acknowledgements
